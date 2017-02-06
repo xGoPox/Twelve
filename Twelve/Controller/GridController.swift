@@ -16,16 +16,42 @@ typealias GridPosition = (row: Int, column: Int)
 
 struct GridController : GridDispatcher {
     
-    typealias TileInformation = (gridPosition: GridPosition, definition: SKTileDefinition)
-    let numberOfPossibilities = 1
-    let lengthForCombo = 4
-    //    var matrix:[[NumberSpriteNode]] = [[NumberSpriteNode]]()
+    let numberOfPossibilities = 2
+    let lengthForCombo = 10
+    var matrix : [[NumberSpriteNode?]] = [[NumberSpriteNode]]()
     var piles = [Pile]()
     var grid : SKTileMapNode!
     
     
     mutating func fullfillGrid(_ grid : SKTileMapNode, with piles: [Pile]) {
         self.grid = grid
+        
+        var row = 0
+        
+        for _ in 0..<self.grid.numberOfRows {
+            // Append an empty row.
+            matrix.append([NumberSpriteNode]())
+            var column = 0
+            for _ in 0..<self.grid.numberOfColumns {
+                // Populate the row.
+                do  {
+                    let position = GridPosition(row, column)
+                    try tileGroupAt(position: position)
+                    let sprite = NumberSpriteNode()
+                    sprite.gridPosition = position
+                    sprite.position = grid.centerOfTile(atColumn: sprite.gridPosition.column, row: sprite.gridPosition.row)
+                    grid.addChild(sprite)
+                    matrix[row].append(sprite)
+                } catch {
+                    matrix[row].append(nil)
+                }
+                column += 1
+            }
+            row += 1
+            
+        }
+        
+        
         self.piles = piles
         do {
             try disposeNumbers()
@@ -47,22 +73,8 @@ struct GridController : GridDispatcher {
     }
     
     
-    func tileGroupFor(tile : Tile) -> SKTileGroup {
-        guard let numbersTilesSet = SKTileSet(named: "Numbers Tiles") else {
-            fatalError("Object Tiles Tile Set not found")
-        }
-        
-        let tileGroups = numbersTilesSet.tileGroups
-        
-        guard let group = tileGroups.first(where: {$0.name == tile.rawValue}) else {
-            fatalError(tile.rawValue)
-        }
-        
-        return group
-    }
     
-    
-    func disposePossibilities() throws {
+    mutating func disposePossibilities() throws {
         
         for pile in piles {
             
@@ -70,13 +82,9 @@ struct GridController : GridDispatcher {
                 
                 var followingNumber = pile.followingNumber()
                 
-                var gridPosition = randomGridPosition()
+                var gridPosition = randomEmptyPosition()
                 
-                do {
-                    _ = try self.tileDefinitionAt(position: gridPosition)
-                } catch let error as ComboError where error == .noDefinitionAtPosition {
-                    try self.createTileAt(position: gridPosition, with: followingNumber)
-                }
+                try createNumberAt(position: gridPosition, with: followingNumber)
                 
                 var counterCombo = 0;
                 
@@ -97,141 +105,151 @@ struct GridController : GridDispatcher {
         }
     }
     
-    func tileDefinitionForEitherEqualValueOrNullAt(position: GridPosition, with followingNumber: Int) throws {
-        guard let definition =  try tileDefinitionAt(position: position) , let value = definition.userData?.value(forKey: "value") as? Int , value == followingNumber else {
-            throw ComboError.numberIsNotEqualWithFollowingNumber
+    mutating func createNumberAt(position : GridPosition, with number: Int) throws {
+        if let sprite = try numberAt(position: position) {
+            sprite.value = number
         }
     }
     
-    func tileDefinitionAt(position: GridPosition) throws -> SKTileDefinition? {
-        guard position.row < grid.numberOfRows && position.row >= 0 else {
-            throw ComboError.rowOutOfBounds
+    func isNumberAt(position: GridPosition, equalWith number: Int) throws -> Bool {
+        if let sprite = try numberAt(position: position) , sprite.value == number {
+            return true
         }
-        guard position.column < grid.numberOfColumns && position.column >= 0 else {
-            throw ComboError.columnOutOfBounds
+        return false
+    }
+    
+    func numberAt(position: GridPosition) throws -> NumberSpriteNode? {
+        
+        guard (position.row < grid.numberOfRows && position.row >= 0)  && (position.column < grid.numberOfColumns && position.column >= 0) else {
+            throw TwelveError.outOfBounds
         }
         
-        guard let definition = grid.tileDefinition(atColumn: position.column, row: position.row) else {
-            throw ComboError.noDefinitionAtPosition
-        }
-        return definition
-    }
-    
-    func createTileAt(position: GridPosition, with number: Int)  throws {
-        guard position.row < grid.numberOfRows && position.row >= 0 else {
-            throw ComboError.rowOutOfBounds
-        }
-        guard position.column < grid.numberOfColumns && position.column >= 0 else {
-            throw ComboError.columnOutOfBounds
-        }
-
-        grid.setTileGroup(tileGroupFor(tile: tileForValue(value: number)), forColumn: position.column, row: position.row)
+        return matrix[position.row][position.column]
     }
     
     
-    func updateDefinitionAt(position: GridPosition, with followingNumber: Int) throws {
-        guard position.row < grid.numberOfRows && position.row >= 0 else {
-            throw ComboError.rowOutOfBounds
-        }
-        guard position.column < grid.numberOfColumns && position.column >= 0 else {
-            throw ComboError.columnOutOfBounds
+    func tileGroupAt(position: GridPosition) throws {
+        guard (position.row < grid.numberOfRows && position.row >= 0)  && (position.column < grid.numberOfColumns && position.column >= 0) else {
+            throw TwelveError.outOfBounds
         }
         
-        grid.setTileGroup(tileGroupFor(tile: tileForValue(value: followingNumber)), forColumn: position.column, row: position.row)
-    }
-    
-    
-    
-    
-    func tileForValue(value : Int) -> Tile {
-        switch value {
-        case -1:
-            return Tile.selected
-        case 1:
-            return Tile.one
-        case 2:
-            return Tile.two
-        case 3:
-            return Tile.three
-        case 4:
-            return Tile.four
-        case 5:
-            return Tile.five
-        case 6:
-            return Tile.six
-        case 7:
-            return Tile.seven
-        case 8:
-            return Tile.eight
-        case 9:
-            return Tile.nine
-        case 10:
-            return Tile.ten
-        case 11:
-            return Tile.eleven
-        default:
-            return Tile.twelve
+        guard (grid.tileGroup(atColumn: position.column, row: position.row)) != nil else {
+            throw TwelveError.noTileGroupAtPosition
         }
     }
     
-    func resetNumbers() {
+    
+    func updateNumberAt(position: GridPosition, with number: Int) throws {
+        guard let sprite = try numberAt(position: position) else {
+            throw TwelveError.noNumberAtPosition
+        }
+        sprite.value = number
+    }
+    
+    
+    
+    
+    func resetNumbers() throws {
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
-                grid.setTileGroup(nil, forColumn: column, row: row)
+                let gridPosition = GridPosition(row, column)
+                try updateNumberAt(position: gridPosition, with: 0)
             }
         }
     }
     
-    func disposeRandomNumbers() throws {
+    mutating func disposeRandomNumbers() throws {
+        
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
                 do {
-                    _ = try self.tileDefinitionAt(position: gridPosition)
-                } catch let error as ComboError where error == .noDefinitionAtPosition {
-                    try self.createTileAt(position: gridPosition, with: randomTileValue())
+                    if try isNumberAt(position: gridPosition, equalWith: 0) {
+                        try createNumberAt(position: gridPosition, with: randomTileValue())
+                    }
+                } catch let error as TwelveError {
+                    fatalError("there should be no error here : \(error)")
                 }
             }
         }
     }
     
-    func createFollowingNumber(_ number: Int, position : GridPosition) -> GridPosition? {
+    mutating func createFollowingNumber(_ number: Int, position : GridPosition) -> GridPosition? {
         
         var newRow = -1
-        while newRow < 2  {
-            do {
-                let gridPosition = GridPosition(row: position.row + newRow, column: position.column)
-                do {
-                    try tileDefinitionForEitherEqualValueOrNullAt(position: gridPosition, with: number)
-                } catch let error as ComboError where error == .noDefinitionAtPosition {
-                    try createTileAt(position: gridPosition, with: number)
-                }
-                print("position \(gridPosition), number \(number)")
-                return gridPosition
-            }
-            catch let error {
-                print("hmm what's up here ? \(error) row : \(position.row) column : \(position.column)")
-            }
+        while newRow <= 1 {
+            
             var newColumn = -1
-            while newColumn < 2  {
-                do {
-                    let gridPosition = GridPosition(row: position.row + newRow, column: position.column + newColumn)
+            
+            while newColumn <= 1 {
+                
+                //                let evenNumber = position.row % 2 == 0 // pair
+                
+                let gridPosition = GridPosition(row: position.row + newRow, column: position.column + newColumn)
+                
+                if gridPosition != position {
                     do {
-                        try tileDefinitionForEitherEqualValueOrNullAt(position: gridPosition, with: number)
-                    } catch let error as ComboError where error == .noDefinitionAtPosition {
-                        try createTileAt(position: gridPosition, with: number)
-                    }
-                    print("position \(gridPosition), number \(number)")
-                    return gridPosition
-                } catch {
-                    print("\(error) row : \(position.row) column : \(position.column)")
+                        try tileGroupAt(position: gridPosition)
+                        
+                        if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) {
+                            try createNumberAt(position: gridPosition, with: number)
+                            return gridPosition
+                        }
+                    } catch { }
+                    
                 }
                 newColumn += 1
             }
             newRow += 1
         }
+        
         return nil
+        
     }
+    
+    
+    func validPosition(_ gridPosition: GridPosition, for number: Int) -> Bool {
+        do {
+            try tileGroupAt(position: gridPosition)
+            if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) {
+                return true
+            }
+            return false
+        } catch let error {
+            print("error : \(error) hmm what's up at  row : \(gridPosition.row) column : \(gridPosition.column)")
+            return false
+        }
+    }
+    
+    
+    func isTile(_ currentTile: NumberSpriteNode, adjacentWith tile: NumberSpriteNode) throws {
+        
+        var newRow = -1
+        
+        while newRow <= 1 {
+            
+            var newColumn = -1
+            
+            while newColumn <= 1 {
+                
+                let gridPosition = GridPosition(row: tile.gridPosition.row + newRow, column: tile.gridPosition.column + newColumn)
+                
+                if gridPosition == currentTile.gridPosition {
+                    do {
+                        try tileGroupAt(position: gridPosition)
+                        return
+                    } catch let error {
+                        print("error : \(error) at position \(gridPosition)")
+                    }
+                }
+                
+                newColumn += 1
+            }
+            newRow += 1
+        }
+        throw TwelveError.notAdjacent
+    }
+
     
     
     func randomInt(min: Int, max:Int) -> Int {
@@ -239,14 +257,21 @@ struct GridController : GridDispatcher {
     }
     
     func randomTileValue() -> Int {
-        return randomInt(min: 0, max: 12)
+        return randomInt(min: 1, max: 12)
     }
     
-    func randomGridPosition() -> GridPosition {
-        var gridPosition: GridPosition
-        gridPosition.row = randomInt(min: 0, max: grid.numberOfRows - 1)
-        gridPosition.column = randomInt(min: 0, max: grid.numberOfColumns - 1)
-        return gridPosition
+    func randomEmptyPosition() -> GridPosition {
+        while true {
+            var gridPosition: GridPosition
+            gridPosition.row = randomInt(min: 0, max: grid.numberOfRows - 1)
+            gridPosition.column = randomInt(min: 0, max: grid.numberOfColumns - 1)
+            do {
+                try tileGroupAt(position: gridPosition)
+                if try isNumberAt(position: gridPosition, equalWith: 0) {
+                    return gridPosition
+                }
+            } catch { }
+        }
     }
     
 }
@@ -260,14 +285,22 @@ extension GridController {
 protocol GridValidator {
     func possibility() throws -> Pile
     func possibilitiesForPile(_ pile: Pile) throws
-    func checkBoard() throws
+    mutating func checkBoard() throws
 }
 
 
 extension GridController : GridValidator {
     
-    func checkBoard() throws {
-        _ = try self.possibility()
+    mutating func checkBoard() {
+        do {
+            _ = try self.possibility()
+        } catch let error as TwelveError where error == .noMorePossibilities {
+            try? resetNumbers()
+            try? disposeNumbers()
+        } catch {
+            fatalError("checkBoard exception should have been caught")
+        }
+        
     }
     
     func possibility() throws -> Pile {
@@ -281,75 +314,60 @@ extension GridController : GridValidator {
         }
         
         guard pile != nil else {
-            throw ComboError.noMorePossibilities
+            throw TwelveError.noMorePossibilities
         }
         return pile!
     }
     
     func possibilitiesForPile(_ pile: Pile) throws {
         
-        var array = [TileInformation]()
+        var array = [NumberSpriteNode]()
         
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
-                if let definition = grid.tileDefinition(atColumn: column, row: row) , let value = definition.userData?.value(forKey: "value") as? Int , value == pile.followingNumber() {
-                    let tileInformation = TileInformation((row, column), definition)
-                    array.append(tileInformation)
+                let position = GridPosition(row, column)
+                if try isNumberAt(position: position, equalWith: pile.followingNumber()) , let number = try numberAt(position: position) {
+                    array.append(number)
                 }
             }
-            //            array.append(contentsOf: matrix[row].filter { pile.followingNumber() == $0.value })
         }
-        print("pile.followingNumber :: \(pile.followingNumber())")
         
-        print("array :: \(array)")
-        
-        
-        let possibilities = (array.filter { do { return try adjacentForTile($0) != nil } catch { return false } })
+        let possibilities = (array.filter { do { return try adjacentForNumber($0) != nil } catch { return false } })
         
         print(possibilities)
         
         guard possibilities.isEmpty == false else {
-            throw ComboError.noMorePossibilities
+            throw TwelveError.noMorePossibilities
         }
     }
     
     
-    func adjacentForTile(_ tile : TileInformation) throws  -> SKTileDefinition? {
-        var row = -1
-        while row < 2 {
-            var column = -1
-            while column < 2 {
-                let gridPosition = (tile.gridPosition.row + row, tile.gridPosition.column + column)
+    
+    func adjacentForNumber(_ number : NumberSpriteNode) throws -> NumberSpriteNode? {
+        
+        var newRow = -1
+        while newRow <= 1 {
+            
+            var newColumn = -1
+            
+            while newColumn <= 1 {
                 
+                let gridPosition = GridPosition(row: number.gridPosition.row + newRow, column: number.gridPosition.column + newColumn)
                 
-                    guard let number =  tile.definition.userData?.value(forKey: "value") as? Int else {
-                        fatalError("it shoul have a number")
-                    }
-                    do {
-                        
-                        try self.tileDefinitionForEitherEqualValueOrNullAt(position: gridPosition, with: number.followingNumber())
-                        
-                        if let tile = try self.tileDefinitionAt(position: gridPosition) {
-                            
-                            print(gridPosition)
-                            
-                            print(number.followingNumber())
-                            
-                            return tile
-                            
-                        }
-                        
-                    } catch {
-                        
-                    }
-
-                column += 1
-
+                if gridPosition != number.gridPosition {
+                    try tileGroupAt(position: gridPosition)
+                    return try numberAt(position: gridPosition)
+                }
+                newColumn += 1
             }
-            row += 1
+            newRow += 1
         }
+        
         return nil
+        
     }
+    
     
     
 }
+

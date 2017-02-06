@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */; };
-		3D48EB9E1E3E684800F80BB7 /* Number.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D48EB9D1E3E684800F80BB7 /* Number.sks */; };
 		3D85629C1E40A51A005EFC36 /* RestartSpriteNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629B1E40A51A005EFC36 /* RestartSpriteNode.swift */; };
 		3D85629F1E40A52E005EFC36 /* Number.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629D1E40A52E005EFC36 /* Number.swift */; };
 		3D8562A01E40A52E005EFC36 /* Pile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629E1E40A52E005EFC36 /* Pile.swift */; };
@@ -51,7 +50,6 @@
 
 /* Begin PBXFileReference section */
 		3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyTileSet.sks; sourceTree = "<group>"; };
-		3D48EB9D1E3E684800F80BB7 /* Number.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Number.sks; sourceTree = "<group>"; };
 		3D85629B1E40A51A005EFC36 /* RestartSpriteNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RestartSpriteNode.swift; path = SpriteNode/RestartSpriteNode.swift; sourceTree = "<group>"; };
 		3D85629D1E40A52E005EFC36 /* Number.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Number.swift; path = SpriteNode/Number.swift; sourceTree = "<group>"; };
 		3D85629E1E40A52E005EFC36 /* Pile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Pile.swift; path = SpriteNode/Pile.swift; sourceTree = "<group>"; };
@@ -147,7 +145,6 @@
 				3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */,
 				3D95CB4A1E35409C008A9A9C /* Actions.sks */,
 				3D95CB4C1E35409C008A9A9C /* GameScene.swift */,
-				3D48EB9D1E3E684800F80BB7 /* Number.sks */,
 				3D8A8CFD1E413A5000C6B148 /* MyHexa.sks */,
 				3D85629A1E40A4D2005EFC36 /* SpriteNode */,
 				3DE8A1811E3CA61300BC150A /* Controller */,
@@ -314,7 +311,6 @@
 				3D95CB541E35409C008A9A9C /* Assets.xcassets in Resources */,
 				3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */,
 				3D95CB4B1E35409C008A9A9C /* Actions.sks in Resources */,
-				3D48EB9E1E3E684800F80BB7 /* Number.sks in Resources */,
 				3D8A8CFE1E413A5000C6B148 /* MyHexa.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

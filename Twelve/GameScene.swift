@@ -9,7 +9,7 @@
 import SpriteKit
 import GameplayKit
 
-enum ComboError: Error {
+enum TwelveError: Error {
     case numberIsNotFollowingPile
     case lastNumberIsNill
     case matchedPileIsNill
@@ -17,30 +17,13 @@ enum ComboError: Error {
     case falseCombo
     case notAdjacent
     case noMorePossibilities
-    case rowOutOfBounds
+    case outOfBounds
+    case noNumberAtPosition
+    case noNeedToCreateNumber
     case columnOutOfBounds
     case numberIsNotEqualWithFollowingNumber
     case tileDefinitionAsNotValue
-    case noDefinitionAtPosition
-    
-    
-}
-
-
-enum Tile: String {
-    case selected = "Selected"
-    case one = "One"
-    case two = "Two"
-    case three = "Three"
-    case four = "Four"
-    case five = "Five"
-    case six = "Six"
-    case seven = "Seven"
-    case eight = "Eight"
-    case nine = "Nine"
-    case ten = "Ten"
-    case eleven = "Eleven"
-    case twelve = "Twelve"
+    case noTileGroupAtPosition
 }
 
 
@@ -51,14 +34,29 @@ class GameScene: SKScene {
     //    var entities = [GKEntity]()
     //    var graphs = [String : GKGraph]()
     
-    typealias TileInformation = (gridPosition: GridPosition, definition: SKTileDefinition)
-    
-    var numberTile: TileInformation?
+    var numberTile: NumberSpriteNode?
     var gridDispatcher = GridController()
     var combo: Combo?
     var objectsTileMap:SKTileMapNode!
     var scoreNode: ScoreNode?
-    var gameStarted = false
+    var gameStarted = false {
+        willSet(started) {
+            if started {
+                totalPoints = 0
+                isDeckMenuHidden(false)
+                isMainMenuHidden(true)
+                isTopBarHidden(false)
+                startTimer()
+            } else {
+                update(score: totalPoints)
+                isTopBarHidden(true)
+                isScoreHidden(false)
+                isEndMenuHidden(false)
+                isDeckMenuHidden(true)
+                endsCombo()
+            }
+        }
+    }
     
     var totalPoints = 0 {
         willSet(number) {
@@ -83,9 +81,7 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         setupObjects()
-        showMenu()
-        combo = Combo.init(lastNumber: nil, combo: [Int](), currentPile: gridDispatcher.pileForNumber(12))
-        fullfillBoard()
+        prepareGame()
     }
     
     
@@ -95,6 +91,8 @@ class GameScene: SKScene {
                 fatalError("Background node not loaded")
         }
         self.objectsTileMap = map
+        combo = Combo.init(lastNumber: nil, combo: [Int](), currentPile: gridDispatcher.pileForNumber(12))
+        fullfillBoard()
     }
     
     func fullfillBoard() {
@@ -117,7 +115,6 @@ class GameScene: SKScene {
     }
     
     
-    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {
             return
@@ -129,8 +126,8 @@ class GameScene: SKScene {
         guard let touch = touches.first else {
             return
         }
-        if let targetNode = atPoint(touch.location(in: self)) as? SKSpriteNode , targetNode.name == "restartNode" {
-            restartGame()
+        if let targetNode = atPoint(touch.location(in: self)) as? RestartSpriteNode , targetNode.name == "restartNode" {
+            prepareGame()
         }
         else {
             analyzeTouch(touch)
@@ -149,16 +146,15 @@ class GameScene: SKScene {
     }
     
     func analyzeTouch(_ touch: UITouch) {
-        let location = touch.location(in: self.objectsTileMap)
-        let row = self.objectsTileMap.tileRowIndex(fromPosition: location)
-        let column = self.objectsTileMap.tileColumnIndex(fromPosition: location)
-        print("row \(row) column \(column)")
-        if let tile = self.objectsTileMap.tileDefinition(atColumn: column, row: row) {
-            print("tile \(tile.userData?.value(forKey: "value") ?? "FUCK")")
+        
+        let location = touch.location(in: self)
+        
+        if let number = atPoint(location) as? NumberSpriteNode {
             do {
-                let tileInformation = (GridPosition(row, column), tile)
-                try detect(tileInformation)
-            } catch let error as ComboError where error == .notAdjacent || error == .numberIsNotFollowingPile  {
+                numberTile?.alpha = 1
+                try detect(number)
+                number.alpha = 0
+            } catch let error as TwelveError where error == .notAdjacent || error == .numberIsNotFollowingPile  {
                 endsCombo()
             } catch {
                 numberTile = nil
@@ -166,61 +162,40 @@ class GameScene: SKScene {
         }
     }
     
-    func detect(_ tile : TileInformation) throws {
+    func detect(_ tile : NumberSpriteNode) throws {
         
         if let prevNumber = numberTile , prevNumber.gridPosition == tile.gridPosition {
             return
         }
         
         if let previousTileSelected = numberTile {
-            try isTile(previousTileSelected, adjacentWith: tile)
+            try gridDispatcher.isTile(previousTileSelected, adjacentWith: tile)
         }
-        
         try addToCombo(number: tile)
-        
-        objectsTileMap.setTileGroup(nil, forColumn: numberTile!.gridPosition.column, row: numberTile!.gridPosition.row)
     }
     
     
-    func isTile(_ currentTile: TileInformation, adjacentWith tile: TileInformation) throws {
-        var row = -1
-        var column = -1
-        
-        while row < 2 {
-            column = -1
-            while column < 2 {
-                if currentTile.gridPosition.column == tile.gridPosition.column + column && currentTile.gridPosition.row == tile.gridPosition.row + row {
-                    return
-                }
-                column += 1
-            }
-            row += 1
-        }
-        throw ComboError.notAdjacent
-    }
     
-    private func addToCombo(number: TileInformation) throws {
-        guard let value = number.definition.userData?.value(forKey: "value") as? Int else {
-            throw ComboError.tileDefinitionAsNotValue
-        }
-        
-        print("value : \(value)")
+    private func addToCombo(number: NumberSpriteNode) throws {
+                
         if let pile = combo?.currentPile {
-            try combo?.addUpComboWith(number: value, on: pile)
-        } else if let pile = gridDispatcher.pileForNumber(value) {
-            try combo?.addUpComboWith(number: value, on: pile)
+            try combo?.addUpComboWith(number: number.value, on: pile)
+        } else if let pile = gridDispatcher.pileForNumber(number.value) {
+            try combo?.addUpComboWith(number: number.value, on: pile)
         } else {
-            throw ComboError.numberIsNotFollowingPile
+            throw TwelveError.numberIsNotFollowingPile
         }
         
         if let numbers = combo?.combo, numbers.count > 1 {
             
-            guard let previousTileSelected = numberTile else {
+            guard let previousNumber = numberTile else {
                 fatalError("it should have a tile!")
             }
-            try gridDispatcher.updateDefinitionAt(position: previousTileSelected.gridPosition, with: gridDispatcher.randomTileValue())
+            
+            try gridDispatcher.updateNumberAt(position: previousNumber.gridPosition, with: gridDispatcher.randomTileValue())
+
             if !gameStarted {
-                startGame()
+                gameStarted = true
             }
         }
         
@@ -230,84 +205,29 @@ class GameScene: SKScene {
     
     func endsCombo() {
         
-        guard let prevNumber = numberTile ,  let value = prevNumber.definition.userData?.value(forKey: "value") as? Int else {
-            
+        guard let previousNumber = numberTile else {
             return
         }
         
-        objectsTileMap.setTileGroup(gridDispatcher.tileGroupFor(tile: gridDispatcher.tileForValue(value: value)), forColumn: prevNumber.gridPosition.column, row: prevNumber.gridPosition.row)
+        previousNumber.alpha = 1
 
         do {
             let points = try combo?.doneWithCombo() ?? 0
             totalPoints += points
-            guard let previousTileSelected = numberTile else {
-                fatalError("it should have a tile!")
-            }
-            _ = try gridDispatcher.tileDefinitionAt(position: previousTileSelected.gridPosition)
-            try gridDispatcher.createTileAt(position: previousTileSelected.gridPosition, with: gridDispatcher.randomTileValue())
+            try gridDispatcher.updateNumberAt(position: previousNumber.gridPosition, with: gridDispatcher.randomTileValue())
             numberTile = nil
-            do {
-                try gridDispatcher.checkBoard()
-            } catch let error as ComboError where error == .noMorePossibilities {
-                gridDispatcher.resetNumbers()
-                try? gridDispatcher.disposeNumbers()
-            } catch {
-                
-            }
+            gridDispatcher.checkBoard()
         } catch  {
             numberTile = nil
-            do {
-                try gridDispatcher.checkBoard()
-            } catch let error as ComboError where error == .noMorePossibilities {
-                gridDispatcher.resetNumbers()
-                try? gridDispatcher.disposeNumbers()
-            } catch {
-                
-            }
+            gridDispatcher.checkBoard()
         }
     }
     
-    
-    
-    
-    func showMenu() {
-        gameStarted = false
-        guard let node = childNode(withName: "menu_sprite")
-            as? SKSpriteNode else {
-                fatalError("menu_sprite node not loaded")
-        }
-        
-        node.isHidden = false
-        hideTopBar()
-        removeScore()
-        removeEndGameMenu()
-        endGame()
-        removeDecks()
-    }
-    
-    func removeMenu() {
-        guard let node = childNode(withName: "menu_sprite")
-            as? SKSpriteNode else {
-                fatalError("menu_sprite node not loaded")
-        }
-        node.isHidden = true
-    }
-    
-    func startGame() {
-        gameStarted = true
-        guard let node = childNode(withName: "decks")
-            as? SKSpriteNode else {
-                fatalError("decks node not loaded")
-        }
-        removeMenu()
-        node.isHidden = false
-        showTopBar()
-        startTimer()
-    }
+  
     
     func startTimer() {
         
-        var levelTimerValue = 60
+        var levelTimerValue = 10
         
         guard let node = childNode(withName: "topBarNode")
             as? SKSpriteNode else {
@@ -326,26 +246,67 @@ class GameScene: SKScene {
                 levelTimerValue -= 1
                 label.text = String("time left : \(levelTimerValue)")
             } else {
+                self.gameStarted = false
                 label.removeAction(forKey: "countdown")
-                self.endsCombo()
-                self.showScore(self.totalPoints)
             }
         }
         label.run(SKAction.sequence([wait, run]))
-        
         label.run(SKAction.repeatForever(SKAction.sequence([wait, run])) , withKey: "countdown")
-        
     }
     
-    func removeScore() {
+}
+
+
+extension GameScene {
+    
+    
+    func isDeckMenuHidden(_ hidden: Bool) {
+        guard let node = childNode(withName: "decks")
+            as? SKSpriteNode else {
+                fatalError("decks node not loaded")
+        }
+        node.isHidden = hidden
+    }
+    
+    
+    func resetPiles() {
+        gridDispatcher.resetPiles()
+        try? gridDispatcher.resetNumbers()
+        try? gridDispatcher.disposeNumbers()
+    }
+    
+    func prepareGame() {
+        totalPoints = 0
+        isEndMenuHidden(true)
+        isScoreHidden(true)
+        resetPiles()
+        isMainMenuHidden(false)
+        isTopBarHidden(true)
+    }
+    
+}
+
+extension GameScene  {
+    
+    
+    func isMainMenuHidden(_ hidden: Bool) {
+        guard let node = childNode(withName: "menu_sprite")
+            as? SKSpriteNode else {
+                fatalError("menu_sprite node not loaded")
+        }
+        node.isHidden = hidden
+    }
+
+    
+    func isScoreHidden(_ hidden: Bool) {
         guard let node = childNode(withName: "endScoreSprite")
             as? SKSpriteNode else {
                 fatalError("endScoreSprite node not loaded")
         }
-        node.isHidden = true
+        node.isHidden = hidden
     }
     
-    func showScore(_ score: Int) {
+    func update(score : Int) {
         guard let node = childNode(withName: "endScoreSprite")
             as? SKSpriteNode else {
                 fatalError("endScoreSprite node not loaded")
@@ -354,81 +315,29 @@ class GameScene: SKScene {
             as? EndScoreNode else {
                 fatalError("scoreNode node not loaded")
         }
-        node.isHidden = false
-        hideTopBar()
         scoreNode.score = score
-        showEndGameMenu()
-        removeDecks()
     }
     
-    func showEndGameMenu() {
+    
+    
+    func isTopBarHidden(_ hidden: Bool) {
+        guard let node = childNode(withName: "topBarNode")
+            as? SKSpriteNode else {
+                fatalError("topBarNode node not loaded")
+        }
+        node.isHidden = hidden
+    }
+    
+    func isEndMenuHidden(_ hidden: Bool) {
         guard let node = childNode(withName: "menuEndGameSprite")
             as? SKSpriteNode else {
                 fatalError("menuEndGameSprite node not loaded")
         }
         
-        node.isHidden = false
-        objectsTileMap.isHidden = true
+        node.isHidden = hidden
     }
-    
-    func removeEndGameMenu() {
-        guard let node = childNode(withName: "menuEndGameSprite")
-            as? SKSpriteNode else {
-                fatalError("menuEndGameSprite node not loaded")
-        }
-        node.isHidden = true
-    }
-    
-    func restartGame() {
-        objectsTileMap.isHidden = false
-        totalPoints = 0
-        removeEndGameMenu()
-        removeScore()
-        resetPiles()
-        showMenu()
-    }
-    
-    func showTopBar() {
-        guard let node = childNode(withName: "topBarNode")
-            as? SKSpriteNode else {
-                fatalError("topBarNode node not loaded")
-        }
-        node.isHidden = false
-    }
-    
-    func hideTopBar() {
-        guard let node = childNode(withName: "topBarNode")
-            as? SKSpriteNode else {
-                fatalError("topBarNode node not loaded")
-        }
-        node.isHidden = true
-    }
-    
-    
-    func resetPiles() {
-        gridDispatcher.resetPiles()
-        gridDispatcher.resetNumbers()
-        try? gridDispatcher.disposeNumbers()
-    }
-    
-    
-    
-    func endGame() {
-        fullfillBoard()
-    }
-    
-    func removeDecks() {
-        guard let node = childNode(withName: "decks")
-            as? SKSpriteNode else {
-                fatalError("decks node not loaded")
-        }
-        node.isHidden = true
-    }
-    
-    
+
 }
-
-
 
 extension Int {
     func followingNumber() -> Int {

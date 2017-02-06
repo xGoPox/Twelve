@@ -51,7 +51,7 @@ class ComboTest: XCTestCase {
         XCTAssertNotNil(pile, "pile \(pile) should not be nil")
 
         XCTAssertThrowsError(try combo.addUpComboWith(number: two.value, on : pile!)) { error in
-            XCTAssertEqual(error as? ComboError, ComboError.numberIsNotFollowingPile)
+            XCTAssertEqual(error as? TwelveError, TwelveError.numberIsNotFollowingPile)
         }
         
         XCTAssertNil(combo.currentPile)
@@ -79,7 +79,7 @@ class ComboTest: XCTestCase {
 
         
         XCTAssertThrowsError(try combo.addUpComboWith(number: two.value, on : combo.currentPile!)) { error in
-            XCTAssertEqual(error as? ComboError, ComboError.numberIsNotFollowingPile)
+            XCTAssertEqual(error as? TwelveError, TwelveError.numberIsNotFollowingPile)
         }
 
     }
@@ -110,11 +110,11 @@ class ComboTest: XCTestCase {
         
         
         XCTAssertThrowsError(try combo.addUpComboWith(number: four.value, on: combo.currentPile!)) { error in
-            XCTAssertEqual(error as? ComboError, ComboError.numberIsNotFollowingPile)
+            XCTAssertEqual(error as? TwelveError, TwelveError.numberIsNotFollowingPile)
         }
         
         XCTAssertThrowsError(try combo.doneWithCombo()) { error in
-            XCTAssertEqual(error as? ComboError, ComboError.falseCombo)
+            XCTAssertEqual(error as? TwelveError, TwelveError.falseCombo)
             XCTAssertNil(combo.currentPile)
             XCTAssertTrue(combo.combo.count == 0)
         }
@@ -160,7 +160,7 @@ class ComboTest: XCTestCase {
 
         
         XCTAssertThrowsError(try combo.addUpComboWith(number: five.value, on: combo.currentPile!)) { error in
-            XCTAssertEqual(error as? ComboError, ComboError.numberIsNotFollowingPile)
+            XCTAssertEqual(error as? TwelveError, TwelveError.numberIsNotFollowingPile)
         }
         
         do {
