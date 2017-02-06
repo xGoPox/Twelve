@@ -33,7 +33,7 @@ struct Combo: ComboHandler {
     mutating func addUpComboWith(number: Int, on pile : Pile) throws {
         print("current number of pile : \(pile.currentNumber) - old number \(pile.oldNumber)")
         guard isNumberValidForCombo(number: number, on: pile) == true else {
-            throw ComboError.numberIsNotFollowingPile
+            throw TwelveError.numberIsNotFollowingPile
         }
         currentPile = pile
         lastNumber = number
@@ -48,7 +48,7 @@ struct Combo: ComboHandler {
     
     mutating func doneWithCombo() throws -> Int {
         guard let number = lastNumber else {
-            throw ComboError.lastNumberIsNill
+            throw TwelveError.lastNumberIsNill
         }
         if isComboValid() {
             // update the pile
@@ -63,7 +63,7 @@ struct Combo: ComboHandler {
             currentPile?.resetForFalseCombo()
             combo.removeAll()
             currentPile = nil
-            throw ComboError.falseCombo
+            throw TwelveError.falseCombo
         }
     }
     

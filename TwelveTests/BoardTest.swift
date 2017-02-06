@@ -142,7 +142,7 @@ class BoardTest: XCTestCase {
                 
                 
                 XCTAssertThrowsError(try sceneNode.gridDispatcher.possibility(grid: sceneNode.grid)) { error in
-                    XCTAssertEqual(error as? ComboError, ComboError.noMorePossibilities)
+                    XCTAssertEqual(error as? TwelveError, TwelveError.noMorePossibilities)
                 }
                 
                 sceneNode.gridDispatcher.piles[0].updateWithLastNumber(2)
