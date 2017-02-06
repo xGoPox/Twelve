@@ -31,48 +31,50 @@ class NumberSpriteNode : SKSpriteNode {
     
     var gridPosition: GridPosition = (0, 0)
     
+    let numberLabel: SKLabelNode!
+    let shape: SKShapeNode!
+
     var value : Int = 0 {
+        willSet(number) {
+            numberLabel.text = String(number)
+        }
         didSet(number) {
-            self.texture = SKTexture(imageNamed: self.imageName.rawValue)
+            shape.fillColor = colorType
         }
     }
     
-    var imageName: TileImage {
+    var colorType: UIColor {
         get {
             switch value {
-            case 1:
-                return .one
-            case 2:
-                return .two
-            case 3:
-                return .three
-            case 4:
-                return .four
-            case 5:
-                return .five
-            case 6:
-                return .six
-            case 7:
-                return .seven
-            case 8:
-                return .eight
-            case 9:
-                return .nine
-            case 10:
-                return .ten
-            case 11:
-                return .eleven
-            case 12:
-                return .twelve
+            case 1...4:
+                return UIColor(red: 81/255, green: 77/255, blue: 152/255, alpha: 1.0)
+            case 5...8:
+                return UIColor(red: 183/255, green: 77/255, blue: 127/255, alpha: 1.0)
+            case 9...12:
+                return UIColor(red: 63/255, green: 149/255, blue: 114/255, alpha: 1.0)
             default:
-                return .null
+                return .clear
             }
         }
     }
+
+    
     
     init() {
-        let texture = SKTexture(imageNamed: TileImage.null.rawValue)
-        super.init(texture: texture, color: .clear, size: CGSize(width: 100, height: 100))
+        numberLabel = SKLabelNode(fontNamed:"MarkerFelt-Thin")
+        shape = SKShapeNode()
+        super.init(texture: nil, color: .clear, size: CGSize(width: 80, height: 80))
+        numberLabel.fontSize = 30
+        numberLabel.horizontalAlignmentMode = .center
+        numberLabel.verticalAlignmentMode = .center
+        numberLabel.isUserInteractionEnabled = false
+        shape.isUserInteractionEnabled = false
+        let corners : UIRectCorner = [UIRectCorner.allCorners]
+        shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
+        shape.position = CGPoint(x: frame.midX, y:    frame.midY)
+        shape.lineWidth = 1
+        addChild(numberLabel)
+        addChild(shape)
     }
     
     required init(coder aDecoder: NSCoder) {
@@ -107,6 +109,7 @@ extension NumberSpriteNode : Adjacent {
     }
     
 }
+
 
 extension Sequence where Iterator.Element == NumberSpriteNode {
     func possibility(on matrix:[[NumberSpriteNode]]) -> NumberSpriteNode? {

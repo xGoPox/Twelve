@@ -48,7 +48,7 @@ class GameScene: SKScene {
                 isTopBarHidden(false)
                 startTimer()
             } else {
-                update(score: totalPoints)
+                updateTotal(score: totalPoints)
                 isTopBarHidden(true)
                 isScoreHidden(false)
                 isEndMenuHidden(false)
@@ -62,20 +62,15 @@ class GameScene: SKScene {
         willSet(number) {
             if let lbl = scoreNode {
                 lbl.score = number
+            } else {
+                
+                guard let scoreNode = childNode(withName: "scoreNode")
+                    as? ScoreNode else {
+                        fatalError("scoreNode node not loaded")
+                }
+                self.scoreNode = scoreNode
+                self.scoreNode?.score = number
             }
-            
-            guard let node = childNode(withName: "topBarNode")
-                as? SKSpriteNode else {
-                    fatalError("menuEndGameSprite node not loaded")
-            }
-            
-            guard let scoreNode = node.childNode(withName: "scoreNode")
-                as? ScoreNode else {
-                    fatalError("scoreNode node not loaded")
-            }
-            
-            self.scoreNode = scoreNode
-            self.scoreNode?.score = number
         }
     }
     
@@ -96,16 +91,15 @@ class GameScene: SKScene {
     }
     
     func fullfillBoard() {
-        guard let node = childNode(withName: "decks")
-            as? SKSpriteNode else {
-                fatalError("decks node not loaded")
-        }
-        let piles = node.children.filter {
-            if let type = $0.userData?.value(forKey: "type") as? String , type == "deck" , $0 is Pile {
-                return true
+        
+        var piles = [Pile]()
+        for child in children {
+            if let type = child.userData?.value(forKey: "type") as? String , type == "pile" {
+                let pile = Pile()
+                child.addChild(pile)
+                piles.append(pile)
             }
-            return false
-            } as! [Pile]
+        }
         
         guard !piles.isEmpty else {
             print("piles array is empty!")
@@ -148,8 +142,7 @@ class GameScene: SKScene {
     func analyzeTouch(_ touch: UITouch) {
         
         let location = touch.location(in: self)
-        
-        if let number = atPoint(location) as? NumberSpriteNode {
+        if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
             do {
                 numberTile?.alpha = 1
                 try detect(number)
@@ -177,7 +170,7 @@ class GameScene: SKScene {
     
     
     private func addToCombo(number: NumberSpriteNode) throws {
-                
+        
         if let pile = combo?.currentPile {
             try combo?.addUpComboWith(number: number.value, on: pile)
         } else if let pile = gridDispatcher.pileForNumber(number.value) {
@@ -193,7 +186,7 @@ class GameScene: SKScene {
             }
             
             try gridDispatcher.updateNumberAt(position: previousNumber.gridPosition, with: gridDispatcher.randomTileValue())
-
+            
             if !gameStarted {
                 gameStarted = true
             }
@@ -210,7 +203,7 @@ class GameScene: SKScene {
         }
         
         previousNumber.alpha = 1
-
+        
         do {
             let points = try combo?.doneWithCombo() ?? 0
             totalPoints += points
@@ -223,28 +216,24 @@ class GameScene: SKScene {
         }
     }
     
-  
+    
     
     func startTimer() {
         
         var levelTimerValue = 10
         
-        guard let node = childNode(withName: "topBarNode")
-            as? SKSpriteNode else {
+        guard let label = childNode(withName: "timerNode")
+            as? SKLabelNode else {
                 fatalError("topBarNode node not loaded")
         }
-        guard let label = node.childNode(withName: "timerLabel")
-            as? SKLabelNode else {
-                fatalError("timerLabel node not loaded")
-        }
         
-        label.text = String("time left : \(levelTimerValue)")
+        label.text = String(levelTimerValue)
         
         let wait = SKAction.wait(forDuration: 1)
         let run = SKAction.run {
             if levelTimerValue > 0 {
                 levelTimerValue -= 1
-                label.text = String("time left : \(levelTimerValue)")
+                label.text = String(levelTimerValue)
             } else {
                 self.gameStarted = false
                 label.removeAction(forKey: "countdown")
@@ -259,14 +248,6 @@ class GameScene: SKScene {
 
 extension GameScene {
     
-    
-    func isDeckMenuHidden(_ hidden: Bool) {
-        guard let node = childNode(withName: "decks")
-            as? SKSpriteNode else {
-                fatalError("decks node not loaded")
-        }
-        node.isHidden = hidden
-    }
     
     
     func resetPiles() {
@@ -289,6 +270,11 @@ extension GameScene {
 extension GameScene  {
     
     
+    func isDeckMenuHidden(_ hidden: Bool) {
+        _ = gridDispatcher.piles.map { $0.isHidden = hidden }
+    }
+    
+    
     func isMainMenuHidden(_ hidden: Bool) {
         guard let node = childNode(withName: "menu_sprite")
             as? SKSpriteNode else {
@@ -296,7 +282,7 @@ extension GameScene  {
         }
         node.isHidden = hidden
     }
-
+    
     
     func isScoreHidden(_ hidden: Bool) {
         guard let node = childNode(withName: "endScoreSprite")
@@ -306,7 +292,7 @@ extension GameScene  {
         node.isHidden = hidden
     }
     
-    func update(score : Int) {
+    func updateTotal(score : Int) {
         guard let node = childNode(withName: "endScoreSprite")
             as? SKSpriteNode else {
                 fatalError("endScoreSprite node not loaded")
@@ -319,13 +305,16 @@ extension GameScene  {
     }
     
     
-    
     func isTopBarHidden(_ hidden: Bool) {
-        guard let node = childNode(withName: "topBarNode")
+        guard let score = childNode(withName: "scoreNode")
             as? SKSpriteNode else {
-                fatalError("topBarNode node not loaded")
+                fatalError("scoreNode node not loaded")
         }
-        node.isHidden = hidden
+        guard let timer = childNode(withName: "timerNode") else {
+            fatalError("timerNode node not loaded")
+        }
+        timer.isHidden = hidden
+        score.isHidden = hidden
     }
     
     func isEndMenuHidden(_ hidden: Bool) {
@@ -336,7 +325,7 @@ extension GameScene  {
         
         node.isHidden = hidden
     }
-
+    
 }
 
 extension Int {

@@ -18,20 +18,53 @@ protocol PileHandler {
 
 
 class Pile : SKSpriteNode, PileHandler {
-    
+
+    let shape: SKShapeNode!
     var oldNumber: Int = 12
-    var label: SKLabelNode?
+    let numberLabel: SKLabelNode!
     var currentNumber: Int = 12 {
         willSet(number) {
-            if let lbl = label {
-                lbl.text = String(number)
-            }
-            guard let node = childNode(withName: "deck_label")
-                as? SKLabelNode else {
-                    fatalError("deck_label node not loaded")
-            }
-            label = node
+            numberLabel.text = String(number)
         }
+        didSet(number) {
+            shape?.fillColor = colorType
+        }
+    }
+    
+    var colorType: SKColor {
+        get {
+            switch currentNumber {
+            case 1...4:
+                return UIColor(red: 81/255, green: 77/255, blue: 152/255, alpha: 1.0)
+            case 5...8:
+                return UIColor(red: 183/255, green: 77/255, blue: 127/255, alpha: 1.0)
+            case 9...12:
+                return UIColor(red: 63/255, green: 149/255, blue: 114/255, alpha: 1.0)
+            default:
+                return UIColor(red: 63/255, green: 149/255, blue: 114/255, alpha: 1.0)
+            }
+        }
+    }
+    
+    init() {
+        numberLabel = SKLabelNode(fontNamed:"MarkerFelt-Thin")
+        shape = SKShapeNode()
+        super.init(texture: nil, color: .clear, size: CGSize(width: 60, height: 60))
+        numberLabel.fontSize = 30
+        numberLabel.horizontalAlignmentMode = .center
+        numberLabel.verticalAlignmentMode = .center
+        numberLabel.isUserInteractionEnabled = false
+        shape.isUserInteractionEnabled = false
+        let corners : UIRectCorner = [UIRectCorner.allCorners]
+        shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
+        shape.position = CGPoint(x: frame.midX, y:    frame.midY)
+        shape.lineWidth = 1
+        addChild(numberLabel)
+        addChild(shape)
+    }
+    
+    required init(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     func updateWithLastNumber(_ number: Int) {
@@ -45,6 +78,9 @@ class Pile : SKSpriteNode, PileHandler {
         currentNumber = oldNumber
         print("RESET pile currentNumber \(oldNumber) with old number \(oldNumber)")
     }
+    
+    
+    
     
     
 }

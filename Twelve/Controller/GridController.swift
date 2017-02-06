@@ -34,17 +34,17 @@ struct GridController : GridDispatcher {
             var column = 0
             for _ in 0..<self.grid.numberOfColumns {
                 // Populate the row.
-                do  {
+              //  do  {
                     let position = GridPosition(row, column)
-                    try tileGroupAt(position: position)
+//                    try tileGroupAt(position: position)
                     let sprite = NumberSpriteNode()
                     sprite.gridPosition = position
                     sprite.position = grid.centerOfTile(atColumn: sprite.gridPosition.column, row: sprite.gridPosition.row)
                     grid.addChild(sprite)
                     matrix[row].append(sprite)
-                } catch {
-                    matrix[row].append(nil)
-                }
+              //  } catch {
+              //      matrix[row].append(nil)
+              //  }
                 column += 1
             }
             row += 1
@@ -128,15 +128,15 @@ struct GridController : GridDispatcher {
     }
     
     
-    func tileGroupAt(position: GridPosition) throws {
-        guard (position.row < grid.numberOfRows && position.row >= 0)  && (position.column < grid.numberOfColumns && position.column >= 0) else {
-            throw TwelveError.outOfBounds
-        }
+//    func tileGroupAt(position: GridPosition) throws {
+//        guard (position.row < grid.numberOfRows && position.row >= 0)  && (position.column < grid.numberOfColumns && position.column >= 0) else {
+//            throw TwelveError.outOfBounds
+//        }
         
-        guard (grid.tileGroup(atColumn: position.column, row: position.row)) != nil else {
-            throw TwelveError.noTileGroupAtPosition
-        }
-    }
+//        guard (grid.tileGroup(atColumn: position.column, row: position.row)) != nil else {
+//            throw TwelveError.noTileGroupAtPosition
+ //       }
+ //   }
     
     
     func updateNumberAt(position: GridPosition, with number: Int) throws {
@@ -189,7 +189,6 @@ struct GridController : GridDispatcher {
                 
                 if gridPosition != position {
                     do {
-                        try tileGroupAt(position: gridPosition)
                         
                         if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) {
                             try createNumberAt(position: gridPosition, with: number)
@@ -210,7 +209,6 @@ struct GridController : GridDispatcher {
     
     func validPosition(_ gridPosition: GridPosition, for number: Int) -> Bool {
         do {
-            try tileGroupAt(position: gridPosition)
             if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) {
                 return true
             }
@@ -236,7 +234,7 @@ struct GridController : GridDispatcher {
                 
                 if gridPosition == currentTile.gridPosition {
                     do {
-                        try tileGroupAt(position: gridPosition)
+                       _  = try numberAt(position: gridPosition)
                         return
                     } catch let error {
                         print("error : \(error) at position \(gridPosition)")
@@ -261,17 +259,18 @@ struct GridController : GridDispatcher {
     }
     
     func randomEmptyPosition() -> GridPosition {
-        while true {
+        for _ in 1...1000 {
             var gridPosition: GridPosition
             gridPosition.row = randomInt(min: 0, max: grid.numberOfRows - 1)
             gridPosition.column = randomInt(min: 0, max: grid.numberOfColumns - 1)
             do {
-                try tileGroupAt(position: gridPosition)
+//                try tileGroupAt(position: gridPosition)
                 if try isNumberAt(position: gridPosition, equalWith: 0) {
                     return gridPosition
                 }
             } catch { }
         }
+        return (0, 0)
     }
     
 }
@@ -355,7 +354,7 @@ extension GridController : GridValidator {
                 let gridPosition = GridPosition(row: number.gridPosition.row + newRow, column: number.gridPosition.column + newColumn)
                 
                 if gridPosition != number.gridPosition {
-                    try tileGroupAt(position: gridPosition)
+                 //   try tileGroupAt(position: gridPosition)
                     return try numberAt(position: gridPosition)
                 }
                 newColumn += 1
