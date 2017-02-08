@@ -198,16 +198,14 @@ class GameScene: SKScene {
     
     func endsCombo() {
         
-        guard let previousNumber = numberTile else {
-            return
-        }
-        
-        previousNumber.alpha = 1
+        numberTile?.alpha = 1
         
         do {
             let points = try combo?.doneWithCombo() ?? 0
             totalPoints += points
-            try gridDispatcher.updateNumberAt(position: previousNumber.gridPosition, with: gridDispatcher.randomTileValue())
+            if let prevNumber = numberTile {
+                try gridDispatcher.updateNumberAt(position: prevNumber.gridPosition, with: gridDispatcher.randomTileValue())
+            }
             numberTile = nil
             gridDispatcher.checkBoard()
         } catch  {
@@ -220,7 +218,7 @@ class GameScene: SKScene {
     
     func startTimer() {
         
-        var levelTimerValue = 10
+        var levelTimerValue = 60
         
         guard let label = childNode(withName: "timerNode")
             as? SKLabelNode else {

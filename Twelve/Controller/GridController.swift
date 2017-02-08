@@ -16,9 +16,9 @@ typealias GridPosition = (row: Int, column: Int)
 
 struct GridController : GridDispatcher {
     
-    let numberOfPossibilities = 2
-    let lengthForCombo = 10
-    var matrix : [[NumberSpriteNode?]] = [[NumberSpriteNode]]()
+    let numberOfPossibilities = 1
+    let lengthForCombo = 3
+    var matrix : [[NumberSpriteNode]] = [[NumberSpriteNode]]()
     var piles = [Pile]()
     var grid : SKTileMapNode!
     
@@ -34,17 +34,12 @@ struct GridController : GridDispatcher {
             var column = 0
             for _ in 0..<self.grid.numberOfColumns {
                 // Populate the row.
-              //  do  {
                     let position = GridPosition(row, column)
-//                    try tileGroupAt(position: position)
                     let sprite = NumberSpriteNode()
                     sprite.gridPosition = position
                     sprite.position = grid.centerOfTile(atColumn: sprite.gridPosition.column, row: sprite.gridPosition.row)
                     grid.addChild(sprite)
                     matrix[row].append(sprite)
-              //  } catch {
-              //      matrix[row].append(nil)
-              //  }
                 column += 1
             }
             row += 1
@@ -56,7 +51,6 @@ struct GridController : GridDispatcher {
         do {
             try disposeNumbers()
         } catch let error {
-            print(error.localizedDescription)
             fatalError(error.localizedDescription)
         }
     }
@@ -331,11 +325,7 @@ extension GridController : GridValidator {
             }
         }
         
-        let possibilities = (array.filter { do { return try adjacentForNumber($0) != nil } catch { return false } })
-        
-        print(possibilities)
-        
-        guard possibilities.isEmpty == false else {
+        guard array.possibility(on: matrix) != nil else {
             throw TwelveError.noMorePossibilities
         }
     }
