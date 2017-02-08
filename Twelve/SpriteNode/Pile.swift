@@ -31,26 +31,30 @@ class Pile : SKSpriteNode, PileHandler {
         }
     }
     
-    var colorType: SKColor {
+    
+    var colorType: UIColor {
         get {
             switch currentNumber {
-            case 1...4:
-                return UIColor(red: 81/255, green: 77/255, blue: 152/255, alpha: 1.0)
-            case 5...8:
-                return UIColor(red: 183/255, green: 77/255, blue: 127/255, alpha: 1.0)
-            case 9...12:
-                return UIColor(red: 63/255, green: 149/255, blue: 114/255, alpha: 1.0)
+            case 1...3:
+                return UIColor(red: 34/255, green: 181/255.0, blue: 115/255.0, alpha: 1)
+            case 4...6:
+                return UIColor(red: 217/255.0, green: 83/255.0, blue: 79/255.0, alpha: 1)
+            case 7...9:
+                return UIColor(red: 240/255.0, green: 173/255.0, blue: 78/255.0, alpha: 1)
+            case 10...12:
+                return UIColor(red: 66/255.0, green: 139/255.0, blue: 202/255.0, alpha: 1)
             default:
-                return UIColor(red: 63/255, green: 149/255, blue: 114/255, alpha: 1.0)
+                return .clear
             }
         }
     }
     
+    
     init() {
-        numberLabel = SKLabelNode(fontNamed:"MarkerFelt-Thin")
+        numberLabel = SKLabelNode(fontNamed:"ChalkboardSE-Light")
         shape = SKShapeNode()
-        super.init(texture: nil, color: .clear, size: CGSize(width: 60, height: 60))
-        numberLabel.fontSize = 30
+        super.init(texture: nil, color: .clear, size: CGSize(width: 80, height: 80))
+        numberLabel.fontSize = 50
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.isUserInteractionEnabled = false
@@ -58,6 +62,7 @@ class Pile : SKSpriteNode, PileHandler {
         let corners : UIRectCorner = [UIRectCorner.allCorners]
         shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
         shape.position = CGPoint(x: frame.midX, y:    frame.midY)
+        shape.strokeColor = UIColor.black
         shape.lineWidth = 1
         addChild(numberLabel)
         addChild(shape)

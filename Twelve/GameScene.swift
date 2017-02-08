@@ -144,11 +144,21 @@ class GameScene: SKScene {
         let location = touch.location(in: self)
         if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
             do {
-                numberTile?.alpha = 1
+                
+                let scaleBack = SKAction.scaleX(to: 1, y: 1,
+                                            duration: 0.25, delay: 0,
+                                            usingSpringWithDamping: 0.25, initialSpringVelocity: 0)
+                numberTile?.run(scaleBack)
                 try detect(number)
-                number.alpha = 0
+                let scale = SKAction.scaleX(to: 0, y: 0,
+                                            duration: 0.25, delay: 0,
+                                            usingSpringWithDamping: 0.25, initialSpringVelocity: 0)
+                numberTile?.run(scale)
             } catch let error as TwelveError where error == .notAdjacent || error == .numberIsNotFollowingPile  {
-                endsCombo()
+               let action = SKAction.screenShakeWithNode(number, amount: CGPoint(x:15, y:15), oscillations: 20, duration: 0.50)
+                number.run(action, completion: {
+                    self.endsCombo()
+                })
             } catch {
                 numberTile = nil
             }
@@ -197,9 +207,10 @@ class GameScene: SKScene {
     
     
     func endsCombo() {
-        
-        numberTile?.alpha = 1
-        
+        let scaleBack = SKAction.scaleX(to: 1, y: 1,
+                                        duration: 0.25, delay: 0,
+                                        usingSpringWithDamping: 0.2, initialSpringVelocity: 0)
+        numberTile?.run(scaleBack)
         do {
             let points = try combo?.doneWithCombo() ?? 0
             totalPoints += points
@@ -207,14 +218,89 @@ class GameScene: SKScene {
                 try gridDispatcher.updateNumberAt(position: prevNumber.gridPosition, with: gridDispatcher.randomTileValue())
             }
             numberTile = nil
-            gridDispatcher.checkBoard()
+            checkBoard()
         } catch  {
             numberTile = nil
-            gridDispatcher.checkBoard()
+            checkBoard()
         }
     }
     
+    func checkBoard() {
+        do {
+            try gridDispatcher.checkBoard()
+        } catch let error as TwelveError where error == .noMorePossibilities {
+            
+
+            for row in 0..<objectsTileMap.numberOfRows {
+                for column in 0..<objectsTileMap.numberOfColumns {
+                    let gridPosition = GridPosition(row, column)
+                    do {
+                        if let number = try gridDispatcher.numberAt(position: gridPosition) {
+                            let scaleSmall = SKAction.scaleX(to: 0, y: 0,
+                                                             duration: 0.25, delay: 0,
+                                                             usingSpringWithDamping: 0.25, initialSpringVelocity: 0)
+                            number.run(scaleSmall)
+                        }
+                    } catch {  }
+                }
+            }
+            
+            try? self.gridDispatcher.resetNumbers()
+            try? self.gridDispatcher.disposeNumbers()
+            
+            afterDelay(0.15, runBlock: {
+                
+                for row in 0..<self.objectsTileMap.numberOfRows {
+                    for column in 0..<self.objectsTileMap.numberOfColumns {
+                        let gridPosition = GridPosition(row, column)
+                        do {
+                            if let number = try self.gridDispatcher.numberAt(position: gridPosition) {
+                                let scaleSmall = SKAction.scaleX(to: 1, y: 1,
+                                                                 duration: 0.25, delay: 0,
+                                                                 usingSpringWithDamping: 0.25, initialSpringVelocity: 0)
+                                number.run(scaleSmall)
+                            }
+                        } catch {  }
+                    }
+                }
+                
+            })
+            
+            
+            
+        } catch {
+            fatalError("checkBoard exception should have been caught")
+        }
+
+    }
     
+    
+  /*  func flip() {
+        
+        let firstHalfFlip = SKAction.scaleX(to: 0.0, duration: 0.4)
+        let secondHalfFlip = SKAction.scaleX(to: 1.0, duration: 0.4)
+        
+        setScale(1.0)
+        
+        if faceUp {
+            run(firstHalfFlip) {
+                self.texture = self.backTexture
+                self.damageLabel.isHidden = true
+                
+                self.run(secondHalfFlip)
+            }
+        } else {
+            run(firstHalfFlip) {
+                self.texture = self.frontTexture
+                self.damageLabel.isHidden = false
+                
+                self.run(secondHalfFlip)
+            }
+        }
+        faceUp = !faceUp
+    }
+
+    */
     
     func startTimer() {
         

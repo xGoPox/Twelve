@@ -37,6 +37,8 @@
 		3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB551E35409C008A9A9C /* LaunchScreen.storyboard */; };
 		3D95CB621E35409C008A9A9C /* TwelveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB611E35409C008A9A9C /* TwelveUITests.swift */; };
 		3DA4BF131E43A6DA00606A0D /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DA4BF121E43A6DA00606A0D /* GameScene_iPad.sks */; };
+		3DAA36C21E4B236A004FE452 /* SpriteKit-Spring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */; };
+		3DAA36C41E4B34A1004FE452 /* MyParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DAA36C31E4B34A1004FE452 /* MyParticle.sks */; };
 		3DE8A17C1E3CA5AC00BC150A /* Combo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A17B1E3CA5AC00BC150A /* Combo.swift */; };
 		3DE8A1801E3CA60900BC150A /* GridController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A17F1E3CA60900BC150A /* GridController.swift */; };
 		3DE8A18D1E3CAC2C00BC150A /* TwelveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A18C1E3CAC2C00BC150A /* TwelveTests.swift */; };
@@ -95,6 +97,8 @@
 		3D95CB611E35409C008A9A9C /* TwelveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwelveUITests.swift; sourceTree = "<group>"; };
 		3D95CB631E35409C008A9A9C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DA4BF121E43A6DA00606A0D /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
+		3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SpriteKit-Spring.swift"; sourceTree = "<group>"; };
+		3DAA36C31E4B34A1004FE452 /* MyParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyParticle.sks; sourceTree = "<group>"; };
 		3DE8A17B1E3CA5AC00BC150A /* Combo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Combo.swift; path = Model/Combo.swift; sourceTree = "<group>"; };
 		3DE8A17F1E3CA60900BC150A /* GridController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GridController.swift; path = Controller/GridController.swift; sourceTree = "<group>"; };
 		3DE8A18A1E3CAC2C00BC150A /* TwelveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwelveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -143,6 +147,7 @@
 				3D087E8C1E48D16800EAD2E2 /* SKTEffects.swift */,
 				3D087E8D1E48D16800EAD2E2 /* SKTTimingFunctions.swift */,
 				3D087E8E1E48D16800EAD2E2 /* Vector3.swift */,
+				3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */,
 			);
 			path = SKTUtils;
 			sourceTree = "<group>";
@@ -188,6 +193,7 @@
 				3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */,
 				3D95CB4A1E35409C008A9A9C /* Actions.sks */,
 				3D95CB4C1E35409C008A9A9C /* GameScene.swift */,
+				3DAA36C31E4B34A1004FE452 /* MyParticle.sks */,
 				3D8A8CFD1E413A5000C6B148 /* MyHexa.sks */,
 				3D087E821E48D16800EAD2E2 /* SKTUtils */,
 				3D85629A1E40A4D2005EFC36 /* SpriteNode */,
@@ -352,6 +358,7 @@
 				3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */,
 				3D95CB521E35409C008A9A9C /* Main.storyboard in Resources */,
 				3D95CB491E35409C008A9A9C /* GameScene.sks in Resources */,
+				3DAA36C41E4B34A1004FE452 /* MyParticle.sks in Resources */,
 				3D95CB541E35409C008A9A9C /* Assets.xcassets in Resources */,
 				3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */,
 				3D95CB4B1E35409C008A9A9C /* Actions.sks in Resources */,
@@ -385,6 +392,7 @@
 				3D087E981E48D16800EAD2E2 /* SKTEffects.swift in Sources */,
 				3D087E8F1E48D16800EAD2E2 /* CGFloat+Extensions.swift in Sources */,
 				3D8562A21E40AE2D005EFC36 /* EndScoreNode.swift in Sources */,
+				3DAA36C21E4B236A004FE452 /* SpriteKit-Spring.swift in Sources */,
 				3D95CB4D1E35409C008A9A9C /* GameScene.swift in Sources */,
 				3D85629F1E40A52E005EFC36 /* Number.swift in Sources */,
 				3D95CB4F1E35409C008A9A9C /* GameViewController.swift in Sources */,

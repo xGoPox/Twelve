@@ -147,7 +147,7 @@ struct GridController : GridDispatcher {
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
-                try updateNumberAt(position: gridPosition, with: 0)
+                    try updateNumberAt(position: gridPosition, with: 0)
             }
         }
     }
@@ -169,31 +169,24 @@ struct GridController : GridDispatcher {
     }
     
     mutating func createFollowingNumber(_ number: Int, position : GridPosition) -> GridPosition? {
-        
-        var newRow = -1
-        while newRow <= 1 {
+
+        for _ in 0..<1000 {
             
-            var newColumn = -1
+            let newRow = randomInt(min: -1, max: 1)
             
-            while newColumn <= 1 {
+            let newColumn = randomInt(min: -1, max: 1)
+
+            let gridPosition = GridPosition(row: position.row + newRow, column: position.column + newColumn)
+            
+            if gridPosition != position {
+                do {
+                    if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) {
+                        try createNumberAt(position: gridPosition, with: number)
+                        return gridPosition
+                    }
+                } catch { }
                 
-                //                let evenNumber = position.row % 2 == 0 // pair
-                
-                let gridPosition = GridPosition(row: position.row + newRow, column: position.column + newColumn)
-                
-                if gridPosition != position {
-                    do {
-                        
-                        if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) {
-                            try createNumberAt(position: gridPosition, with: number)
-                            return gridPosition
-                        }
-                    } catch { }
-                    
-                }
-                newColumn += 1
             }
-            newRow += 1
         }
         
         return nil
@@ -278,23 +271,16 @@ extension GridController {
 protocol GridValidator {
     func possibility() throws -> Pile
     func possibilitiesForPile(_ pile: Pile) throws
-    mutating func checkBoard() throws
+    func checkBoard() throws
 }
 
 
 extension GridController : GridValidator {
     
-    mutating func checkBoard() {
-        do {
-            _ = try self.possibility()
-        } catch let error as TwelveError where error == .noMorePossibilities {
-            try? resetNumbers()
-            try? disposeNumbers()
-        } catch {
-            fatalError("checkBoard exception should have been caught")
-        }
-        
+    func checkBoard() throws {
+        _ = try self.possibility()
     }
+    
     
     func possibility() throws -> Pile {
         let pile = piles.first {
