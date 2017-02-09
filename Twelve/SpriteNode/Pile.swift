@@ -53,8 +53,8 @@ class Pile : SKSpriteNode, PileHandler {
     init() {
         numberLabel = SKLabelNode(fontNamed:"ChalkboardSE-Light")
         shape = SKShapeNode()
-        super.init(texture: nil, color: .clear, size: CGSize(width: 80, height: 80))
-        numberLabel.fontSize = 50
+        super.init(texture: nil, color: .clear, size: CGSize(width: 100, height: 100))
+        numberLabel.fontSize = 60
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.isUserInteractionEnabled = false

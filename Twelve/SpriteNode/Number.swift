@@ -66,7 +66,7 @@ class NumberSpriteNode : SKSpriteNode {
         shape = SKShapeNode()
         super.init(texture: nil, color: .clear, size: CGSize(width: 100, height: 100))
         name = "NumberSprite"
-        numberLabel.fontSize = 60
+        numberLabel.fontSize = 65
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.isUserInteractionEnabled = false

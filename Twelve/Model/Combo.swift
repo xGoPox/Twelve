@@ -9,19 +9,22 @@
 import Foundation
 
 
+typealias ComboResult = (points: Int , comboOf: Int)
+
+
 protocol ComboHandler {
     var combo: [Int] { get set }
     var lastNumber: Int? { get set }
     mutating func addUpComboWith(number: Int, on pile :  Pile) throws
-    mutating func doneWithCombo() throws -> Int
+    mutating func doneWithCombo() throws -> ComboResult
     func points() -> Int
 }
-
 
 
 struct Combo: ComboHandler {
     
     var lastNumber: Int?
+    
     
     var combo: [Int]
     var currentPile: Pile?
@@ -46,7 +49,7 @@ struct Combo: ComboHandler {
         return combo.count > 1
     }
     
-    mutating func doneWithCombo() throws -> Int {
+    mutating func doneWithCombo() throws -> ComboResult {
         guard let number = lastNumber else {
             throw TwelveError.lastNumberIsNill
         }
@@ -55,9 +58,10 @@ struct Combo: ComboHandler {
             print("COMBO IS VALID")
             currentPile?.updateWithLastNumber(number)
             let total = points()
+            let comboResult = ComboResult(points: total, comboOf: combo.count)
             combo.removeAll()
             currentPile = nil
-            return total
+            return comboResult
         } else {
             print("COMBO IS NOT VALID")
             currentPile?.resetForFalseCombo()
