@@ -20,7 +20,6 @@
 		3D087E991E48D16800EAD2E2 /* SKTTimingFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D087E8D1E48D16800EAD2E2 /* SKTTimingFunctions.swift */; };
 		3D087E9A1E48D16800EAD2E2 /* Vector3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D087E8E1E48D16800EAD2E2 /* Vector3.swift */; };
 		3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */; };
-		3D8282C41E4B5CCC00E653BD /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D8282C31E4B5CCC00E653BD /* GameScene_iPad.sks */; };
 		3D85629C1E40A51A005EFC36 /* RoundedCornerSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629B1E40A51A005EFC36 /* RoundedCornerSprite.swift */; };
 		3D85629F1E40A52E005EFC36 /* Number.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629D1E40A52E005EFC36 /* Number.swift */; };
 		3D8562A01E40A52E005EFC36 /* Pile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629E1E40A52E005EFC36 /* Pile.swift */; };
@@ -37,6 +36,9 @@
 		3D95CB541E35409C008A9A9C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB531E35409C008A9A9C /* Assets.xcassets */; };
 		3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB551E35409C008A9A9C /* LaunchScreen.storyboard */; };
 		3D95CB621E35409C008A9A9C /* TwelveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB611E35409C008A9A9C /* TwelveUITests.swift */; };
+		3D970DD51E4F727C0058490B /* ComboBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D970DD41E4F727C0058490B /* ComboBar.swift */; };
+		3D970DD71E4F8BE40058490B /* Multiplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D970DD61E4F8BE40058490B /* Multiplicator.swift */; };
+		3DA8565A1E4E12B100C6DF42 /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DA856591E4E12B100C6DF42 /* GameScene_iPad.sks */; };
 		3DAA36C21E4B236A004FE452 /* SpriteKit-Spring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */; };
 		3DAA36C41E4B34A1004FE452 /* MyParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DAA36C31E4B34A1004FE452 /* MyParticle.sks */; };
 		3DE8A17C1E3CA5AC00BC150A /* Combo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A17B1E3CA5AC00BC150A /* Combo.swift */; };
@@ -76,7 +78,6 @@
 		3D087E8D1E48D16800EAD2E2 /* SKTTimingFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTTimingFunctions.swift; sourceTree = "<group>"; };
 		3D087E8E1E48D16800EAD2E2 /* Vector3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector3.swift; sourceTree = "<group>"; };
 		3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyTileSet.sks; sourceTree = "<group>"; };
-		3D8282C31E4B5CCC00E653BD /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
 		3D85629B1E40A51A005EFC36 /* RoundedCornerSprite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RoundedCornerSprite.swift; path = SpriteNode/RoundedCornerSprite.swift; sourceTree = "<group>"; };
 		3D85629D1E40A52E005EFC36 /* Number.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Number.swift; path = SpriteNode/Number.swift; sourceTree = "<group>"; };
 		3D85629E1E40A52E005EFC36 /* Pile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Pile.swift; path = SpriteNode/Pile.swift; sourceTree = "<group>"; };
@@ -97,6 +98,9 @@
 		3D95CB5D1E35409C008A9A9C /* TwelveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwelveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D95CB611E35409C008A9A9C /* TwelveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwelveUITests.swift; sourceTree = "<group>"; };
 		3D95CB631E35409C008A9A9C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3D970DD41E4F727C0058490B /* ComboBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ComboBar.swift; path = SpriteNode/ComboBar.swift; sourceTree = "<group>"; };
+		3D970DD61E4F8BE40058490B /* Multiplicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Multiplicator.swift; path = SpriteNode/Multiplicator.swift; sourceTree = "<group>"; };
+		3DA856591E4E12B100C6DF42 /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
 		3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SpriteKit-Spring.swift"; sourceTree = "<group>"; };
 		3DAA36C31E4B34A1004FE452 /* MyParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyParticle.sks; sourceTree = "<group>"; };
 		3DE8A17B1E3CA5AC00BC150A /* Combo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Combo.swift; path = Model/Combo.swift; sourceTree = "<group>"; };
@@ -160,6 +164,8 @@
 				3D85629E1E40A52E005EFC36 /* Pile.swift */,
 				3D8562A11E40AE2D005EFC36 /* EndScoreNode.swift */,
 				3D8562A31E40D9A9005EFC36 /* ScoreNode.swift */,
+				3D970DD41E4F727C0058490B /* ComboBar.swift */,
+				3D970DD61E4F8BE40058490B /* Multiplicator.swift */,
 			);
 			name = SpriteNode;
 			sourceTree = "<group>";
@@ -189,10 +195,10 @@
 			children = (
 				3D95CB461E35409B008A9A9C /* AppDelegate.swift */,
 				3D95CB481E35409C008A9A9C /* GameScene.sks */,
-				3D8282C31E4B5CCC00E653BD /* GameScene_iPad.sks */,
 				3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */,
 				3D95CB4A1E35409C008A9A9C /* Actions.sks */,
 				3D95CB4C1E35409C008A9A9C /* GameScene.swift */,
+				3DA856591E4E12B100C6DF42 /* GameScene_iPad.sks */,
 				3DAA36C31E4B34A1004FE452 /* MyParticle.sks */,
 				3D8A8CFD1E413A5000C6B148 /* MyHexa.sks */,
 				3D087E821E48D16800EAD2E2 /* SKTUtils */,
@@ -312,7 +318,7 @@
 				TargetAttributes = {
 					3D95CB421E35409B008A9A9C = {
 						CreatedOnToolsVersion = 8.2;
-						DevelopmentTeam = QYL8GFRZX7;
+						DevelopmentTeam = U6947XZ2V2;
 						ProvisioningStyle = Automatic;
 					};
 					3D95CB5C1E35409C008A9A9C = {
@@ -354,7 +360,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3D8282C41E4B5CCC00E653BD /* GameScene_iPad.sks in Resources */,
+				3DA8565A1E4E12B100C6DF42 /* GameScene_iPad.sks in Resources */,
 				3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */,
 				3D95CB521E35409C008A9A9C /* Main.storyboard in Resources */,
 				3D95CB491E35409C008A9A9C /* GameScene.sks in Resources */,
@@ -401,6 +407,7 @@
 				3D85629C1E40A51A005EFC36 /* RoundedCornerSprite.swift in Sources */,
 				3D95CB471E35409B008A9A9C /* AppDelegate.swift in Sources */,
 				3DE8A17C1E3CA5AC00BC150A /* Combo.swift in Sources */,
+				3D970DD71E4F8BE40058490B /* Multiplicator.swift in Sources */,
 				3D087E961E48D16800EAD2E2 /* SKNode+Extensions.swift in Sources */,
 				3D8562A41E40D9A9005EFC36 /* ScoreNode.swift in Sources */,
 				3D087E901E48D16800EAD2E2 /* CGPoint+Extensions.swift in Sources */,
@@ -409,6 +416,7 @@
 				3D087E911E48D16800EAD2E2 /* CGVector+Extensions.swift in Sources */,
 				3D087E951E48D16800EAD2E2 /* SKColor+Extensions.swift in Sources */,
 				3D087E971E48D16800EAD2E2 /* SKTAudio.swift in Sources */,
+				3D970DD51E4F727C0058490B /* ComboBar.swift in Sources */,
 				3D8562A01E40A52E005EFC36 /* Pile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -563,12 +571,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = QYL8GFRZX7;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = U6947XZ2V2;
 				INFOPLIST_FILE = Twelve/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.julment.Twelve;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -577,12 +587,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = QYL8GFRZX7;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = U6947XZ2V2;
 				INFOPLIST_FILE = Twelve/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.julment.Twelve;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

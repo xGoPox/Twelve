@@ -9,7 +9,7 @@
 import Foundation
 
 
-typealias ComboResult = (points: Int , comboOf: Int)
+typealias ComboResult = (points: Int , comboOf: Int, hasTwelve: Bool)
 
 
 protocol ComboHandler {
@@ -58,7 +58,7 @@ struct Combo: ComboHandler {
             print("COMBO IS VALID")
             currentPile?.updateWithLastNumber(number)
             let total = points()
-            let comboResult = ComboResult(points: total, comboOf: combo.count)
+            let comboResult = ComboResult(points: total, comboOf: combo.count, hasTwelve : combo.contains(12))
             combo.removeAll()
             currentPile = nil
             return comboResult

@@ -33,13 +33,24 @@ class NumberSpriteNode : SKSpriteNode {
     
     let numberLabel: SKLabelNode!
     let shape: SKShapeNode!
+    var haloShape: SKShapeNode!
 
     var value : Int = 0 {
         willSet(number) {
-            numberLabel.text = String(number)
+            let fadeIn = SKAction.fadeIn(withDuration: 0.1)
+            let fadeOut = SKAction.fadeOut(withDuration: 0.1)
+            numberLabel.run(fadeOut) {
+                self.numberLabel.text = String(number)
+                self.numberLabel.run(fadeIn)
+            }
         }
         didSet(number) {
-            shape.fillColor = colorType
+            removeAction(forKey: "pulse")
+            haloShape.fillColor = colorType
+            let color = getColorFadeAction(startColor: shape.fillColor, endColor: colorType, duration: 0.25)
+            shape.run(color) { 
+                self.shape.strokeColor = self.colorType
+            }
         }
     }
     
@@ -64,21 +75,33 @@ class NumberSpriteNode : SKSpriteNode {
     init() {
         numberLabel = SKLabelNode(fontNamed:"ChalkboardSE-Light")
         shape = SKShapeNode()
-        super.init(texture: nil, color: .clear, size: CGSize(width: 100, height: 100))
+        haloShape = SKShapeNode()
+        super.init(texture: nil, color: .clear, size: CGSize(width: 80, height: 80))
         name = "NumberSprite"
-        numberLabel.fontSize = 65
+        numberLabel.fontSize = 55
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.isUserInteractionEnabled = false
+        numberLabel.fontColor = UIColor(red:242/255, green:236/255, blue:225/255, alpha: 1)
         shape.isUserInteractionEnabled = false
         let corners : UIRectCorner = [UIRectCorner.allCorners]
         shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
-        shape.strokeColor = UIColor.black
+        shape.strokeColor = UIColor(red:242/255, green:236/255, blue:225/255, alpha: 1)
         shape.position = CGPoint(x: frame.midX, y:    frame.midY)
         shape.lineWidth = 1
-
-        addChild(numberLabel)
+        haloShape = shape.copy() as! SKShapeNode
+        haloShape.alpha = 0.5
+        let shadow = SKShapeNode()
+        shadow.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
+        shadow.position = CGPoint(x: frame.midX, y:    frame.midY-2.5)
+        shadow.lineWidth = 1
+        shadow.alpha = 0.5
+        shadow.strokeColor = UIColor.black
+        shadow.fillColor = UIColor.black
+        addChild(shadow)
+        addChild(haloShape)
         addChild(shape)
+        addChild(numberLabel)
     }
     
     required init(coder aDecoder: NSCoder) {
@@ -128,6 +151,27 @@ func ==(lhs: NumberSpriteNode, rhs: NumberSpriteNode) -> Bool {
 }
 
 
-
+private func getColorFadeAction(startColor: UIColor, endColor: UIColor, duration: TimeInterval) -> SKAction {
+    // Create a custom action for color fade
+    let action = SKAction.customAction(withDuration: duration) {(node, elapsedTime) in
+        if let node = node as? SKShapeNode {
+            var color = endColor
+            // Calculate the changing color during the elapsed time.
+            let fraction = elapsedTime / CGFloat(duration)
+            if let startColorRGB = startColor.rgb(), let endColorRGB = endColor.rgb(){
+                let red = CGFloat().lerp(start: startColorRGB.red, end: endColorRGB.red, t: fraction)
+                let green = CGFloat().lerp(start: startColorRGB.green, end: endColorRGB.green, t: fraction)
+                let blue = CGFloat().lerp(start: startColorRGB.blue, end: endColorRGB.blue, t: fraction)
+                let alpha = CGFloat().lerp(start: startColorRGB.alpha, end: endColorRGB.alpha, t: fraction)
+                
+                color = UIColor.init(red: red, green: green, blue: blue, alpha: alpha)
+            }
+            // Node properties to change.
+            node.strokeColor = color
+            node.fillColor = color
+        }
+    }
+    return action
+}
 
 
