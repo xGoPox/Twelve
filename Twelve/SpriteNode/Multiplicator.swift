@@ -17,7 +17,7 @@ class Multiplicator : SKSpriteNode {
     var twoSprite : SKSpriteNode?
     var threeSprite : SKSpriteNode?
     var fourSprite : SKSpriteNode?
-    var valueLabel : SKLabelNode?
+//    var valueLabel : SKLabelNode?
     
     var multiplicator: Int {
         get {
@@ -41,7 +41,7 @@ class Multiplicator : SKSpriteNode {
                     let scaleEmpty = SKAction.scaleY(to: 0, duration: 0.1)
                     fourSprite?.run(scaleEmpty)
                     threeSprite?.run(scaleEmpty, completion: {
-                        self.valueLabel?.text = "x1"
+//                        self.valueLabel?.text = "x1"
                     })
                 }
                 var scaleValue = 0.0
@@ -54,7 +54,7 @@ class Multiplicator : SKSpriteNode {
                 let growScale = SKAction.scaleY(to: CGFloat(scaleValue), duration: TimeInterval(0.1))
                 twoSprite?.run(growScale)
                 
-            case 4...8:
+/*            case 4...8:
                 if value < 4 {
                     let scaleFull = SKAction.scaleY(to: CGFloat(denomiator * 4), duration: TimeInterval(0.1))
                     twoSprite?.run(scaleFull, completion: {
@@ -77,19 +77,19 @@ class Multiplicator : SKSpriteNode {
                 print("TUUUT : scaleValue \(scaleValue) new value : \(newValue) value : \(value)")
 
                 let growScale = SKAction.scaleY(to: CGFloat(scaleValue), duration: TimeInterval(0.1))
-                threeSprite?.run(growScale)
+                threeSprite?.run(growScale)*/
             default:
-                if value < 8 {
+                if value < 4 {
                     let scaleFull = SKAction.scaleY(to: CGFloat(denomiator * 4.0), duration: TimeInterval(0.1))
                     threeSprite?.run(scaleFull, completion: {
-                        self.valueLabel?.text = "x3"
+//                        self.valueLabel?.text = "x3"
                     })
                 }
                 var scaleValue = 0.0
-                if value < 8 {
-                    scaleValue = denomiator * ((newValue - value) - (8 - value))
+                if value < 4 {
+                    scaleValue = denomiator * ((newValue - value) - (4 - value))
                 } else {
-                    scaleValue = denomiator * (newValue - 8)
+                    scaleValue = denomiator * (newValue - 4)
                 }
                 print("TUUUT : scaleValue \(newValue) \(value)")
                 let growScale = SKAction.scaleY(to: CGFloat(scaleValue > denomiator * 4 ? denomiator * 4 : scaleValue), duration: TimeInterval(0.1))
@@ -121,18 +121,20 @@ class Multiplicator : SKSpriteNode {
                 fatalError("fourNode node not loaded")
         }
         
-        
-        guard let nodeLabel = childNode(withName: "multiplicatorValue")
+
+/*        guard let nodeLabel = childNode(withName: "multiplicatorValue")
             as? SKLabelNode else {
                 fatalError("multiplicatorTwo node not loaded")
-        }
+         } */
+
+        
         
         twoSprite = twoNode
         threeSprite = threeNode
         fourSprite = fourNode
-        valueLabel = nodeLabel
+//        valueLabel = nodeLabel
         
     }
-    
+ 
     
 }

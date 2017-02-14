@@ -85,14 +85,14 @@ class Pile : SKSpriteNode, PileHandler {
         shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
         shape.position = CGPoint(x: frame.midX, y:    frame.midY)
         shape.lineWidth = 2
-        shape.fillColor = UIColor(red:242/255, green:236/255, blue:225/255, alpha: 1)
+        shape.fillColor = UIColor(red:46/255, green:46/255, blue:59/255, alpha: 1)
         shape.setScale(1.05)
         roundShape.isUserInteractionEnabled = false
         roundShape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
         roundShape.position = CGPoint(x: frame.midX, y:    frame.midY)
         roundShape.lineWidth = 1
         roundShape.setScale(0.9)
-        roundShape.strokeColor = UIColor(red:242/255, green:236/255, blue:225/255, alpha: 1)
+        roundShape.strokeColor = UIColor(red:46/255, green:46/255, blue:59/255, alpha: 1)
         shape.strokeColor = colorType
         roundShape.fillColor = colorType
         addChild(shape)

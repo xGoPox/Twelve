@@ -233,7 +233,7 @@ class GameScene: SKScene {
             
             if previousNumber.value == 12 {
                 print("BOUM ++! YEAH")
-                multiCombo.value = (multiCombo.value + 1 > 12) ? 12 : (multiCombo.value + 1.5)
+                multiCombo.value = (multiCombo.value + 1 > 4) ? 4 : (multiCombo.value + 1.5)
             }
             
             try gridDispatcher.updateNumberAt(position: previousNumber.gridPosition, with: gridDispatcher.randomTileValue())
@@ -261,7 +261,7 @@ class GameScene: SKScene {
                 if let prevNumber = numberTile {
                     if prevNumber.value == 12 {
                         print("BOUM ++! OHHH")
-                        multiCombo.value = (multiCombo.value + 1 > 12) ? 12 : (multiCombo.value + 1.5)
+                        multiCombo.value = (multiCombo.value + 1 > 4) ? 4 : (multiCombo.value + 1.5)
                     }
                     try gridDispatcher.updateNumberAt(position: prevNumber.gridPosition, with: gridDispatcher.randomTileValue())
                 }
@@ -326,7 +326,7 @@ class GameScene: SKScene {
             }
             guard let label = topBar.childNode(withName: "timerNode")
                 as? SKLabelNode else {
-                    fatalError("topBarNode node not loaded")
+                    fatalError("timerNode node not loaded")
             }
             timeLabel = label
         
