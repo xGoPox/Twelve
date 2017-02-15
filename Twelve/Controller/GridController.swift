@@ -329,20 +329,13 @@ protocol GridValidator {
 extension GridController : GridValidator {
     
     func cancelSolution() {
-        currentSolution?.setScale(1)
-        currentSolution?.removeAction(forKey: "pulse")
+        currentSolution?.removeSolution()
     }
     
      mutating func checkBoard() throws {
         currentSolution = try possibility()
-        cancelSolution()
-        let pulseUp = SKAction.scale(to: 1.1, duration: 0.25)
-        let pulseDown = SKAction.scale(to: 0.9, duration: 0.25)
-        let pulse = SKAction.sequence([pulseUp, pulseDown])
-        let repeatPulse = SKAction.repeatForever(pulse)
-        let delay = SKAction.wait(forDuration: 2)
-        let finalSequece = SKAction.sequence([delay, repeatPulse])
-        currentSolution?.run(finalSequece , withKey: "pulse")
+        currentSolution?.removeSolution()
+        currentSolution?.showSolution()
     }
     
     

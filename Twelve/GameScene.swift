@@ -584,6 +584,7 @@ extension UIColor {
     static var myRed: UIColor { return UIColor(red: 217/255.0, green: 83/255.0, blue: 79/255.0, alpha: 1) }
     static var myBlue: UIColor { return UIColor(red: 66/255.0, green: 139/255.0, blue: 202/255.0, alpha: 1) }
     static var myYellow: UIColor { return UIColor(red: 240/255.0, green: 173/255.0, blue: 78/255.0, alpha: 1) }
+    static var myBackgroundColor : UIColor { return UIColor(red:252/255, green:252/255, blue:252/255, alpha: 1) }
     
 }
 
