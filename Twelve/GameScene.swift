@@ -45,6 +45,7 @@ class GameScene: SKScene {
     var combo: Combo?
     var objectsTileMap:SKTileMapNode!
     var scoreNode: ScoreNode?
+
     var timeLabel: SKLabelNode?
     var levelTimerValue = 60 {
         willSet(newValue) {
@@ -168,8 +169,9 @@ class GameScene: SKScene {
         guard let touch = touches.first else {
             return
         }
-        
-        analyzeTouch(touch)
+        if gridDispatcher.freezed == false {
+            analyzeTouch(touch)
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -184,10 +186,14 @@ class GameScene: SKScene {
             let location = touch.location(in: self)
             if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
                 do {
-                    numberTile?.unselected()
-                    try detect(number)
-                    gridDispatcher.cancelSolution()
-                    numberTile?.selected()
+                    if gridDispatcher.freezed == false {
+                        numberTile?.unselected()
+                        try detect(number)
+                        gridDispatcher.cancelSolution()
+                        numberTile?.selected()
+                    } else {
+                        try addToCombo(number: number)
+                    }
                     //numberTile?.alpha = 0
                 } catch let error as TwelveError where error == .notAdjacent || error == .numberIsNotFollowingPile  {
                     let action = SKAction.screenShakeWithNode(number, amount: CGPoint(x:5, y:5), oscillations: 20, duration: 0.50)
@@ -268,21 +274,17 @@ class GameScene: SKScene {
             throw TwelveError.numberIsNotFollowingPile
         }
         
-        if let numbers = combo?.combo, numbers.count > 1 {
+       if let numbers = combo?.combo, numbers.count > 1 && gridDispatcher.freezed == false {
             
             guard let previousNumber = numberTile else {
                 fatalError("it should have a tile!")
             }
-            
-            if previousNumber.value == 12 {
-                newPileAdded()
-            }
-            
+        
             try gridDispatcher.updateNumberAt(position: previousNumber.gridPosition, with: gridDispatcher.randomTileValue())
             
-            if numbers.count > 2 {
-                addSecondForCombo()
-            }
+          //  if numbers.count > 2 {
+          //      addSecond()
+           // }
             
             if !gameStarted {
                 gameStarted = true
@@ -295,24 +297,46 @@ class GameScene: SKScene {
     
     func newPileAdded() {
         if progressBar?.increaseAndHasGivenBonus() == true {
+            
+            if let action = timeLabel?.action(forKey: "countdown") {
+                action.speed = 0
+            }
+
+            progressBar?.value = 0
+            
             let colorizeUp = SKAction.colorize(with: .myBlue, colorBlendFactor: 1, duration: 0.25)
             let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
             let sequences = SKAction.sequence([colorizeUp, colorizeDown])
+            
+            gridDispatcher.freezed = true
+
             run(sequences)
+            
+            afterDelay(5, runBlock: {
+                self.gridDispatcher.freezed = false
+                if let action = self.timeLabel?.action(forKey: "countdown") {
+                    action.speed = 1
+                }
+
+            })
         }
     }
+    
+    
+
     
     func endsCombo() {
         
         numberTile?.unselected()
         do {
-            if let comboResult = try combo?.doneWithCombo() {
-                addPointsForCombo(comboResult)
-                if let prevNumber = numberTile {
-                    if prevNumber.value == 12 {
+            if let comboResult = try combo?.doneWithCombo(frozenMode: gridDispatcher.freezed) {
+                gridDispatcher.freezed ? addSecond() : addPointsForCombo(comboResult)
+                if gridDispatcher.freezed == false {
+                    for _ in 0..<comboResult.numberOfTwelve {
                         newPileAdded()
                     }
-                    
+                }
+                if let prevNumber = numberTile {
                     try gridDispatcher.updateNumberAt(position: prevNumber.gridPosition, with: gridDispatcher.randomTileValue())
                 }
                 numberTile = nil
@@ -396,6 +420,7 @@ class GameScene: SKScene {
             }
         }
         timeLabel?.run(SKAction.repeatForever(SKAction.sequence([wait, run])) , withKey: "countdown")
+
     }
     
 }
@@ -422,7 +447,7 @@ extension GameScene {
         }
     }
     
-    func addSecondForCombo() {
+    func addSecond() {
         
         levelTimerValue += 1
         if let label = timeLabel {

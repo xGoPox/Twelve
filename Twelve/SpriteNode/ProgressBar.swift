@@ -58,7 +58,7 @@ class ProgressBar : SKSpriteNode {
     func increaseAndHasGivenBonus() -> GiveBonus {
         var newValue = value + 1.5
         var bonus = false
-        if newValue >= 4 {
+        if newValue >= 1 {
             newValue = 4
             bonus = true
         }

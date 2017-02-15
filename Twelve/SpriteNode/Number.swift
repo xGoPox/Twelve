@@ -34,6 +34,15 @@ class NumberSpriteNode : SKSpriteNode {
     let numberLabel: SKLabelNode!
     let shape: SKShapeNode!
 
+    var frozen: Bool = false {
+        willSet(value) {
+            if value {
+                freeze()
+            } else {
+                unfreeze()
+            }
+        }
+    }
     var value : Int = 0 {
         willSet(number) {
             let fadeIn = SKAction.fadeIn(withDuration: 0.1)
@@ -47,7 +56,11 @@ class NumberSpriteNode : SKSpriteNode {
             removeSolution()
             numberLabel.fontColor = colorType
             if value != number {
-                unselected()
+                if frozen {
+                    freeze()
+                } else {
+                    unselected()
+                }
             }
         }
     }
@@ -127,6 +140,18 @@ class NumberSpriteNode : SKSpriteNode {
         shape.removeAction(forKey: "selected")
     }
     
+    func freeze() {
+        let color = getStrokeColorFadeAction(startColor: .myBackgroundColor, endColor:colorType , duration: 0.5)
+        shape.run(color)
+    }
+    
+    func unfreeze() {
+        let color = getStrokeColorFadeAction(startColor: colorType, endColor: .myBackgroundColor , duration: 0.5)
+        shape.run(color) {
+            self.shape.fillColor = .clear
+            self.shape.strokeColor = .clear
+        }
+    }
     
     init() {
         numberLabel = SKLabelNode(fontNamed:"Exo2-Medium")

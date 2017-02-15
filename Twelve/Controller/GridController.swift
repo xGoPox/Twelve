@@ -26,6 +26,18 @@ struct GridController : GridDispatcher {
             return randomInt(min: 2, max: 5)
         }
     }
+    
+    var freezed = false  {
+        willSet(freeze) {
+            if freeze {
+                freezeGrid()
+            } else {
+                unfreezeGrid()
+            }
+        }
+    }
+
+    
     var matrix : [[NumberSpriteNode]] = [[NumberSpriteNode]]()
     var piles = [Pile]()
     var grid : SKTileMapNode!
@@ -312,6 +324,46 @@ struct GridController : GridDispatcher {
     
 }
 
+protocol Freezer {
+    func unfreezeGrid()
+    func freezeGrid()
+}
+
+extension GridController : Freezer {
+    
+    func unfreezeGrid() {
+        
+        for row in 0..<grid.numberOfRows {
+            for column in 0..<grid.numberOfColumns {
+                let gridPosition = GridPosition(row, column)
+                do {
+                    if let number = try numberAt(position: gridPosition) {
+                        number.frozen = false
+                    }
+                } catch {  }
+            }
+        }
+    }
+    func freezeGrid() {
+        
+        
+        for row in 0..<grid.numberOfRows {
+            for column in 0..<grid.numberOfColumns {
+                let gridPosition = GridPosition(row, column)
+                do {
+                    if let number = try numberAt(position: gridPosition) {
+                        number.frozen = true
+                    }
+                } catch {  }
+            }
+        }
+        
+      
+
+    }
+    
+}
+
 extension GridController {
     func pileForNumber(_ number: Int) -> Pile? {
         return piles.first { $0.acceptFollowingNumber(number) }
@@ -332,10 +384,12 @@ extension GridController : GridValidator {
         currentSolution?.removeSolution()
     }
     
-     mutating func checkBoard() throws {
+    mutating func checkBoard() throws {
         currentSolution = try possibility()
-        currentSolution?.removeSolution()
-        currentSolution?.showSolution()
+        if !freezed {
+            currentSolution?.removeSolution()
+            currentSolution?.showSolution()
+        }
     }
     
     
@@ -361,11 +415,18 @@ extension GridController : GridValidator {
             }
         }
         
-        guard let possibleNumber = array.possibility(on: matrix) else {
-            throw TwelveError.noMorePossibilities
+        if freezed {
+            guard let possibleNumber = array.first else {
+                throw TwelveError.noMorePossibilities
+            }
+            return possibleNumber
+
+        } else {
+            guard let possibleNumber = array.possibility(on: matrix) else {
+                throw TwelveError.noMorePossibilities
+            }
+            return possibleNumber
         }
-        
-        return possibleNumber
     }
     
     
