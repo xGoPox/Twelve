@@ -18,18 +18,19 @@ struct GridController : GridDispatcher {
     
     var numberOfPossibilities: Int {
         get {
-            return randomInt(min: 1, max: 3)
+            return randomInt(min: 2, max: 2)
         }
     }
     var lengthForCombo: Int {
         get {
-            return randomInt(min: 2, max: 5)
+            return randomInt(min: 4, max: 6)
         }
     }
     
     var freezed = false  {
         willSet(freeze) {
             if freeze {
+                cancelSolution()
                 freezeGrid()
             } else {
                 unfreezeGrid()
@@ -84,7 +85,7 @@ struct GridController : GridDispatcher {
     
     mutating func disposeNumbers() throws {
         try disposePossibilities()
-        try disposeFuturesCombos()
+//        try disposeFuturesCombos()
         try disposeRandomNumbers()
     }
     
