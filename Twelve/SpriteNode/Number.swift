@@ -46,10 +46,10 @@ class NumberSpriteNode : SKSpriteNode {
         didSet(number) {
             removeAction(forKey: "pulse")
             numberLabel.fontColor = colorType
-            if shape.strokeColor != colorType {
-                let color = getStrokeColorFadeAction(startColor: shape.strokeColor, endColor: colorType, duration: 0.1)
-                shape.run(color)
-            }
+        //    if shape.strokeColor != colorType {
+        //        let color = getStrokeColorFadeAction(startColor: shape.strokeColor, endColor: colorType, duration: 0.1)
+         //       shape.run(color)
+         //   }
             if value != number {
                 unselected()
             }
@@ -73,13 +73,22 @@ class NumberSpriteNode : SKSpriteNode {
         }
     }
     
+    func showSolution() {
+        
+    }
+    
+    func removeSolution() {
+        
+    }
+    
     func selected() {
         
         let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
         let pulseDown = SKAction.scale(to: 1, duration: 0.20)
         let pulse = SKAction.sequence([pulseUp, pulseDown])
         
-        let color = getFillColorFadeAction(startColor: colorType, endColor: colorType, duration: 0.1)
+        let color = getColorFadeAction(startColor: colorType, endColor: colorType, duration: 0.1)
+        shape.run(color)
 
         let fadeIn = SKAction.fadeIn(withDuration: 0.1)
         let fadeOut = SKAction.fadeOut(withDuration: 0.1)
@@ -95,10 +104,12 @@ class NumberSpriteNode : SKSpriteNode {
     }
     
     func unselected() {
-        shape.setScale(1)
-        let color = getFillColorFadeAction(startColor: colorType, endColor: .white, duration: 0.1)
+        let color = getColorFadeAction(startColor: colorType, endColor: .white, duration: 0.1)
         let fadeIn = SKAction.fadeIn(withDuration: 0.1)
         let fadeOut = SKAction.fadeOut(withDuration: 0.1)
+        
+        let numberScaleBackAction = SKAction.scale(to: 1, duration: 0.15)
+        shape.run(numberScaleBackAction)
         numberLabel.run(fadeOut) {
             self.shape.run(color)
             self.numberLabel.fontColor = self.colorType
@@ -190,14 +201,14 @@ private func getStrokeColorFadeAction(startColor: UIColor, endColor: UIColor, du
                 color = UIColor.init(red: red, green: green, blue: blue, alpha: alpha)
             }
             // Node properties to change.
-            node.strokeColor =  .clear
+            node.strokeColor =  color
         }
     }
     return action
 }
 
 
-private func getFillColorFadeAction(startColor: UIColor, endColor: UIColor, duration: TimeInterval) -> SKAction {
+private func getColorFadeAction(startColor: UIColor, endColor: UIColor, duration: TimeInterval) -> SKAction {
     // Create a custom action for color fade
     let action = SKAction.customAction(withDuration: duration) {(node, elapsedTime) in
         if let node = node as? SKShapeNode {
@@ -214,6 +225,8 @@ private func getFillColorFadeAction(startColor: UIColor, endColor: UIColor, dura
             }
             // Node properties to change.
             node.fillColor = color
+            node.strokeColor = color
+
         }
     }
     return action

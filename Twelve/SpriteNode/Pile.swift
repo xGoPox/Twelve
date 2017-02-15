@@ -101,10 +101,10 @@ class Pile : SKSpriteNode, PileHandler {
         roundShape.position = CGPoint(x: frame.midX, y:    frame.midY)
         roundShape.lineWidth = 1
         roundShape.setScale(0.9)
-        roundShape.strokeColor = .white
-        //shape.strokeColor = colorType
-        roundShape.fillColor = .white
-       // addChild(shape)
+        shape.strokeColor = colorType
+        roundShape.fillColor = colorType
+        roundShape.strokeColor = colorType
+        addChild(shape)
         addChild(roundShape)
         addChild(numberLabel)
     }
