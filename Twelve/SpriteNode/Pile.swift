@@ -39,8 +39,20 @@ class Pile : SKSpriteNode, PileHandler {
         didSet(number) {
             if number != currentNumber {
                 shape?.strokeColor = colorType
-                let action = SKAction.screenZoomWithNode(shape, amount: CGPoint(x:1.2,y:1.2), oscillations: 3, duration: 0.5)
-                shape.run(action)
+//                let action = SKAction.screenZoomWithNode(shape, amount: CGPoint(x:1.2,y:1.2), oscillations: 3, duration: 0.5)
+//                shape.run(action)
+                shape.removeAction(forKey: "selected")
+                shape.setScale(1)
+                if currentNumber == number.followingNumber() {
+                    
+                    let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
+                    let pulseDown = SKAction.scale(to: 1, duration: 0.20)
+                    let pulse = SKAction.sequence([pulseUp, pulseDown])
+                    let repeatAction = SKAction.repeatForever(pulse)
+                    shape.run(repeatAction , withKey: "selected")
+                }
+
+
                 let color = getColorFadeAction(startColor: roundShape.fillColor, endColor: colorType, duration: 0.75)
                 roundShape.run(color)
             }
@@ -52,13 +64,13 @@ class Pile : SKSpriteNode, PileHandler {
         get {
             switch currentNumber {
             case 1...3:
-                return UIColor(red: 34/255, green: 181/255.0, blue: 115/255.0, alpha: 1)
+                return .myGreen
             case 4...6:
-                return UIColor(red: 217/255.0, green: 83/255.0, blue: 79/255.0, alpha: 1)
+                return .myRed
             case 7...9:
-                return UIColor(red: 240/255.0, green: 173/255.0, blue: 78/255.0, alpha: 1)
+                return .myYellow
             case 10...12:
-                return UIColor(red: 66/255.0, green: 139/255.0, blue: 202/255.0, alpha: 1)
+                return .myBlue
             default:
                 return .clear
             }
@@ -67,35 +79,32 @@ class Pile : SKSpriteNode, PileHandler {
     
     
     init() {
-        numberLabel = SKLabelNode(fontNamed:"ChalkboardSE-Light")
+        numberLabel = SKLabelNode(fontNamed:"Exo2-Medium")
         shape = SKShapeNode()
         roundShape = SKShapeNode()
         super.init(texture: nil, color: .clear, size: CGSize(width: 70, height: 70))
-//        effectNode.shouldEnableEffects = false
-//        effectNode.shouldRasterize = true
-//        addChild(effectNode)
         numberLabel.fontSize = 40
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.isUserInteractionEnabled = false
-        numberLabel.fontColor = UIColor(red:242/255, green:236/255, blue:225/255, alpha: 1)
+        numberLabel.fontColor = UIColor(red:252/255, green:252/255, blue:252/255, alpha: 1)
         numberLabel.text = String(currentNumber)
         shape.isUserInteractionEnabled = false
         let corners : UIRectCorner = [UIRectCorner.allCorners]
         shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
         shape.position = CGPoint(x: frame.midX, y:    frame.midY)
         shape.lineWidth = 2
-        shape.fillColor = UIColor(red:46/255, green:46/255, blue:59/255, alpha: 1)
+        shape.fillColor = UIColor(red:252/255, green:252/255, blue:252/255, alpha: 1)
         shape.setScale(1.05)
         roundShape.isUserInteractionEnabled = false
         roundShape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
         roundShape.position = CGPoint(x: frame.midX, y:    frame.midY)
         roundShape.lineWidth = 1
         roundShape.setScale(0.9)
-        roundShape.strokeColor = UIColor(red:46/255, green:46/255, blue:59/255, alpha: 1)
-        shape.strokeColor = colorType
-        roundShape.fillColor = colorType
-        addChild(shape)
+        roundShape.strokeColor = .white
+        //shape.strokeColor = colorType
+        roundShape.fillColor = .white
+       // addChild(shape)
         addChild(roundShape)
         addChild(numberLabel)
     }
@@ -105,6 +114,8 @@ class Pile : SKSpriteNode, PileHandler {
     }
     
     func updateWithLastNumber(_ number: Int) {
+        shape.removeAction(forKey: "selected")
+        shape.setScale(1)
         oldNumber = number
         currentNumber = number
 //        removeGlow()
@@ -112,6 +123,8 @@ class Pile : SKSpriteNode, PileHandler {
     }
     
     func resetForFalseCombo() {
+        shape.removeAction(forKey: "selected")
+        shape.setScale(1)
         currentNumber = oldNumber
  //       removeGlow()
         print("RESET pile currentNumber \(oldNumber) with old number \(oldNumber)")

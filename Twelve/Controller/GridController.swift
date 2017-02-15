@@ -44,6 +44,7 @@ struct GridController : GridDispatcher {
                 // Populate the row.
                 let position = GridPosition(row, column)
                 let sprite = NumberSpriteNode()
+                sprite.zPosition = 2
                 sprite.gridPosition = position
                 sprite.position = grid.centerOfTile(atColumn: sprite.gridPosition.column, row: sprite.gridPosition.row)
                 grid.addChild(sprite)

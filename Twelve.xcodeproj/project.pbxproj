@@ -29,18 +29,36 @@
 		3D8A8CFE1E413A5000C6B148 /* MyHexa.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D8A8CFD1E413A5000C6B148 /* MyHexa.sks */; };
 		3D95CB471E35409B008A9A9C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB461E35409B008A9A9C /* AppDelegate.swift */; };
 		3D95CB491E35409C008A9A9C /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB481E35409C008A9A9C /* GameScene.sks */; };
-		3D95CB4B1E35409C008A9A9C /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB4A1E35409C008A9A9C /* Actions.sks */; };
+		3D95CB4B1E35409C008A9A9C /* TestAction.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB4A1E35409C008A9A9C /* TestAction.sks */; };
 		3D95CB4D1E35409C008A9A9C /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB4C1E35409C008A9A9C /* GameScene.swift */; };
 		3D95CB4F1E35409C008A9A9C /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB4E1E35409C008A9A9C /* GameViewController.swift */; };
 		3D95CB521E35409C008A9A9C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB501E35409C008A9A9C /* Main.storyboard */; };
 		3D95CB541E35409C008A9A9C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB531E35409C008A9A9C /* Assets.xcassets */; };
 		3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB551E35409C008A9A9C /* LaunchScreen.storyboard */; };
 		3D95CB621E35409C008A9A9C /* TwelveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB611E35409C008A9A9C /* TwelveUITests.swift */; };
-		3D970DD51E4F727C0058490B /* ComboBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D970DD41E4F727C0058490B /* ComboBar.swift */; };
-		3D970DD71E4F8BE40058490B /* Multiplicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D970DD61E4F8BE40058490B /* Multiplicator.swift */; };
+		3D970DD71E4F8BE40058490B /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D970DD61E4F8BE40058490B /* ProgressBar.swift */; };
 		3DA8565A1E4E12B100C6DF42 /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DA856591E4E12B100C6DF42 /* GameScene_iPad.sks */; };
 		3DAA36C21E4B236A004FE452 /* SpriteKit-Spring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */; };
 		3DAA36C41E4B34A1004FE452 /* MyParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DAA36C31E4B34A1004FE452 /* MyParticle.sks */; };
+		3DB187711E53061B009C6BAA /* Exo2-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1875E1E53061B009C6BAA /* Exo2-Black.ttf */; };
+		3DB187721E53061B009C6BAA /* Exo2-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1875F1E53061B009C6BAA /* Exo2-BlackItalic.ttf */; };
+		3DB187731E53061B009C6BAA /* Exo2-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187601E53061B009C6BAA /* Exo2-Bold.ttf */; };
+		3DB187741E53061B009C6BAA /* Exo2-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187611E53061B009C6BAA /* Exo2-BoldItalic.ttf */; };
+		3DB187751E53061B009C6BAA /* Exo2-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187621E53061B009C6BAA /* Exo2-ExtraBold.ttf */; };
+		3DB187761E53061B009C6BAA /* Exo2-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187631E53061B009C6BAA /* Exo2-ExtraBoldItalic.ttf */; };
+		3DB187771E53061B009C6BAA /* Exo2-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187641E53061B009C6BAA /* Exo2-ExtraLight.ttf */; };
+		3DB187781E53061B009C6BAA /* Exo2-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187651E53061B009C6BAA /* Exo2-ExtraLightItalic.ttf */; };
+		3DB187791E53061B009C6BAA /* Exo2-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187661E53061B009C6BAA /* Exo2-Italic.ttf */; };
+		3DB1877A1E53061B009C6BAA /* Exo2-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187671E53061B009C6BAA /* Exo2-Light.ttf */; };
+		3DB1877B1E53061B009C6BAA /* Exo2-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187681E53061B009C6BAA /* Exo2-LightItalic.ttf */; };
+		3DB1877C1E53061B009C6BAA /* Exo2-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187691E53061B009C6BAA /* Exo2-Medium.ttf */; };
+		3DB1877D1E53061B009C6BAA /* Exo2-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1876A1E53061B009C6BAA /* Exo2-MediumItalic.ttf */; };
+		3DB1877E1E53061B009C6BAA /* Exo2-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1876B1E53061B009C6BAA /* Exo2-Regular.ttf */; };
+		3DB1877F1E53061B009C6BAA /* Exo2-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1876C1E53061B009C6BAA /* Exo2-SemiBold.ttf */; };
+		3DB187801E53061B009C6BAA /* Exo2-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1876D1E53061B009C6BAA /* Exo2-SemiBoldItalic.ttf */; };
+		3DB187811E53061B009C6BAA /* Exo2-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1876E1E53061B009C6BAA /* Exo2-Thin.ttf */; };
+		3DB187821E53061B009C6BAA /* Exo2-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1876F1E53061B009C6BAA /* Exo2-ThinItalic.ttf */; };
+		3DB187831E53061B009C6BAA /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187701E53061B009C6BAA /* OFL.txt */; };
 		3DE8A17C1E3CA5AC00BC150A /* Combo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A17B1E3CA5AC00BC150A /* Combo.swift */; };
 		3DE8A1801E3CA60900BC150A /* GridController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A17F1E3CA60900BC150A /* GridController.swift */; };
 		3DE8A18D1E3CAC2C00BC150A /* TwelveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A18C1E3CAC2C00BC150A /* TwelveTests.swift */; };
@@ -88,7 +106,7 @@
 		3D95CB431E35409B008A9A9C /* Twelve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Twelve.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D95CB461E35409B008A9A9C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3D95CB481E35409C008A9A9C /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
-		3D95CB4A1E35409C008A9A9C /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
+		3D95CB4A1E35409C008A9A9C /* TestAction.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = TestAction.sks; sourceTree = "<group>"; };
 		3D95CB4C1E35409C008A9A9C /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		3D95CB4E1E35409C008A9A9C /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		3D95CB511E35409C008A9A9C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -98,11 +116,29 @@
 		3D95CB5D1E35409C008A9A9C /* TwelveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwelveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D95CB611E35409C008A9A9C /* TwelveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwelveUITests.swift; sourceTree = "<group>"; };
 		3D95CB631E35409C008A9A9C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3D970DD41E4F727C0058490B /* ComboBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ComboBar.swift; path = SpriteNode/ComboBar.swift; sourceTree = "<group>"; };
-		3D970DD61E4F8BE40058490B /* Multiplicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Multiplicator.swift; path = SpriteNode/Multiplicator.swift; sourceTree = "<group>"; };
+		3D970DD61E4F8BE40058490B /* ProgressBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProgressBar.swift; path = SpriteNode/ProgressBar.swift; sourceTree = "<group>"; };
 		3DA856591E4E12B100C6DF42 /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
 		3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SpriteKit-Spring.swift"; sourceTree = "<group>"; };
 		3DAA36C31E4B34A1004FE452 /* MyParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyParticle.sks; sourceTree = "<group>"; };
+		3DB1875E1E53061B009C6BAA /* Exo2-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Black.ttf"; sourceTree = "<group>"; };
+		3DB1875F1E53061B009C6BAA /* Exo2-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-BlackItalic.ttf"; sourceTree = "<group>"; };
+		3DB187601E53061B009C6BAA /* Exo2-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Bold.ttf"; sourceTree = "<group>"; };
+		3DB187611E53061B009C6BAA /* Exo2-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-BoldItalic.ttf"; sourceTree = "<group>"; };
+		3DB187621E53061B009C6BAA /* Exo2-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-ExtraBold.ttf"; sourceTree = "<group>"; };
+		3DB187631E53061B009C6BAA /* Exo2-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
+		3DB187641E53061B009C6BAA /* Exo2-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-ExtraLight.ttf"; sourceTree = "<group>"; };
+		3DB187651E53061B009C6BAA /* Exo2-ExtraLightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
+		3DB187661E53061B009C6BAA /* Exo2-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Italic.ttf"; sourceTree = "<group>"; };
+		3DB187671E53061B009C6BAA /* Exo2-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Light.ttf"; sourceTree = "<group>"; };
+		3DB187681E53061B009C6BAA /* Exo2-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-LightItalic.ttf"; sourceTree = "<group>"; };
+		3DB187691E53061B009C6BAA /* Exo2-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Medium.ttf"; sourceTree = "<group>"; };
+		3DB1876A1E53061B009C6BAA /* Exo2-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-MediumItalic.ttf"; sourceTree = "<group>"; };
+		3DB1876B1E53061B009C6BAA /* Exo2-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Regular.ttf"; sourceTree = "<group>"; };
+		3DB1876C1E53061B009C6BAA /* Exo2-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-SemiBold.ttf"; sourceTree = "<group>"; };
+		3DB1876D1E53061B009C6BAA /* Exo2-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		3DB1876E1E53061B009C6BAA /* Exo2-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Thin.ttf"; sourceTree = "<group>"; };
+		3DB1876F1E53061B009C6BAA /* Exo2-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-ThinItalic.ttf"; sourceTree = "<group>"; };
+		3DB187701E53061B009C6BAA /* OFL.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
 		3DE8A17B1E3CA5AC00BC150A /* Combo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Combo.swift; path = Model/Combo.swift; sourceTree = "<group>"; };
 		3DE8A17F1E3CA60900BC150A /* GridController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GridController.swift; path = Controller/GridController.swift; sourceTree = "<group>"; };
 		3DE8A18A1E3CAC2C00BC150A /* TwelveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TwelveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,8 +200,7 @@
 				3D85629E1E40A52E005EFC36 /* Pile.swift */,
 				3D8562A11E40AE2D005EFC36 /* EndScoreNode.swift */,
 				3D8562A31E40D9A9005EFC36 /* ScoreNode.swift */,
-				3D970DD41E4F727C0058490B /* ComboBar.swift */,
-				3D970DD61E4F8BE40058490B /* Multiplicator.swift */,
+				3D970DD61E4F8BE40058490B /* ProgressBar.swift */,
 			);
 			name = SpriteNode;
 			sourceTree = "<group>";
@@ -196,7 +231,7 @@
 				3D95CB461E35409B008A9A9C /* AppDelegate.swift */,
 				3D95CB481E35409C008A9A9C /* GameScene.sks */,
 				3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */,
-				3D95CB4A1E35409C008A9A9C /* Actions.sks */,
+				3D95CB4A1E35409C008A9A9C /* TestAction.sks */,
 				3D95CB4C1E35409C008A9A9C /* GameScene.swift */,
 				3DA856591E4E12B100C6DF42 /* GameScene_iPad.sks */,
 				3DAA36C31E4B34A1004FE452 /* MyParticle.sks */,
@@ -206,6 +241,7 @@
 				3DE8A1811E3CA61300BC150A /* Controller */,
 				3DE8A17A1E3CA58000BC150A /* Model */,
 				3D95CB4E1E35409C008A9A9C /* GameViewController.swift */,
+				3DB1875D1E53061B009C6BAA /* Exo_2 */,
 				3D95CB501E35409C008A9A9C /* Main.storyboard */,
 				3D95CB531E35409C008A9A9C /* Assets.xcassets */,
 				3D95CB551E35409C008A9A9C /* LaunchScreen.storyboard */,
@@ -221,6 +257,32 @@
 				3D95CB631E35409C008A9A9C /* Info.plist */,
 			);
 			path = TwelveUITests;
+			sourceTree = "<group>";
+		};
+		3DB1875D1E53061B009C6BAA /* Exo_2 */ = {
+			isa = PBXGroup;
+			children = (
+				3DB1875E1E53061B009C6BAA /* Exo2-Black.ttf */,
+				3DB1875F1E53061B009C6BAA /* Exo2-BlackItalic.ttf */,
+				3DB187601E53061B009C6BAA /* Exo2-Bold.ttf */,
+				3DB187611E53061B009C6BAA /* Exo2-BoldItalic.ttf */,
+				3DB187621E53061B009C6BAA /* Exo2-ExtraBold.ttf */,
+				3DB187631E53061B009C6BAA /* Exo2-ExtraBoldItalic.ttf */,
+				3DB187641E53061B009C6BAA /* Exo2-ExtraLight.ttf */,
+				3DB187651E53061B009C6BAA /* Exo2-ExtraLightItalic.ttf */,
+				3DB187661E53061B009C6BAA /* Exo2-Italic.ttf */,
+				3DB187671E53061B009C6BAA /* Exo2-Light.ttf */,
+				3DB187681E53061B009C6BAA /* Exo2-LightItalic.ttf */,
+				3DB187691E53061B009C6BAA /* Exo2-Medium.ttf */,
+				3DB1876A1E53061B009C6BAA /* Exo2-MediumItalic.ttf */,
+				3DB1876B1E53061B009C6BAA /* Exo2-Regular.ttf */,
+				3DB1876C1E53061B009C6BAA /* Exo2-SemiBold.ttf */,
+				3DB1876D1E53061B009C6BAA /* Exo2-SemiBoldItalic.ttf */,
+				3DB1876E1E53061B009C6BAA /* Exo2-Thin.ttf */,
+				3DB1876F1E53061B009C6BAA /* Exo2-ThinItalic.ttf */,
+				3DB187701E53061B009C6BAA /* OFL.txt */,
+			);
+			path = Exo_2;
 			sourceTree = "<group>";
 		};
 		3DE8A17A1E3CA58000BC150A /* Model */ = {
@@ -360,15 +422,34 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DB187751E53061B009C6BAA /* Exo2-ExtraBold.ttf in Resources */,
+				3DB1877B1E53061B009C6BAA /* Exo2-LightItalic.ttf in Resources */,
 				3DA8565A1E4E12B100C6DF42 /* GameScene_iPad.sks in Resources */,
+				3DB187811E53061B009C6BAA /* Exo2-Thin.ttf in Resources */,
 				3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */,
 				3D95CB521E35409C008A9A9C /* Main.storyboard in Resources */,
+				3DB187721E53061B009C6BAA /* Exo2-BlackItalic.ttf in Resources */,
+				3DB187761E53061B009C6BAA /* Exo2-ExtraBoldItalic.ttf in Resources */,
+				3DB187771E53061B009C6BAA /* Exo2-ExtraLight.ttf in Resources */,
+				3DB1877A1E53061B009C6BAA /* Exo2-Light.ttf in Resources */,
+				3DB1877E1E53061B009C6BAA /* Exo2-Regular.ttf in Resources */,
+				3DB187741E53061B009C6BAA /* Exo2-BoldItalic.ttf in Resources */,
 				3D95CB491E35409C008A9A9C /* GameScene.sks in Resources */,
 				3DAA36C41E4B34A1004FE452 /* MyParticle.sks in Resources */,
+				3DB187831E53061B009C6BAA /* OFL.txt in Resources */,
+				3DB187781E53061B009C6BAA /* Exo2-ExtraLightItalic.ttf in Resources */,
 				3D95CB541E35409C008A9A9C /* Assets.xcassets in Resources */,
+				3DB187711E53061B009C6BAA /* Exo2-Black.ttf in Resources */,
 				3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */,
-				3D95CB4B1E35409C008A9A9C /* Actions.sks in Resources */,
+				3DB187791E53061B009C6BAA /* Exo2-Italic.ttf in Resources */,
+				3DB187731E53061B009C6BAA /* Exo2-Bold.ttf in Resources */,
+				3D95CB4B1E35409C008A9A9C /* TestAction.sks in Resources */,
+				3DB1877C1E53061B009C6BAA /* Exo2-Medium.ttf in Resources */,
+				3DB187801E53061B009C6BAA /* Exo2-SemiBoldItalic.ttf in Resources */,
+				3DB187821E53061B009C6BAA /* Exo2-ThinItalic.ttf in Resources */,
 				3D8A8CFE1E413A5000C6B148 /* MyHexa.sks in Resources */,
+				3DB1877D1E53061B009C6BAA /* Exo2-MediumItalic.ttf in Resources */,
+				3DB1877F1E53061B009C6BAA /* Exo2-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,7 +488,7 @@
 				3D85629C1E40A51A005EFC36 /* RoundedCornerSprite.swift in Sources */,
 				3D95CB471E35409B008A9A9C /* AppDelegate.swift in Sources */,
 				3DE8A17C1E3CA5AC00BC150A /* Combo.swift in Sources */,
-				3D970DD71E4F8BE40058490B /* Multiplicator.swift in Sources */,
+				3D970DD71E4F8BE40058490B /* ProgressBar.swift in Sources */,
 				3D087E961E48D16800EAD2E2 /* SKNode+Extensions.swift in Sources */,
 				3D8562A41E40D9A9005EFC36 /* ScoreNode.swift in Sources */,
 				3D087E901E48D16800EAD2E2 /* CGPoint+Extensions.swift in Sources */,
@@ -416,7 +497,6 @@
 				3D087E911E48D16800EAD2E2 /* CGVector+Extensions.swift in Sources */,
 				3D087E951E48D16800EAD2E2 /* SKColor+Extensions.swift in Sources */,
 				3D087E971E48D16800EAD2E2 /* SKTAudio.swift in Sources */,
-				3D970DD51E4F727C0058490B /* ComboBar.swift in Sources */,
 				3D8562A01E40A52E005EFC36 /* Pile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

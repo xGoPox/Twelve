@@ -37,8 +37,8 @@ class GameScene: SKScene {
     
     //    var entities = [GKEntity]()
     //    var graphs = [String : GKGraph]()
-    var multiCombo: Multiplicator!
-    var comboBar: ComboBar?
+    var progressBar: ProgressBar?
+
     var gameType: GameType = .surviror
     var numberTile: NumberSpriteNode?
     var gridDispatcher = GridController()
@@ -49,7 +49,7 @@ class GameScene: SKScene {
     var levelTimerValue = 60 {
         willSet(newValue) {
             timeLabel?.text = String(newValue)
-            comboBar?.value = Double(newValue)
+            self.progressBar?.decrease()
         }
     }
     
@@ -70,6 +70,7 @@ class GameScene: SKScene {
             }
         }
     }
+    
     
     var totalPoints = 0 {
         willSet(number) {
@@ -104,21 +105,22 @@ class GameScene: SKScene {
             as? SKTileMapNode else {
                 fatalError("Background node not loaded")
         }
-        guard let topBar = childNode(withName: "topBar")
-            as? SKSpriteNode else {
-                fatalError("topBar node not loaded")
+        
+        guard let nodeProgressBar = childNode(withName: "progressBar")
+            as? ProgressBar else {
+                fatalError("comboBarTop node not loaded")
         }
         
-        guard let node = topBar.childNode(withName: "multiplicatorParent")
-            as? Multiplicator else {
-                fatalError("multiplicatorParent node not loaded")
-        }
+
         
-        multiCombo = node
+        progressBar = nodeProgressBar
+
         objectsTileMap = map
         
         combo = Combo.init(lastNumber: nil, combo: [Int](), currentPile: gridDispatcher.pileForNumber(12))
         fullfillBoard()
+        
+        objectsTileMap.addChild(line)
     }
     
     func fullfillBoard() {
@@ -143,12 +145,30 @@ class GameScene: SKScene {
         }
         gridDispatcher.fullfillGrid(objectsTileMap, with: piles)
     }
+
+    var line = SKShapeNode()
+    
+    func drawLine(endingPoint: CGPoint) {
+        if let number = numberTile {
+            let path = CGMutablePath()
+            path.move(to: number.position)
+            path.addLine(to: CGPoint(x: endingPoint.x, y:endingPoint.y))
+            line.zPosition = 1
+            line.path = path
+            line.strokeColor = number.colorType.withAlphaComponent(0.5)
+            line.lineWidth = 20
+        } else {
+            line.path = nil
+        }
+    }
+    
     
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {
             return
         }
+        
         analyzeTouch(touch)
     }
     
@@ -156,15 +176,34 @@ class GameScene: SKScene {
         guard let touch = touches.first else {
             return
         }
+        
         if atPoint(touch.location(in: self)).name == "Restart" {
             prepareGame()
         }
         else {
-            analyzeTouch(touch)
+            let location = touch.location(in: self)
+            if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
+                do {
+                    numberTile?.unselected()
+                    try detect(number)
+                    gridDispatcher.cancelSolution()
+                    numberTile?.selected()
+                    //numberTile?.alpha = 0
+                } catch let error as TwelveError where error == .notAdjacent || error == .numberIsNotFollowingPile  {
+                    let action = SKAction.screenShakeWithNode(number, amount: CGPoint(x:5, y:5), oscillations: 20, duration: 0.50)
+                    number.run(action, completion: {
+                        self.endsCombo()
+                    })
+                } catch {
+                   numberTile = nil
+                    line.path = nil
+                }
+            }
         }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        line.path = nil
         endsCombo()
     }
     
@@ -177,40 +216,44 @@ class GameScene: SKScene {
     
     func analyzeTouch(_ touch: UITouch) {
         
+        if  numberTile != nil {
+            drawLine(endingPoint: touch.location(in: self.objectsTileMap))
+        }
+
         let location = touch.location(in: self)
         if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
+            
+            guard let prevNumber = numberTile , prevNumber.gridPosition != number.gridPosition else {
+                return
+            }
+
             do {
-                if let prevNumber = numberTile , prevNumber.gridPosition == number.gridPosition {
-                    return
-                }
-                numberTile?.haloShape.setScale(1)
-                numberTile?.haloShape.removeAction(forKey: "selected")
+                
+                numberTile?.unselected()
                 try detect(number)
                 gridDispatcher.cancelSolution()
-                let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
-                let pulseDown = SKAction.scale(to: 1, duration: 0.20)
-                let pulse = SKAction.sequence([pulseUp, pulseDown])
-                let repeatAction = SKAction.repeatForever(pulse)
-                numberTile?.haloShape.run(repeatAction , withKey: "selected")
+                numberTile?.selected()
                 //numberTile?.alpha = 0
             } catch let error as TwelveError where error == .notAdjacent || error == .numberIsNotFollowingPile  {
+                numberTile = nil
+                line.path = nil
                 let action = SKAction.screenShakeWithNode(number, amount: CGPoint(x:5, y:5), oscillations: 20, duration: 0.50)
                 number.run(action, completion: {
                     self.endsCombo()
                 })
             } catch {
-                numberTile = nil
+                 numberTile = nil
+                line.path = nil
             }
         }
+        
     }
     
-    func detect(_ tile : NumberSpriteNode) throws {
-        
-        
-        if let previousTileSelected = numberTile {
-            try gridDispatcher.isTile(previousTileSelected, adjacentWith: tile)
+    func detect(_ number : NumberSpriteNode) throws {
+        if let prevNumber = numberTile {
+            try gridDispatcher.isTile(prevNumber, adjacentWith: number)
         }
-        try addToCombo(number: tile)
+        try addToCombo(number: number)
     }
     
     
@@ -232,8 +275,7 @@ class GameScene: SKScene {
             }
             
             if previousNumber.value == 12 {
-                print("BOUM ++! YEAH")
-                multiCombo.value = (multiCombo.value + 1 > 4) ? 4 : (multiCombo.value + 1.5)
+                newPileAdded()
             }
             
             try gridDispatcher.updateNumberAt(position: previousNumber.gridPosition, with: gridDispatcher.randomTileValue())
@@ -251,25 +293,35 @@ class GameScene: SKScene {
     }
     
     
+    func newPileAdded() {
+        if progressBar?.increaseAndHasGivenBonus() == true {
+            let colorizeUp = SKAction.colorize(with: .myBlue, colorBlendFactor: 1, duration: 0.25)
+            let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
+            let sequences = SKAction.sequence([colorizeUp, colorizeDown])
+            run(sequences)
+        }
+    }
+    
     func endsCombo() {
         
-        numberTile?.haloShape.setScale(1)
-        numberTile?.haloShape.removeAction(forKey: "selected")
+        numberTile?.unselected()
         do {
             if let comboResult = try combo?.doneWithCombo() {
                 addPointsForCombo(comboResult)
                 if let prevNumber = numberTile {
                     if prevNumber.value == 12 {
-                        print("BOUM ++! OHHH")
-                        multiCombo.value = (multiCombo.value + 1 > 4) ? 4 : (multiCombo.value + 1.5)
+                        newPileAdded()
                     }
+                    
                     try gridDispatcher.updateNumberAt(position: prevNumber.gridPosition, with: gridDispatcher.randomTileValue())
                 }
                 numberTile = nil
+                line.path = nil
                 checkBoard()
             }
         } catch  {
             numberTile = nil
+            line.path = nil
             checkBoard()
         }
     }
@@ -308,7 +360,7 @@ class GameScene: SKScene {
     
     func startTimer() {
         
-        if comboBar == nil {
+/*        if comboBar == nil {
             guard let node = childNode(withName: "comboBar")
                 as? ComboBar else {
                     fatalError("comboBar node not loaded")
@@ -316,7 +368,7 @@ class GameScene: SKScene {
             comboBar = node
         }
 
-        comboBar?.value = 0
+        comboBar?.value = 0*/
         levelTimerValue = 60
         
         if timeLabel == nil {
@@ -337,8 +389,7 @@ class GameScene: SKScene {
         let run = SKAction.run {
             if self.levelTimerValue > 0 {
                 self.levelTimerValue -= 1
-                let newValue = self.multiCombo.value - 0.1
-                self.multiCombo.value = newValue >= 0 ? newValue : 0
+
             } else {
                 self.gameStarted = false
                 self.timeLabel?.removeAction(forKey: "countdown")
@@ -354,7 +405,7 @@ extension GameScene {
     
     func addPointsForCombo(_ comboResult : ComboResult) {
         
-        let points = comboResult.points * multiCombo.multiplicator
+        let points = comboResult.points
         guard let label = childNode(withName: "newPointsLabel")
             as? SKLabelNode else {
                 fatalError("newPointsLabel node not loaded")
@@ -527,4 +578,12 @@ extension Int {
 }
 
 
+extension UIColor {
+    
+    static var myGreen: UIColor  { return UIColor(red: 34/255, green: 181/255.0, blue: 115/255.0, alpha: 1) }
+    static var myRed: UIColor { return UIColor(red: 217/255.0, green: 83/255.0, blue: 79/255.0, alpha: 1) }
+    static var myBlue: UIColor { return UIColor(red: 66/255.0, green: 139/255.0, blue: 202/255.0, alpha: 1) }
+    static var myYellow: UIColor { return UIColor(red: 240/255.0, green: 173/255.0, blue: 78/255.0, alpha: 1) }
+    
+}
 
