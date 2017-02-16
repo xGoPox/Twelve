@@ -22,6 +22,7 @@ class Pile : SKSpriteNode, PileHandler {
     let effectNode = SKEffectNode()
     let shape: SKShapeNode!
     let roundShape: SKShapeNode!
+    var possibility: NumberSpriteNode?
 
     var oldNumber: Int = 12
     let numberLabel: SKLabelNode!
@@ -87,14 +88,14 @@ class Pile : SKSpriteNode, PileHandler {
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.isUserInteractionEnabled = false
-        numberLabel.fontColor = UIColor(red:252/255, green:252/255, blue:252/255, alpha: 1)
+        numberLabel.fontColor = .white
         numberLabel.text = String(currentNumber)
         shape.isUserInteractionEnabled = false
         let corners : UIRectCorner = [UIRectCorner.allCorners]
         shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
         shape.position = CGPoint(x: frame.midX, y:    frame.midY)
         shape.lineWidth = 2
-        shape.fillColor = UIColor(red:252/255, green:252/255, blue:252/255, alpha: 1)
+        shape.fillColor = .white
         shape.setScale(1.05)
         roundShape.isUserInteractionEnabled = false
         roundShape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
@@ -111,6 +112,11 @@ class Pile : SKSpriteNode, PileHandler {
     
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func reset() {
+        possibility = nil
+        updateWithLastNumber(12)
     }
     
     func updateWithLastNumber(_ number: Int) {

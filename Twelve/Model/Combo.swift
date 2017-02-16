@@ -13,7 +13,7 @@ typealias ComboResult = (points: Int , comboOf: Int, numberOfTwelve: Int)
 
 
 protocol ComboHandler {
-    var combo: [Int] { get set }
+    var numbers: [Int] { get set }
     var lastNumber: Int? { get set }
     mutating func addUpComboWith(number: Int, on pile :  Pile) throws
     mutating func doneWithCombo(frozenMode: Bool) throws -> ComboResult
@@ -26,7 +26,7 @@ struct Combo: ComboHandler {
     var lastNumber: Int?
     
     
-    var combo: [Int]
+    var numbers: [Int]
     var currentPile: Pile?
     
    private func isNumberValidForCombo(number: Int, on pile : Pile) -> Bool {
@@ -42,11 +42,11 @@ struct Combo: ComboHandler {
         lastNumber = number
         currentPile?.currentNumber = number
         print("current number of pile : \(pile.currentNumber) - old number \(pile.oldNumber)")
-        combo.append(number)
+        numbers.append(number)
     }
     
    private  func isComboValid() -> Bool {
-        return combo.count > 1
+        return numbers.count > 1
     }
     
     mutating func doneWithCombo(frozenMode: Bool) throws -> ComboResult {
@@ -58,21 +58,21 @@ struct Combo: ComboHandler {
             print("COMBO IS VALID")
             currentPile?.updateWithLastNumber(number)
             let total = points()
-            let comboResult = ComboResult(points: total, comboOf: combo.count, numberOfTwelve : combo.filter{$0 == 12}.count)
-            combo.removeAll()
+            let comboResult = ComboResult(points: total, comboOf: numbers.count, numberOfTwelve : numbers.filter{$0 == 12}.count)
+            numbers.removeAll()
             currentPile = nil
             return comboResult
         } else {
             print("COMBO IS NOT VALID")
             currentPile?.resetForFalseCombo()
-            combo.removeAll()
+            numbers.removeAll()
             currentPile = nil
             throw TwelveError.falseCombo
         }
     }
     
     func points() -> Int {
-        let pts = combo.count * combo.count
+        let pts = numbers.count * numbers.count
         return pts
     }
 }

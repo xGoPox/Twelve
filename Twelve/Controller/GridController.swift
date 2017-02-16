@@ -9,56 +9,66 @@
 import SpriteKit
 
 protocol GridDispatcher {
-    mutating func fullfillGrid(_ grid : SKTileMapNode, with piles: [Pile])
+    mutating func fullfillGrid()
+    func resetPiles()
+    mutating func disposeNumbers() throws
 }
+
+protocol Helper {
+    func randomInt(min: Int, max:Int) -> Int
+}
+
+
+protocol GridValidator {
+    func possibility() throws -> NumberSpriteNode
+    func possibilityForPile(_ pile: Pile) throws -> NumberSpriteNode
+    mutating func checkBoard() throws
+    func cancelSolution()
+}
+
 
 typealias GridPosition = (row: Int, column: Int)
 
 struct GridController : GridDispatcher {
     
-    var numberOfPossibilities: Int {
+    var matrix: [[NumberSpriteNode]]
+    var piles: [Pile]
+    var grid : SKTileMapNode
+    var currentSolution: NumberSpriteNode?
+    
+   fileprivate var numberOfPossibilities: Int {
         get {
-            return randomInt(min: 2, max: 2)
+            return randomInt(min: 1, max: 3)
         }
     }
-    var lengthForCombo: Int {
+    fileprivate var lengthForCombo: Int {
         get {
-            return randomInt(min: 4, max: 6)
+            return randomInt(min: 1, max: 5)
         }
     }
     
-    var freezed = false  {
+     var frozen: Bool = false  {
         willSet(freeze) {
             if freeze {
                 cancelSolution()
-                freezeGrid()
+                freezeGrid(freeze: true)
             } else {
-                unfreezeGrid()
+                freezeGrid(freeze: false)
             }
         }
     }
-
     
-    var matrix : [[NumberSpriteNode]] = [[NumberSpriteNode]]()
-    var piles = [Pile]()
-    var grid : SKTileMapNode!
-    var currentSolution: NumberSpriteNode?
-    
-    mutating func fullfillGrid(_ grid : SKTileMapNode, with piles: [Pile]) {
-        self.grid = grid
+    mutating func fullfillGrid() {
+        
+        matrix = [[NumberSpriteNode]]()
         
         var row = 0
         
         for _ in 0..<self.grid.numberOfRows {
-            // Append an empty row.
             matrix.append([NumberSpriteNode]())
             var column = 0
             for _ in 0..<self.grid.numberOfColumns {
-                // Populate the row.
-                let position = GridPosition(row, column)
-                let sprite = NumberSpriteNode()
-                sprite.zPosition = 2
-                sprite.gridPosition = position
+                let sprite = NumberSpriteNode(gridPosition: GridPosition(row, column))
                 sprite.position = grid.centerOfTile(atColumn: sprite.gridPosition.column, row: sprite.gridPosition.row)
                 grid.addChild(sprite)
                 matrix[row].append(sprite)
@@ -68,30 +78,23 @@ struct GridController : GridDispatcher {
             
         }
         
-        
-        self.piles = piles
-        do {
-            try disposeNumbers()
-        } catch let error {
-            fatalError(error.localizedDescription)
-        }
     }
     
     func resetPiles() {
         for pile in piles {
-            pile.updateWithLastNumber(12)
+            pile.reset()
         }
     }
     
     mutating func disposeNumbers() throws {
         try disposePossibilities()
-//        try disposeFuturesCombos()
+        try disposeFuturesCombos()
         try disposeRandomNumbers()
     }
     
     
     
-    mutating func disposePossibilities() throws {
+    fileprivate mutating func disposePossibilities() throws {
         
         for pile in piles {
             
@@ -99,22 +102,29 @@ struct GridController : GridDispatcher {
                 
                 var followingNumber = pile.followingNumber()
                 
-                var gridPosition = randomEmptyPosition()
+                var gridPosition: GridPosition
                 
-                try createNumberAt(position: gridPosition, with: followingNumber)
-                
-                var counterCombo = 0;
-                
-                while counterCombo < lengthForCombo {
+                if let possibility = pile.possibility , try isNumberAt(position: possibility.gridPosition, equalWith: followingNumber) {
+                    gridPosition = possibility.gridPosition
+                } else {
+                    guard let position = randomEmptyPosition() else {
+                        break
+                    }
+                    gridPosition = position
+                    if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: followingNumber)) {
+                        try createNumberAt(position: gridPosition, with: followingNumber)
+                    }
                     
+                }
+                
+                pile.possibility = try numberAt(position: gridPosition)
+                
+                for _ in 0..<lengthForCombo {
                     followingNumber = followingNumber.followingNumber()
-                    
                     guard let newGridPosition = createFollowingNumber(followingNumber, position: gridPosition) else {
                         break
                     }
-                    
                     gridPosition = newGridPosition
-                    counterCombo += 1
                 }
                 
             }
@@ -122,13 +132,15 @@ struct GridController : GridDispatcher {
         }
     }
     
-    mutating func disposeFuturesCombos() throws {
+   fileprivate mutating func disposeFuturesCombos() throws {
         
         for pile in piles {
             
             var followingNumber = pile.followingNumber().followingNumber().followingNumber().followingNumber().followingNumber()
             
-            var gridPosition = randomEmptyPosition()
+            guard var gridPosition = randomEmptyPosition() else {
+                break
+            }
             
             try createNumberAt(position: gridPosition, with: followingNumber)
             
@@ -151,13 +163,13 @@ struct GridController : GridDispatcher {
     
     
     
-    mutating func createNumberAt(position : GridPosition, with number: Int) throws {
+   fileprivate mutating func createNumberAt(position : GridPosition, with number: Int) throws {
         if let sprite = try numberAt(position: position) {
             sprite.value = number
         }
     }
     
-    func isNumberAt(position: GridPosition, equalWith number: Int) throws -> Bool {
+   fileprivate func isNumberAt(position: GridPosition, equalWith number: Int) throws -> Bool {
         if let sprite = try numberAt(position: position) , sprite.value == number {
             return true
         }
@@ -174,55 +186,27 @@ struct GridController : GridDispatcher {
     }
     
     
-    //    func tileGroupAt(position: GridPosition) throws {
-    //        guard (position.row < grid.numberOfRows && position.row >= 0)  && (position.column < grid.numberOfColumns && position.column >= 0) else {
-    //            throw TwelveError.outOfBounds
-    //        }
-    
-    //        guard (grid.tileGroup(atColumn: position.column, row: position.row)) != nil else {
-    //            throw TwelveError.noTileGroupAtPosition
-    //       }
-    //   }
     
     
-    var trueFalse: Bool {
-        return arc4random_uniform(3) < 2
-    }
     
-    func updateNumberAt(position: GridPosition, with number: Int) throws {
+    func resetNumberAt(position: GridPosition) throws {
         guard let sprite = try numberAt(position: position) else {
             throw TwelveError.noNumberAtPosition
         }
-        if sprite.value > 0 && trueFalse {
-            if trueFalse {
-                sprite.value = sprite.value.followingNumber().followingNumber()
-            } else {
-                sprite.value = sprite.value.followingNumber().followingNumber().followingNumber()
-            }
-        } else {
-            sprite.value = number
-        }
+        sprite.value = 0
     }
     
     
     
-    func resetNumbers() throws {
-        for row in 0..<grid.numberOfRows {
-            for column in 0..<grid.numberOfColumns {
-                let gridPosition = GridPosition(row, column)
-                try updateNumberAt(position: gridPosition, with: 0)
-            }
-        }
-    }
-    
-    mutating func disposeRandomNumbers() throws {
+   private mutating func disposeRandomNumbers() throws {
         
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
                 do {
                     if try isNumberAt(position: gridPosition, equalWith: 0) {
-                        try createNumberAt(position: gridPosition, with: randomTileValue())
+                        let number = try numberAt(position: gridPosition)
+                        number?.updateNumberValue()
                     }
                 } catch let error as TwelveError {
                     fatalError("there should be no error here : \(error)")
@@ -231,7 +215,7 @@ struct GridController : GridDispatcher {
         }
     }
     
-    mutating func createFollowingNumber(_ number: Int, position : GridPosition) -> GridPosition? {
+   private mutating func createFollowingNumber(_ number: Int, position : GridPosition) -> GridPosition? {
         
         for _ in 0..<100 {
             
@@ -242,32 +226,16 @@ struct GridController : GridDispatcher {
             let gridPosition = GridPosition(row: position.row + newRow, column: position.column + newColumn)
             
             if gridPosition != position {
-                do {
-                    if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) {
-                        try createNumberAt(position: gridPosition, with: number)
-                        return gridPosition
-                    }
-                } catch { }
-                
+                if let result = try? (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) , result == true {
+                    try? createNumberAt(position: gridPosition, with: number)
+                    return gridPosition
+                }
             }
         }
-        
         return nil
         
     }
     
-    
-    func validPosition(_ gridPosition: GridPosition, for number: Int) -> Bool {
-        do {
-            if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) {
-                return true
-            }
-            return false
-        } catch let error {
-            print("error : \(error) hmm what's up at  row : \(gridPosition.row) column : \(gridPosition.column)")
-            return false
-        }
-    }
     
     
     func isTile(_ currentTile: NumberSpriteNode, adjacentWith tile: NumberSpriteNode) throws {
@@ -300,67 +268,60 @@ struct GridController : GridDispatcher {
     
     
     
-    func randomInt(min: Int, max:Int) -> Int {
-        return min + Int(arc4random_uniform(UInt32(max - min + 1)))
-    }
     
-    func randomTileValue() -> Int {
-        return randomInt(min: 1, max: 12)
-    }
-    
-    func randomEmptyPosition() -> GridPosition {
-        for _ in 1...1000 {
+   private func randomEmptyPosition() -> GridPosition? {
+        for _ in 0..<100 {
             var gridPosition: GridPosition
             gridPosition.row = randomInt(min: 0, max: grid.numberOfRows - 1)
             gridPosition.column = randomInt(min: 0, max: grid.numberOfColumns - 1)
             do {
-                //                try tileGroupAt(position: gridPosition)
                 if try isNumberAt(position: gridPosition, equalWith: 0) {
                     return gridPosition
                 }
             } catch { }
         }
-        return (0, 0)
+        return nil
     }
     
 }
 
-protocol Freezer {
-    func unfreezeGrid()
-    func freezeGrid()
-}
-
-extension GridController : Freezer {
+extension GridController {
     
-    func unfreezeGrid() {
-        
+    func resetNumbers() throws {
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
-                do {
-                    if let number = try numberAt(position: gridPosition) {
-                        number.frozen = false
-                    }
-                } catch {  }
+                try resetNumberAt(position: gridPosition)
             }
         }
     }
-    func freezeGrid() {
-        
+
+    
+}
+
+
+extension GridController : Helper {
+    func randomInt(min: Int, max:Int) -> Int {
+        return min + Int(arc4random_uniform(UInt32(max - min + 1)))
+    }
+    
+    
+}
+
+
+
+extension GridController {
+    
+   fileprivate func freezeGrid(freeze: Bool) {
         
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
-                do {
-                    if let number = try numberAt(position: gridPosition) {
-                        number.frozen = true
-                    }
-                } catch {  }
+                if let number = try? numberAt(position: gridPosition) {
+                    number?.frozen = freeze
+                }
             }
         }
-        
-      
-
     }
     
 }
@@ -369,13 +330,6 @@ extension GridController {
     func pileForNumber(_ number: Int) -> Pile? {
         return piles.first { $0.acceptFollowingNumber(number) }
     }
-}
-
-protocol GridValidator {
-    func possibility() throws -> NumberSpriteNode
-    func possibilityForPile(_ pile: Pile) throws -> NumberSpriteNode
-    mutating func checkBoard() throws
-    func cancelSolution()
 }
 
 
@@ -387,7 +341,7 @@ extension GridController : GridValidator {
     
     mutating func checkBoard() throws {
         currentSolution = try possibility()
-        if !freezed {
+        if !frozen {
             currentSolution?.removeSolution()
             currentSolution?.showSolution()
         }
@@ -416,12 +370,12 @@ extension GridController : GridValidator {
             }
         }
         
-        if freezed {
+        if frozen {
             guard let possibleNumber = array.first else {
                 throw TwelveError.noMorePossibilities
             }
             return possibleNumber
-
+            
         } else {
             guard let possibleNumber = array.possibility(on: matrix) else {
                 throw TwelveError.noMorePossibilities
@@ -444,7 +398,6 @@ extension GridController : GridValidator {
                 let gridPosition = GridPosition(row: number.gridPosition.row + newRow, column: number.gridPosition.column + newColumn)
                 
                 if gridPosition != number.gridPosition {
-                    //   try tileGroupAt(position: gridPosition)
                     return try numberAt(position: gridPosition)
                 }
                 newColumn += 1
@@ -455,8 +408,6 @@ extension GridController : GridValidator {
         return nil
         
     }
-    
-    
     
 }
 

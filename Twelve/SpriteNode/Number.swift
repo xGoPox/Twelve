@@ -10,28 +10,13 @@ import SpriteKit
 
 class NumberSpriteNode : SKSpriteNode {
     
-    enum TileImage: String {
-        case one = "One"
-        case two = "Two"
-        case three = "Three"
-        case four = "Four"
-        case five = "Five"
-        case six = "Six"
-        case seven = "Seven"
-        case eight = "Eight"
-        case nine = "Nine"
-        case ten = "Ten"
-        case eleven = "Eleven"
-        case twelve = "Twelve"
-        case null = "Null"
-
-    }
 
     typealias GridPosition = (row: Int , column: Int )
     
-    var gridPosition: GridPosition = (0, 0)
+    var gridPosition: GridPosition
     
     let numberLabel: SKLabelNode!
+    
     let shape: SKShapeNode!
 
     var frozen: Bool = false {
@@ -104,8 +89,7 @@ class NumberSpriteNode : SKSpriteNode {
             let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
             let pulseDown = SKAction.scale(to: 1, duration: 0.20)
             let pulse = SKAction.sequence([pulseUp, pulseDown])
-            let color = getColorFadeAction(startColor: .myBackgroundColor, endColor: colorType, duration: 0.1)
-            
+            let color = getColorFadeAction(startColor: .white, endColor: colorType, duration: 0.1, stroke: true, fill: true)
             
             let fadeIn = SKAction.fadeIn(withDuration: 0.1)
             let fadeOut = SKAction.fadeOut(withDuration: 0.1)
@@ -114,7 +98,7 @@ class NumberSpriteNode : SKSpriteNode {
             shape.run(SKAction.sequence([color, repeatAction]), withKey: "selected")
             
             numberLabel.run(fadeOut) {
-                self.numberLabel.fontColor = .myBackgroundColor
+                self.numberLabel.fontColor = .white
                 self.numberLabel.run(fadeIn)
             }
             
@@ -123,7 +107,7 @@ class NumberSpriteNode : SKSpriteNode {
     
     func unselected() {
         if !frozen {
-            let color = getColorFadeAction(startColor: colorType, endColor: .myBackgroundColor, duration: 0.1)
+            let color = getColorFadeAction(startColor: colorType, endColor: .white, duration: 0.1, stroke: true, fill: true)
             let fadeIn = SKAction.fadeIn(withDuration: 0.1)
             let fadeOut = SKAction.fadeOut(withDuration: 0.1)
             let numberScaleBackAction = SKAction.scale(to: 1, duration: 0.15)
@@ -142,14 +126,14 @@ class NumberSpriteNode : SKSpriteNode {
     
     
     func freeze() {
-        let color = getColorFadeAction(startColor: shape.fillColor, endColor:colorType , duration: 0.5)
+        let color = getColorFadeAction(startColor: shape.fillColor, endColor:colorType , duration: 0.5, stroke: true, fill: true)
         shape.run(color) { 
-            self.numberLabel.fontColor = .myBackgroundColor
+            self.numberLabel.fontColor = .white
         }
     }
     
     func unfreeze() {
-        let color = getColorFadeAction(startColor: colorType, endColor: .white , duration: 0.5)
+        let color = getColorFadeAction(startColor: colorType, endColor: .white , duration: 0.5, stroke: true, fill: true)
         shape.run(color) {
             self.numberLabel.fontColor = self.colorType
             self.shape.fillColor = .clear
@@ -157,20 +141,21 @@ class NumberSpriteNode : SKSpriteNode {
         }
     }
     
-    init() {
+    init(gridPosition: GridPosition) {
         numberLabel = SKLabelNode(fontNamed:"Exo2-Medium")
         shape = SKShapeNode()
+        self.gridPosition = gridPosition
         super.init(texture: nil, color: .clear, size: CGSize(width: 80, height: 80))
-        name = "NumberSprite"
+        zPosition = 2
         numberLabel.fontSize = 55
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.isUserInteractionEnabled = false
-        numberLabel.fontColor = .myBackgroundColor
+        numberLabel.fontColor = .white
         shape.isUserInteractionEnabled = false
         let corners : UIRectCorner = [UIRectCorner.allCorners]
         shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
-        shape.strokeColor = .myBackgroundColor
+        shape.strokeColor = .white
         shape.position = CGPoint(x: frame.midX, y:    frame.midY)
         shape.lineWidth = 3
         addChild(shape)
@@ -209,6 +194,26 @@ extension NumberSpriteNode : Adjacent {
         return nil
     }
     
+    
+    func updateNumberValue() {
+        var trueFalse: Bool {
+            return arc4random_uniform(3) < 2
+        }
+        if value > 0 && trueFalse {
+            if trueFalse {
+                value = value.followingNumber().followingNumber()
+            } else {
+                value = value.followingNumber().followingNumber().followingNumber()
+            }
+        } else {
+            value = randomValue()
+        }
+    }
+
+    func randomValue() -> Int {
+        return 1 + Int(arc4random_uniform(UInt32(12 - 1 + 1)))
+    }
+    
 }
 
 
@@ -224,9 +229,7 @@ func ==(lhs: NumberSpriteNode, rhs: NumberSpriteNode) -> Bool {
 }
 
 
-
-
-private func getColorFadeAction(startColor: UIColor, endColor: UIColor, duration: TimeInterval) -> SKAction {
+private func getColorFadeAction(startColor: UIColor, endColor: UIColor, duration: TimeInterval, stroke: Bool, fill: Bool) -> SKAction {
     // Create a custom action for color fade
     let action = SKAction.customAction(withDuration: duration) {(node, elapsedTime) in
         if let node = node as? SKShapeNode {
@@ -242,33 +245,12 @@ private func getColorFadeAction(startColor: UIColor, endColor: UIColor, duration
                 color = UIColor.init(red: red, green: green, blue: blue, alpha: alpha)
             }
             // Node properties to change.
-            node.fillColor = color
-            node.strokeColor = color
-
-        }
-    }
-    return action
-}
-
-
-private func getStrokeColorFadeAction(startColor: UIColor, endColor: UIColor, duration: TimeInterval) -> SKAction {
-    // Create a custom action for color fade
-    let action = SKAction.customAction(withDuration: duration) {(node, elapsedTime) in
-        if let node = node as? SKShapeNode {
-            var color = endColor
-            // Calculate the changing color during the elapsed time.
-            let fraction = elapsedTime / CGFloat(duration)
-            if let startColorRGB = startColor.rgb(), let endColorRGB = endColor.rgb(){
-                let red = CGFloat().lerp(start: startColorRGB.red, end: endColorRGB.red, t: fraction)
-                let green = CGFloat().lerp(start: startColorRGB.green, end: endColorRGB.green, t: fraction)
-                let blue = CGFloat().lerp(start: startColorRGB.blue, end: endColorRGB.blue, t: fraction)
-                let alpha = CGFloat().lerp(start: startColorRGB.alpha, end: endColorRGB.alpha, t: fraction)
-                
-                color = UIColor.init(red: red, green: green, blue: blue, alpha: alpha)
+            if stroke {
+                node.strokeColor = color
             }
-            // Node properties to change.
-            node.strokeColor = color
-            
+            if fill {
+                node.fillColor = color
+            }
         }
     }
     return action

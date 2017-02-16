@@ -33,124 +33,18 @@ enum GameType {
 }
 
 
-class GameScene: SKScene {
-    
-    //    var entities = [GKEntity]()
-    //    var graphs = [String : GKGraph]()
-    var progressBar: ProgressBar?
-    
-    var gameType: GameType = .surviror
-    var numberTile: NumberSpriteNode?
-    var gridDispatcher = GridController()
-    var combo: Combo?
-    var objectsTileMap:SKTileMapNode!
-    var scoreNode: ScoreNode?
-    
-    var timeLabel: SKLabelNode?
-    var levelTimerValue = 60 {
-        willSet(newValue) {
-            timeLabel?.text = String(newValue)
-            self.progressBar?.decrease()
-        }
-    }
-    
-    var gameStarted = false {
-        willSet(started) {
-            if started {
-                totalPoints = 0
-                isDeckMenuHidden(false)
-                isMainMenuHidden(true)
-                isTopBarHidden(false)
-                startTimer()
-            } else {
-                updateTotal(score: totalPoints)
-                isTopBarHidden(true)
-                showGameOver(true)
-                isDeckMenuHidden(true)
-                endsCombo()
-            }
-        }
-    }
-    
-    
-    var totalPoints = 0 {
-        willSet(number) {
-            if let lbl = scoreNode {
-                lbl.score = number
-            } else {
-                
-                guard let topBar = childNode(withName: "topBar")
-                    as? SKSpriteNode else {
-                        fatalError("topBar node not loaded")
-                }
-                
-                guard let scoreNode = topBar.childNode(withName: "scoreNode")
-                    as? ScoreNode else {
-                        fatalError("scoreNode node not loaded")
-                }
-                self.scoreNode = scoreNode
-                self.scoreNode?.score = number
-            }
-        }
-    }
-    
-    override func didMove(to view: SKView) {
-        setupObjects()
-        prepareGame()
-    }
-    
-    
-    func setupObjects() {
-        
-        guard let map = childNode(withName: "Tile Map Node")
-            as? SKTileMapNode else {
-                fatalError("Background node not loaded")
-        }
-        
-        guard let nodeProgressBar = childNode(withName: "progressBar")
-            as? ProgressBar else {
-                fatalError("comboBarTop node not loaded")
-        }
-        
-        
-        
-        progressBar = nodeProgressBar
-        
-        objectsTileMap = map
-        
-        combo = Combo.init(lastNumber: nil, combo: [Int](), currentPile: gridDispatcher.pileForNumber(12))
-        fullfillBoard()
-        
-        objectsTileMap.addChild(line)
-    }
-    
-    func fullfillBoard() {
-        
-        guard let bottomBar = childNode(withName: "bottomBar")
-            as? SKSpriteNode else {
-                fatalError("bottomBar node not loaded")
-        }
-        
-        var piles = [Pile]()
-        for child in bottomBar.children {
-            if child.name == "pile" {
-                let pile = Pile()
-                child.addChild(pile)
-                piles.append(pile)
-            }
-        }
-        
-        guard !piles.isEmpty else {
-            print("piles array is empty!")
-            return
-        }
-        gridDispatcher.fullfillGrid(objectsTileMap, with: piles)
-    }
-    
-    var line = SKShapeNode()
-    
+
+protocol Preparation {
+    func fillUpMap()
+}
+
+protocol DrawLine {
+    func drawLine(endingPoint: CGPoint)
+}
+
+extension GameScene : DrawLine {
     func drawLine(endingPoint: CGPoint) {
-        if let number = numberTile , gridDispatcher.freezed == false {
+        if let number = numberTile {
             let path = CGMutablePath()
             path.move(to: number.position)
             path.addLine(to: CGPoint(x: endingPoint.x, y:endingPoint.y))
@@ -162,97 +56,154 @@ class GameScene: SKScene {
             line.path = nil
         }
     }
+}
+
+
+extension GameScene : Preparation {
     
     
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else {
-            return
-        }
-        if gridDispatcher.freezed == false {
-            analyzeTouch(touch)
+    func fillUpMap()  {
+        do {
+            let piles = try pilesAvailable()
+            gridDispatcher = GridController(matrix: [[NumberSpriteNode]](), piles: piles, grid: objectsTileMap, currentSolution: nil, frozen: false)
+            gridDispatcher.fullfillGrid()
+            objectsTileMap.addChild(line)
+        } catch let error as TwelveError where error == .gridHasNoPile {
+            fatalError("no piles available on grid")
+        } catch let error {
+            print("unknown error \(error )")
         }
     }
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else {
-            return
+}
+
+class GameScene: SKScene {
+    
+    
+    lazy var progressBar: ProgressBar = {
+        guard let nodeProgressBar = self.childNode(withName: "progressBar")
+            as? ProgressBar else {
+                fatalError("comboBarTop node not loaded")
+        }
+        return nodeProgressBar
+    }()
+    
+    lazy var objectsTileMap: SKTileMapNode = {
+        guard let map = self.childNode(withName: "Tile Map Node")
+            as? SKTileMapNode else {
+                fatalError("Background node not loaded")
+        }
+        return map
+    }()
+    
+    lazy var scoreNode: ScoreNode = {
+        guard let topBar = self.childNode(withName: "topBar")
+            as? SKSpriteNode else {
+                fatalError("topBar node not loaded")
         }
         
-        if atPoint(touch.location(in: self)).name == "Restart" {
-            prepareGame()
+        guard let scoreNode = topBar.childNode(withName: "scoreNode")
+            as? ScoreNode else {
+                fatalError("scoreNode node not loaded")
         }
-        else {
-            let location = touch.location(in: self)
-            if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
-                do {
-                    if gridDispatcher.freezed == false {
-                        numberTile?.unselected()
-                        try detect(number)
-                        gridDispatcher.cancelSolution()
-                        numberTile?.selected()
-                    } else {
-                        try addToCombo(number: number)
-                    }
-                } catch let error as TwelveError where error == .notAdjacent || error == .numberIsNotFollowingPile  {
-                    let action = SKAction.screenShakeWithNode(number, amount: CGPoint(x:8, y:8), oscillations: 20, duration: 0.50)
-                    number.run(action, completion: {
-                        self.endsCombo()
-                    })
-                } catch {
-                    numberTile = nil
-                    line.path = nil
-                }
-            }
-        }
-    }
+        return scoreNode
+    }()
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        line.path = nil
-        endsCombo()
-    }
     
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else {
-            return
+    lazy var timeLabel: SKLabelNode = {
+        guard let topBar = self.childNode(withName: "topBar")
+            as? SKSpriteNode else {
+                fatalError("topBarNode node not loaded")
         }
-        analyzeTouch(touch)
-    }
+        guard let label = topBar.childNode(withName: "timerNode")
+            as? SKLabelNode else {
+                fatalError("timerNode node not loaded")
+        }
+        return label
+    }()
     
-    func analyzeTouch(_ touch: UITouch) {
-        
-        if  numberTile != nil {
-            drawLine(endingPoint: touch.location(in: self.objectsTileMap))
-        }
-        
-        let location = touch.location(in: self)
-        if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
-            
-            guard let prevNumber = numberTile , prevNumber.gridPosition != number.gridPosition else {
-                return
-            }
-            
-            do {
-                numberTile?.unselected()
-                try detect(number)
+    
+    
+    var gridDispatcher : GridController!
+    var gameType: GameType = .surviror
+    var numberTile: NumberSpriteNode? {
+        willSet(obj) {
+            if let number = obj {
                 gridDispatcher.cancelSolution()
-                numberTile?.selected()
-            } catch let error as TwelveError where error == .notAdjacent || error == .numberIsNotFollowingPile  {
-                numberTile = nil
-                line.path = nil
-                let action = SKAction.screenShakeWithNode(number, amount: CGPoint(x:5, y:5), oscillations: 20, duration: 0.50)
-                number.run(action, completion: {
-                    self.endsCombo()
-                })
-            } catch {
-                numberTile = nil
+                number.selected()
+            } else {
                 line.path = nil
             }
+        }
+    }
+    
+    
+    lazy var combo: Combo = {
+        return Combo(lastNumber: nil, numbers: [Int](), currentPile: self.gridDispatcher.pileForNumber(12))
+    }()
+    
+    
+    lazy var line: SKShapeNode = {
+        return SKShapeNode()
+    }()
+    
+    var timerValue = 60 {
+        willSet(newValue) {
+            timeLabel.text = String(newValue)
+            self.progressBar.decrease()
+        }
+    }
+    
+    
+    var gameStarted = false {
+        willSet(started) {
+            if started {
+                totalPoints = 0
+                isDeckMenuHidden(false)
+                isMainMenuHidden(true)
+                isTopBarHidden(false)
+                startTimer()
+            } else {
+                timeLabel.removeAction(forKey: "countdown")
+                updateTotal(score: totalPoints)
+                isTopBarHidden(true)
+                showGameOver(true)
+                isDeckMenuHidden(true)
+                endsCombo()
+            }
+        }
+    }
+    
+    var totalPoints = 0 {
+        willSet(number) {
+            scoreNode.score = number
+        }
+    }
+    
+    override func didMove(to view: SKView) {
+        fillUpMap()
+        prepareGame()
+    }
+    
+
+    
+    
+    func analyzeNumber(_ number: NumberSpriteNode) {
+        
+        do {
+            try select(number)
+        } catch  {
+            numberTile = nil
+            let action = SKAction.screenShakeWithNode(number, amount: CGPoint(x:5, y:5), oscillations: 20, duration: 0.50)
+            number.run(action, completion: {
+                self.endsCombo()
+            })
         }
         
     }
     
-    func detect(_ number : NumberSpriteNode) throws {
+    func select(_ number : NumberSpriteNode) throws  {
+        numberTile?.unselected()
         if let prevNumber = numberTile {
             try gridDispatcher.isTile(prevNumber, adjacentWith: number)
         }
@@ -263,21 +214,18 @@ class GameScene: SKScene {
     
     private func addToCombo(number: NumberSpriteNode) throws {
         
-        if let pile = combo?.currentPile {
-            try combo?.addUpComboWith(number: number.value, on: pile)
+        if let pile = combo.currentPile {
+            try combo.addUpComboWith(number: number.value, on: pile)
         } else if let pile = gridDispatcher.pileForNumber(number.value) {
-            try combo?.addUpComboWith(number: number.value, on: pile)
+            try combo.addUpComboWith(number: number.value, on: pile)
         } else {
             throw TwelveError.numberIsNotFollowingPile
         }
         
-        if let numbers = combo?.combo, numbers.count > 1 && gridDispatcher.freezed == false {
+        if combo.numbers.count > 1 && gridDispatcher.frozen == false {
             
-            guard let previousNumber = numberTile else {
-                fatalError("it should have a tile!")
-            }
             
-            try gridDispatcher.updateNumberAt(position: previousNumber.gridPosition, with: gridDispatcher.randomTileValue())
+            numberTile?.updateNumberValue()
             
             //  if numbers.count > 2 {
             //      addSecond()
@@ -293,36 +241,36 @@ class GameScene: SKScene {
     
     
     func newPileAdded() {
-        if progressBar?.increaseAndHasGivenBonus() == true {
-            
-            if let action = timeLabel?.action(forKey: "countdown") {
-                action.speed = 0
-            }
-            
-            progressBar?.value = 0
-            
-            let colorizeUp = SKAction.colorize(with: .black, colorBlendFactor: 1, duration: 0.25)
-            //            let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
-            //            let sequences = SKAction.sequence([colorizeUp])
-            
-            
-            run(colorizeUp, completion: {
-                
-                self.gridDispatcher.freezed = true
-                
-                self.afterDelay(10, runBlock: {
-                    let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
-                    self.gridDispatcher.freezed = false
-                    self.run(colorizeDown, completion: {
-                        if let action = self.timeLabel?.action(forKey: "countdown") {
-                            action.speed = 1
-                        }
-                    })
-                })
-                
-            })
-            
-        }
+        /*        if progressBar.increaseAndHasGivenBonus() == true {
+         
+         if let action = timeLabel.action(forKey: "countdown") {
+         action.speed = 0
+         }
+         
+         progressBar.value = 0
+         
+         let colorizeUp = SKAction.colorize(with: .black, colorBlendFactor: 1, duration: 0.25)
+         //            let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
+         //            let sequences = SKAction.sequence([colorizeUp])
+         
+         
+         run(colorizeUp, completion: {
+         
+         self.gridDispatcher.frozen = true
+         
+         self.afterDelay(10, runBlock: {
+         let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
+         self.gridDispatcher.frozen = false
+         self.run(colorizeDown, completion: {
+         if let action = self.timeLabel.action(forKey: "countdown") {
+         action.speed = 1
+         }
+         })
+         })
+         
+         })
+         
+         }*/
     }
     
     
@@ -332,131 +280,138 @@ class GameScene: SKScene {
         
         numberTile?.unselected()
         do {
-            if let comboResult = try combo?.doneWithCombo(frozenMode: gridDispatcher.freezed) {
-                gridDispatcher.freezed ? addSecond() : addPointsForCombo(comboResult)
-                if gridDispatcher.freezed == false {
-                    for _ in 0..<comboResult.numberOfTwelve {
-                        newPileAdded()
-                    }
+            let comboResult = try combo.doneWithCombo(frozenMode: gridDispatcher.frozen)
+            gridDispatcher.frozen ? addSecond() : addPointsForCombo(comboResult)
+            if gridDispatcher.frozen == false {
+                for _ in 0..<comboResult.numberOfTwelve {
+                    newPileAdded()
                 }
-                if let prevNumber = numberTile {
-                    try gridDispatcher.updateNumberAt(position: prevNumber.gridPosition, with: gridDispatcher.randomTileValue())
-                }
-                numberTile = nil
-                line.path = nil
-                checkBoard()
             }
+            numberTile?.updateNumberValue()
+            numberTile = nil
+            checkBoard()
         } catch  {
             numberTile = nil
-            line.path = nil
             checkBoard()
         }
     }
     
     func checkBoard() {
+        
         do {
             try gridDispatcher.checkBoard()
         } catch let error as TwelveError where error == .noMorePossibilities {
             
-            
             for row in 0..<objectsTileMap.numberOfRows {
                 for column in 0..<objectsTileMap.numberOfColumns {
                     let gridPosition = GridPosition(row, column)
-                    do {
-                        if let number = try gridDispatcher.numberAt(position: gridPosition) {
-                            let firstHalfFlip = SKAction.scaleX(to: 0.0, duration: 0.1)
-                            let secondHalfFlip = SKAction.scaleX(to: 1.0, duration: 0.1)
-                            let action = SKAction.sequence([firstHalfFlip, secondHalfFlip])
-                            number.run(action)
-                        }
-                    } catch {  }
+                    if let number = try? gridDispatcher.numberAt(position: gridPosition) {
+                        let firstHalfFlip = SKAction.scaleX(to: 0.0, duration: 0.1)
+                        let secondHalfFlip = SKAction.scaleX(to: 1.0, duration: 0.1)
+                        let action = SKAction.sequence([firstHalfFlip, secondHalfFlip])
+                        number?.run(action)
+                    }
                 }
             }
             
             try? self.gridDispatcher.resetNumbers()
             try? self.gridDispatcher.disposeNumbers()
             
-            
         } catch {
-            fatalError("checkBoard exception should have been caught")
+            fatalError("checkBoard exception should have been caught error : \(error)")
         }
         
     }
-    
     
     
     func startTimer() {
         
-        /*        if comboBar == nil {
-         guard let node = childNode(withName: "comboBar")
-         as? ComboBar else {
-         fatalError("comboBar node not loaded")
-         }
-         comboBar = node
-         }
-         
-         comboBar?.value = 0*/
-        levelTimerValue = 60
-        
-        if timeLabel == nil {
-            guard let topBar = childNode(withName: "topBar")
-                as? SKSpriteNode else {
-                    fatalError("topBarNode node not loaded")
-            }
-            guard let label = topBar.childNode(withName: "timerNode")
-                as? SKLabelNode else {
-                    fatalError("timerNode node not loaded")
-            }
-            timeLabel = label
-            
-        }
-        
+        timerValue = 60
         
         let wait = SKAction.wait(forDuration: 1)
         let run = SKAction.run {
-            if self.levelTimerValue > 0 {
-                self.levelTimerValue -= 1
-                
+            if self.timerValue > 0 {
+                self.timerValue -= 1
             } else {
                 self.gameStarted = false
-                self.timeLabel?.removeAction(forKey: "countdown")
             }
         }
-        timeLabel?.run(SKAction.repeatForever(SKAction.sequence([wait, run])) , withKey: "countdown")
+        
+        timeLabel.run(SKAction.repeatForever(SKAction.sequence([wait, run])) , withKey: "countdown")
         
     }
     
+}
+
+extension GameScene {
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        endsCombo()
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else {
+            return
+        }
+        
+        let location = touch.location(in: self)
+        if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
+            guard let prevNumber = numberTile , prevNumber.gridPosition != number.gridPosition else {
+                return
+            }
+            analyzeNumber(number)
+        }
+    }
+    
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else {
+            return
+        }
+        if gridDispatcher.frozen == false {
+            if numberTile != nil {
+                drawLine(endingPoint: touch.location(in: self.objectsTileMap))
+            }
+            
+            let location = touch.location(in: self)
+            if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
+                guard let prevNumber = numberTile , prevNumber.gridPosition != number.gridPosition else {
+                    return
+                }
+                analyzeNumber(number)
+            }
+            
+        }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else {
+            return
+        }
+        
+        if atPoint(touch.location(in: self)).name == "Restart" {
+            prepareGame()
+        }
+        else {
+            let location = touch.location(in: self)
+            if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
+                analyzeNumber(number)
+            }
+        }
+    }
 }
 
 
 extension GameScene {
     
     func addPointsForCombo(_ comboResult : ComboResult) {
-        
-        let points = comboResult.points
-        guard let label = childNode(withName: "newPointsLabel")
-            as? SKLabelNode else {
-                fatalError("newPointsLabel node not loaded")
-        }
-        label.text = "+" + String(points)
-        let fadeIn = SKAction.fadeAlpha(to: 1, duration: 0.5)
-        let scaleIn = SKAction.scale(to: 1.5, duration: 1)
-        let group = SKAction.group([fadeIn, scaleIn])
-        label.run(group) {
-            label.alpha = 0
-        }
-        afterDelay(0.1) {
-            self.totalPoints += points
-        }
+        self.totalPoints += comboResult.points
     }
     
     func addSecond() {
-        
-        levelTimerValue += 1
-        if let label = timeLabel {
-            let action = SKAction.screenZoomWithNode(label, amount: CGPoint(x:2, y:2), oscillations: 2, duration: 1)
-            label.run(action)
-        }
+        timerValue += 1
+        let action = SKAction.screenZoomWithNode(timeLabel, amount: CGPoint(x:2, y:2), oscillations: 2, duration: 1)
+        timeLabel.run(action)
     }
 }
 
@@ -497,6 +452,30 @@ extension GameScene {
 
 extension GameScene  {
     
+    
+    func pilesAvailable() throws -> [Pile] {
+        
+        guard let bottomBar = childNode(withName: "bottomBar")
+            as? SKSpriteNode else {
+                fatalError("bottomBar node not loaded")
+        }
+        
+        var piles = [Pile]()
+        for child in bottomBar.children {
+            if child.name == "pile" {
+                let pile = Pile()
+                child.addChild(pile)
+                piles.append(pile)
+            }
+        }
+        
+        guard !piles.isEmpty else {
+            print("piles array is empty!")
+            throw TwelveError.gridHasNoPile
+        }
+        
+        return piles
+    }
     
     func isDeckMenuHidden(_ hidden: Bool) {
         guard let node = childNode(withName: "bottomBar")
@@ -578,22 +557,21 @@ extension GameScene  {
         for row in 0..<self.objectsTileMap.numberOfRows {
             for column in 0..<self.objectsTileMap.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
-                do {
-                    if let number = try self.gridDispatcher.numberAt(position: gridPosition) {
-                        let scale = SKAction.scale(to: 0.1, duration: 0.5)
-                        let fade = SKAction.fadeOut(withDuration: 0.5)
-                        let group = SKAction.group([scale, fade])
-                        number.run(group)
-                    }
-                } catch {  }
+                if let number = try? self.gridDispatcher.numberAt(position: gridPosition) {
+                    let scale = SKAction.scale(to: 0.1, duration: 0.5)
+                    let fade = SKAction.fadeOut(withDuration: 0.5)
+                    let group = SKAction.group([scale, fade])
+                    number?.run(group)
+                }
             }
         }
-        
         
         node.run(move, completion: {
             self.showEndMenu()
         })
     }
+    
+    
 }
 
 extension Int {
@@ -612,7 +590,7 @@ extension UIColor {
     static var myRed: UIColor { return UIColor(red: 217/255.0, green: 83/255.0, blue: 79/255.0, alpha: 1) }
     static var myBlue: UIColor { return UIColor(red: 66/255.0, green: 139/255.0, blue: 202/255.0, alpha: 1) }
     static var myYellow: UIColor { return UIColor(red: 240/255.0, green: 173/255.0, blue: 78/255.0, alpha: 1) }
-    static var myBackgroundColor : UIColor { return UIColor(red:252/255, green:252/255, blue:252/255, alpha: 1) }
+
     
 }
 
