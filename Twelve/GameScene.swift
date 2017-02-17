@@ -56,6 +56,7 @@ extension GameScene : DrawLine {
             line.path = nil
         }
     }
+    
 }
 
 
@@ -185,13 +186,13 @@ class GameScene: SKScene {
         prepareGame()
     }
     
-
+    
     
     
     func analyzeNumber(_ number: NumberSpriteNode) {
         
         do {
-            try select(number)
+            try selectNumber(number)
         } catch  {
             numberTile = nil
             let action = SKAction.screenShakeWithNode(number, amount: CGPoint(x:5, y:5), oscillations: 20, duration: 0.50)
@@ -202,7 +203,7 @@ class GameScene: SKScene {
         
     }
     
-    func select(_ number : NumberSpriteNode) throws  {
+    func selectNumber(_ number : NumberSpriteNode) throws  {
         numberTile?.unselected()
         if let prevNumber = numberTile {
             try gridDispatcher.isTile(prevNumber, adjacentWith: number)
@@ -223,7 +224,6 @@ class GameScene: SKScene {
         }
         
         if combo.numbers.count > 1 && gridDispatcher.frozen == false {
-            
             
             numberTile?.updateNumberValue()
             
@@ -574,14 +574,6 @@ extension GameScene  {
     
 }
 
-extension Int {
-    func followingNumber() -> Int {
-        if self == 12  {
-            return 1
-        }
-        return self + 1
-    }
-}
 
 
 extension UIColor {
@@ -590,7 +582,49 @@ extension UIColor {
     static var myRed: UIColor { return UIColor(red: 217/255.0, green: 83/255.0, blue: 79/255.0, alpha: 1) }
     static var myBlue: UIColor { return UIColor(red: 66/255.0, green: 139/255.0, blue: 202/255.0, alpha: 1) }
     static var myYellow: UIColor { return UIColor(red: 240/255.0, green: 173/255.0, blue: 78/255.0, alpha: 1) }
+    
+    static var myRandomColor: UIColor {
+        let value = 1 + Int(arc4random_uniform(UInt32(4 - 1 + 1)))
+        switch value {
+        case 1:
+            return .myGreen
+        case 2:
+            return .myRed
+        case 3:
+            return .myYellow
+        default:
+            return .myBlue
+        }
+    
+    }
 
     
+    
+    // Function used to get the red, green, and blue values of a UIColor object.
+    
+    
+    
+    func rgb() -> (red:CGFloat, green:CGFloat, blue:CGFloat, alpha:CGFloat)? {
+        var fRed : CGFloat = 0
+        var fGreen : CGFloat = 0
+        var fBlue : CGFloat = 0
+        var fAlpha: CGFloat = 0
+        if self.getRed(&fRed, green: &fGreen, blue: &fBlue, alpha: &fAlpha) {
+            // Could extract RGBA components
+            return (red:fRed, green:fGreen, blue:fBlue, alpha:fAlpha)
+        } else {
+            // Could not extract RGBA components
+            return nil
+        }
+    }
+    
+    
+}
+
+extension CGFloat {
+    // Used to calculate a linear interpolation between two values.
+    func lerp(start: CGFloat, end: CGFloat, t: CGFloat) -> CGFloat {
+        return start + (end - start) * t
+    }
 }
 

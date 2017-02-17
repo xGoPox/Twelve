@@ -10,15 +10,20 @@ import SpriteKit
 
 class NumberSpriteNode : SKSpriteNode {
     
-
+    
     typealias GridPosition = (row: Int , column: Int )
+    typealias joker = Int
     
     var gridPosition: GridPosition
     
     let numberLabel: SKLabelNode!
     
     let shape: SKShapeNode!
-
+    
+    let isJoker: joker = -1
+    
+    var followingNumber: Int?
+    
     var frozen: Bool = false {
         willSet(value) {
             if value {
@@ -28,16 +33,34 @@ class NumberSpriteNode : SKSpriteNode {
             }
         }
     }
-    var value : Int = 0 {
+    var value : Int = -1 {
         willSet(number) {
-            let fadeIn = SKAction.fadeIn(withDuration: 0.1)
-            let fadeOut = SKAction.fadeOut(withDuration: 0.1)
-            numberLabel.run(fadeOut) {
-                self.numberLabel.text = String(number)
-                self.numberLabel.run(fadeIn)
+            if number != isJoker {
+                if value == isJoker {
+                    let textureFadeOutAction = SKAction.fadeAlpha(by: 0, duration: 0.1)
+                    run(textureFadeOutAction, completion: {
+                        self.texture = self.textureType
+                    })
+                }
+                let fadeIn = SKAction.fadeIn(withDuration: 0.1)
+                let fadeOut = SKAction.fadeOut(withDuration: 0.1)
+                numberLabel.run(fadeOut) {
+                    self.numberLabel.text = String(number)
+                    self.numberLabel.run(fadeIn)
+                }
+            } else {
+                let fadeOut = SKAction.fadeOut(withDuration: 0.1)
+                let textureFadeOutAction = SKAction.fadeAlpha(by: 1, duration: 0.1)
+                run(textureFadeOutAction)
+                numberLabel.run(fadeOut)
             }
         }
         didSet(number) {
+            
+            self.texture = self.textureType
+            let textureFadeOutAction = SKAction.fadeAlpha(by: 1, duration: 0.1)
+            run(textureFadeOutAction)
+            
             removeSolution()
             if value != number {
                 if frozen {
@@ -48,6 +71,18 @@ class NumberSpriteNode : SKSpriteNode {
             }
         }
     }
+    
+    var textureType : SKTexture? {
+        get {
+            switch value {
+            case isJoker:
+                return SKTexture(imageNamed: "joker")
+            default:
+                return nil
+            }
+        }
+    }
+    
     
     var colorType: UIColor {
         get {
@@ -61,10 +96,11 @@ class NumberSpriteNode : SKSpriteNode {
             case 10...12:
                 return .myBlue
             default:
-                return .clear
+                return .myRandomColor
             }
         }
     }
+    
     
     func showSolution() {
         let pulseUp = SKAction.scale(to: 1.4, duration: 0.25)
@@ -85,7 +121,13 @@ class NumberSpriteNode : SKSpriteNode {
     }
     
     func selected() {
-        if !frozen {
+        if value == isJoker {
+            let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
+            let pulseDown = SKAction.scale(to: 1, duration: 0.20)
+            let pulse = SKAction.sequence([pulseUp, pulseDown])
+            let repeatAction = SKAction.repeatForever(pulse)
+            run(repeatAction, withKey: "selected")
+        } else if !frozen && value != isJoker  {
             let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
             let pulseDown = SKAction.scale(to: 1, duration: 0.20)
             let pulse = SKAction.sequence([pulseUp, pulseDown])
@@ -101,12 +143,16 @@ class NumberSpriteNode : SKSpriteNode {
                 self.numberLabel.fontColor = .white
                 self.numberLabel.run(fadeIn)
             }
-            
         }
     }
     
     func unselected() {
-        if !frozen {
+        if value == isJoker {
+            let numberScaleBackAction = SKAction.scale(to: 1, duration: 0.15)
+            run(numberScaleBackAction)
+            removeAction(forKey: "selected")
+        }
+        else if !frozen {
             let color = getColorFadeAction(startColor: colorType, endColor: .white, duration: 0.1, stroke: true, fill: true)
             let fadeIn = SKAction.fadeIn(withDuration: 0.1)
             let fadeOut = SKAction.fadeOut(withDuration: 0.1)
@@ -124,10 +170,9 @@ class NumberSpriteNode : SKSpriteNode {
         }
     }
     
-    
     func freeze() {
         let color = getColorFadeAction(startColor: shape.fillColor, endColor:colorType , duration: 0.5, stroke: true, fill: true)
-        shape.run(color) { 
+        shape.run(color) {
             self.numberLabel.fontColor = .white
         }
     }
@@ -148,6 +193,7 @@ class NumberSpriteNode : SKSpriteNode {
         super.init(texture: nil, color: .clear, size: CGSize(width: 80, height: 80))
         zPosition = 2
         numberLabel.fontSize = 55
+        numberLabel.alpha = 0
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.isUserInteractionEnabled = false
@@ -183,7 +229,8 @@ extension NumberSpriteNode : Adjacent {
                 let rowTmp = self.gridPosition.row + row
                 let columnTmp = self.gridPosition.column + column
                 if rowTmp >= 0 && rowTmp < matrix[0].count && columnTmp >= 0 && columnTmp < matrix[0].count {
-                    if matrix[rowTmp][columnTmp].value == self.value.followingNumber() {
+                    let value = matrix[rowTmp][columnTmp].value
+                    if value == followingNumber {
                         return matrix[rowTmp][columnTmp]
                     }
                 }
@@ -195,10 +242,13 @@ extension NumberSpriteNode : Adjacent {
     }
     
     
+    
     func updateNumberValue() {
         var trueFalse: Bool {
             return arc4random_uniform(3) < 2
         }
+        
+        
         if value > 0 && trueFalse {
             if trueFalse {
                 value = value.followingNumber().followingNumber()
@@ -209,9 +259,12 @@ extension NumberSpriteNode : Adjacent {
             value = randomValue()
         }
     }
-
+    
     func randomValue() -> Int {
-        return 1 + Int(arc4random_uniform(UInt32(12 - 1 + 1)))
+        var joker: Bool {
+            return arc4random_uniform(15) < 1
+        }
+        return joker ? -1 : 1 + Int(arc4random_uniform(UInt32(12 - 1 + 1)))
     }
     
 }

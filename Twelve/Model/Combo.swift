@@ -38,11 +38,12 @@ struct Combo: ComboHandler {
         guard isNumberValidForCombo(number: number, on: pile) == true else {
             throw TwelveError.numberIsNotFollowingPile
         }
+        let finalNumber = number == -1 ? pile.currentNumber.followingNumber() : number
         currentPile = pile
-        lastNumber = number
-        currentPile?.currentNumber = number
+        lastNumber = finalNumber
+        currentPile?.currentNumber = finalNumber
         print("current number of pile : \(pile.currentNumber) - old number \(pile.oldNumber)")
-        numbers.append(number)
+        numbers.append(finalNumber)
     }
     
    private  func isComboValid() -> Bool {

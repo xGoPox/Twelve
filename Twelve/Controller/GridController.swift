@@ -104,14 +104,14 @@ struct GridController : GridDispatcher {
                 
                 var gridPosition: GridPosition
                 
-                if let possibility = pile.possibility , try isNumberAt(position: possibility.gridPosition, equalWith: followingNumber) {
+                if let possibility = pile.possibility , try (isNumberAt(position: possibility.gridPosition, equalWith: followingNumber) || isNumberAt(position: possibility.gridPosition, aJoker: true)) {
                     gridPosition = possibility.gridPosition
                 } else {
                     guard let position = randomEmptyPosition() else {
                         break
                     }
                     gridPosition = position
-                    if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: followingNumber)) {
+                    if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: followingNumber) || isNumberAt(position: gridPosition, aJoker: true)) {
                         try createNumberAt(position: gridPosition, with: followingNumber)
                     }
                     
@@ -165,7 +165,10 @@ struct GridController : GridDispatcher {
     
    fileprivate mutating func createNumberAt(position : GridPosition, with number: Int) throws {
         if let sprite = try numberAt(position: position) {
-            sprite.value = number
+            var joker: Bool {
+                return arc4random_uniform(20) < 1
+            }
+            sprite.value = joker ? -1 : number
         }
     }
     
@@ -176,6 +179,14 @@ struct GridController : GridDispatcher {
         return false
     }
     
+    fileprivate func isNumberAt(position: GridPosition, aJoker: Bool) throws -> Bool {
+        if let sprite = try numberAt(position: position) , sprite.value == -1 {
+            return true
+        }
+        return false
+    }
+
+    
     func numberAt(position: GridPosition) throws -> NumberSpriteNode? {
         
         guard (position.row < grid.numberOfRows && position.row >= 0)  && (position.column < grid.numberOfColumns && position.column >= 0) else {
@@ -184,8 +195,6 @@ struct GridController : GridDispatcher {
         
         return matrix[position.row][position.column]
     }
-    
-    
     
     
     
@@ -226,8 +235,8 @@ struct GridController : GridDispatcher {
             let gridPosition = GridPosition(row: position.row + newRow, column: position.column + newColumn)
             
             if gridPosition != position {
-                if let result = try? (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number)) , result == true {
-                    try? createNumberAt(position: gridPosition, with: number)
+                if let result = try? (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number) || isNumberAt(position: gridPosition, aJoker: true)) , result == true {
+                    try? createNumberAt(position: gridPosition, with:number)
                     return gridPosition
                 }
             }
@@ -363,8 +372,9 @@ extension GridController : GridValidator {
         
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
-                let position = GridPosition(row, column)
-                if try isNumberAt(position: position, equalWith: pile.followingNumber()) , let number = try numberAt(position: position) {
+                let gridPosition = GridPosition(row, column)
+                if try (isNumberAt(position: gridPosition, equalWith: pile.followingNumber()) || isNumberAt(position: gridPosition, aJoker: true)) , let number = try numberAt(position: gridPosition) {
+                    number.followingNumber = pile.followingNumber().followingNumber()
                     array.append(number)
                 }
             }
@@ -409,5 +419,22 @@ extension GridController : GridValidator {
         
     }
     
+}
+
+extension Int {
+    func followingNumber() -> Int {
+        if self == 12  {
+            return 1
+        }
+        return self + 1
+    }
+    
+    func previousNumber() -> Int {
+        if self == 1  {
+            return 12
+        }
+        return self - 1
+    }
+
 }
 

@@ -168,10 +168,16 @@ extension Pile : PileValidator {
         return currentNumber.followingNumber()
     }
     
+    func previousNumber() -> Int {
+        return currentNumber.previousNumber()
+    }
+    
     func acceptFollowingNumber(_ number: Int) -> Bool {
         if currentNumber == 12 , number == 1 {
             return true
         } else if currentNumber + 1 == number {
+            return true
+        } else if currentNumber == -1 || number == -1 {
             return true
         }
         return false
@@ -202,28 +208,5 @@ private func getColorFadeAction(startColor: UIColor, endColor: UIColor, duration
     return action
 }
 
-extension UIColor {
-    // Function used to get the red, green, and blue values of a UIColor object.
-    func rgb() -> (red:CGFloat, green:CGFloat, blue:CGFloat, alpha:CGFloat)? {
-        var fRed : CGFloat = 0
-        var fGreen : CGFloat = 0
-        var fBlue : CGFloat = 0
-        var fAlpha: CGFloat = 0
-        if self.getRed(&fRed, green: &fGreen, blue: &fBlue, alpha: &fAlpha) {
-            // Could extract RGBA components
-            return (red:fRed, green:fGreen, blue:fBlue, alpha:fAlpha)
-        } else {
-            // Could not extract RGBA components
-            return nil
-        }
-    }
-}
-
-extension CGFloat {
-    // Used to calculate a linear interpolation between two values.
-    func lerp(start: CGFloat, end: CGFloat, t: CGFloat) -> CGFloat {
-        return start + (end - start) * t
-    }
-}
 
 

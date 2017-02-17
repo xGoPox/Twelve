@@ -20,6 +20,7 @@
 		3D087E991E48D16800EAD2E2 /* SKTTimingFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D087E8D1E48D16800EAD2E2 /* SKTTimingFunctions.swift */; };
 		3D087E9A1E48D16800EAD2E2 /* Vector3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D087E8E1E48D16800EAD2E2 /* Vector3.swift */; };
 		3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */; };
+		3D7976AC1E561508005C9520 /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D7976AB1E561508005C9520 /* GameScene_iPad.sks */; };
 		3D85629C1E40A51A005EFC36 /* RoundedCornerSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629B1E40A51A005EFC36 /* RoundedCornerSprite.swift */; };
 		3D85629F1E40A52E005EFC36 /* Number.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629D1E40A52E005EFC36 /* Number.swift */; };
 		3D8562A01E40A52E005EFC36 /* Pile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629E1E40A52E005EFC36 /* Pile.swift */; };
@@ -37,7 +38,6 @@
 		3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB551E35409C008A9A9C /* LaunchScreen.storyboard */; };
 		3D95CB621E35409C008A9A9C /* TwelveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB611E35409C008A9A9C /* TwelveUITests.swift */; };
 		3D970DD71E4F8BE40058490B /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D970DD61E4F8BE40058490B /* ProgressBar.swift */; };
-		3DA8565A1E4E12B100C6DF42 /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DA856591E4E12B100C6DF42 /* GameScene_iPad.sks */; };
 		3DAA36C21E4B236A004FE452 /* SpriteKit-Spring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */; };
 		3DAA36C41E4B34A1004FE452 /* MyParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DAA36C31E4B34A1004FE452 /* MyParticle.sks */; };
 		3DB187711E53061B009C6BAA /* Exo2-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1875E1E53061B009C6BAA /* Exo2-Black.ttf */; };
@@ -96,6 +96,7 @@
 		3D087E8D1E48D16800EAD2E2 /* SKTTimingFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTTimingFunctions.swift; sourceTree = "<group>"; };
 		3D087E8E1E48D16800EAD2E2 /* Vector3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector3.swift; sourceTree = "<group>"; };
 		3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyTileSet.sks; sourceTree = "<group>"; };
+		3D7976AB1E561508005C9520 /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
 		3D85629B1E40A51A005EFC36 /* RoundedCornerSprite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RoundedCornerSprite.swift; path = SpriteNode/RoundedCornerSprite.swift; sourceTree = "<group>"; };
 		3D85629D1E40A52E005EFC36 /* Number.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Number.swift; path = SpriteNode/Number.swift; sourceTree = "<group>"; };
 		3D85629E1E40A52E005EFC36 /* Pile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Pile.swift; path = SpriteNode/Pile.swift; sourceTree = "<group>"; };
@@ -117,7 +118,6 @@
 		3D95CB611E35409C008A9A9C /* TwelveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwelveUITests.swift; sourceTree = "<group>"; };
 		3D95CB631E35409C008A9A9C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3D970DD61E4F8BE40058490B /* ProgressBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProgressBar.swift; path = SpriteNode/ProgressBar.swift; sourceTree = "<group>"; };
-		3DA856591E4E12B100C6DF42 /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
 		3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SpriteKit-Spring.swift"; sourceTree = "<group>"; };
 		3DAA36C31E4B34A1004FE452 /* MyParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyParticle.sks; sourceTree = "<group>"; };
 		3DB1875E1E53061B009C6BAA /* Exo2-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Black.ttf"; sourceTree = "<group>"; };
@@ -230,10 +230,10 @@
 			children = (
 				3D95CB461E35409B008A9A9C /* AppDelegate.swift */,
 				3D95CB481E35409C008A9A9C /* GameScene.sks */,
+				3D7976AB1E561508005C9520 /* GameScene_iPad.sks */,
 				3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */,
 				3D95CB4A1E35409C008A9A9C /* TestAction.sks */,
 				3D95CB4C1E35409C008A9A9C /* GameScene.swift */,
-				3DA856591E4E12B100C6DF42 /* GameScene_iPad.sks */,
 				3DAA36C31E4B34A1004FE452 /* MyParticle.sks */,
 				3D8A8CFD1E413A5000C6B148 /* MyHexa.sks */,
 				3D087E821E48D16800EAD2E2 /* SKTUtils */,
@@ -424,7 +424,6 @@
 			files = (
 				3DB187751E53061B009C6BAA /* Exo2-ExtraBold.ttf in Resources */,
 				3DB1877B1E53061B009C6BAA /* Exo2-LightItalic.ttf in Resources */,
-				3DA8565A1E4E12B100C6DF42 /* GameScene_iPad.sks in Resources */,
 				3DB187811E53061B009C6BAA /* Exo2-Thin.ttf in Resources */,
 				3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */,
 				3D95CB521E35409C008A9A9C /* Main.storyboard in Resources */,
@@ -441,6 +440,7 @@
 				3D95CB541E35409C008A9A9C /* Assets.xcassets in Resources */,
 				3DB187711E53061B009C6BAA /* Exo2-Black.ttf in Resources */,
 				3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */,
+				3D7976AC1E561508005C9520 /* GameScene_iPad.sks in Resources */,
 				3DB187791E53061B009C6BAA /* Exo2-Italic.ttf in Resources */,
 				3DB187731E53061B009C6BAA /* Exo2-Bold.ttf in Resources */,
 				3D95CB4B1E35409C008A9A9C /* TestAction.sks in Resources */,
