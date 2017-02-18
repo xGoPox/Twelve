@@ -80,7 +80,6 @@ struct GridController : GridDispatcher {
     }
     
     
-    
     fileprivate mutating func disposePossibilities() throws {
         
         for pile in piles {
@@ -153,7 +152,7 @@ struct GridController : GridDispatcher {
     fileprivate mutating func createNumberAt(position : GridPosition, with number: Int) throws {
         if let element = try elementAt(position: position) {
             var isJoker: Bool {
-                return arc4random_uniform(3) < 1
+                return arc4random_uniform(2) < 1
             }
             if element is NumberSpriteNode {
                 if isJoker {
@@ -359,10 +358,17 @@ extension GridController {
                 if isJoker {
                     let position:GridPosition = element.gridPosition
                     let object = Joker(gridPosition: position)
+                    object.alpha = 0
                     object.position = element.position
-                    element.removeFromParent()
+                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
                     matrix[position.row][position.column] = object
-                    grid.addChild(object)
+                    element.run(fadeOut, completion: {
+                        element.removeFromParent()
+                    })
+                    self.grid.addChild(object)
+                    object.run(fadeIn)
+
                 } else {
                     element.value = randomValue()
                 }
@@ -371,11 +377,18 @@ extension GridController {
         } else {
             let position:GridPosition = element.gridPosition
             let object = NumberSpriteNode(gridPosition: position)
+            object.alpha = 0
             object.value = randomValue()
             object.position = element.position
-            element.removeFromParent()
+            let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+            let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+
+            element.run(fadeOut, completion: {
+                element.removeFromParent()
+            })
             matrix[position.row][position.column] = object
-            grid.addChild(object)
+            self.grid.addChild(object)
+            object.run(fadeIn)
         }
         
     }

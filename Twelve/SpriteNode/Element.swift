@@ -62,6 +62,7 @@ protocol Animation {
 extension Element : Animation {
     
     func selected() {
+        
     }
     
     func unselected() {

@@ -13,9 +13,6 @@ class NumberSpriteNode : Element {
     
     let numberLabel: SKLabelNode!
     
-    let shape: SKShapeNode!
-    
-    
     override var value : Int {
         
         willSet(number) {
@@ -35,25 +32,18 @@ class NumberSpriteNode : Element {
     }
     
     
-    
     override init(gridPosition: GridPosition) {
         numberLabel = SKLabelNode(fontNamed:"Exo2-Medium")
-        shape = SKShapeNode()
         super.init(gridPosition: gridPosition)
         texture = nil
         numberLabel.fontSize = 55
         numberLabel.alpha = 0
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
+        numberLabel.color = .clear
         numberLabel.isUserInteractionEnabled = false
         numberLabel.fontColor = .white
-        shape.isUserInteractionEnabled = false
-        let corners : UIRectCorner = [UIRectCorner.allCorners]
-        shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
-        shape.strokeColor = .white
-        shape.position = CGPoint(x: frame.midX, y:    frame.midY)
-        shape.lineWidth = 3
-        addChild(shape)
+        numberLabel.zPosition = 2
         addChild(numberLabel)
     }
     
@@ -65,41 +55,45 @@ class NumberSpriteNode : Element {
 
 extension NumberSpriteNode {
     
-   override func selected() {
+    override func selected() {
         let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
         let pulseDown = SKAction.scale(to: 1, duration: 0.20)
         let pulse = SKAction.sequence([pulseUp, pulseDown])
-        let color = getColorFadeAction(startColor: .white, endColor: colorType, duration: 0.1, stroke: true, fill: true)
-        
-        let fadeIn = SKAction.fadeIn(withDuration: 0.1)
-        let fadeOut = SKAction.fadeOut(withDuration: 0.1)
-        
-        let repeatAction = SKAction.repeatForever(pulse)
-        shape.run(SKAction.sequence([color, repeatAction]), withKey: "selected")
-        
+        let color = SKAction.colorize(with: colorType, colorBlendFactor: 1, duration: 0.1)
+        let shape = SKSpriteNode.init(texture: SKTexture.init(imageNamed: "number"), color: colorType, size: self.size)
+        shape.name = "shape"
+        shape.isUserInteractionEnabled = false
+        shape.zPosition = 1
+        addChild(shape)
+        shape.run(SKAction.sequence([color, SKAction.repeatForever(pulse)]))
+        let fadeIn = SKAction.fadeAlpha(to: 1, duration: 0.1)
+        let fadeOut = SKAction.fadeAlpha(to: 0, duration: 0.1)
         numberLabel.run(fadeOut) {
             self.numberLabel.fontColor = .white
             self.numberLabel.run(fadeIn)
         }
     }
     
-   override func unselected() {
-        let color = getColorFadeAction(startColor: colorType, endColor: .white, duration: 0.1, stroke: true, fill: true)
-        let fadeIn = SKAction.fadeIn(withDuration: 0.1)
-        let fadeOut = SKAction.fadeOut(withDuration: 0.1)
+    override func unselected() {
+        let color = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.1)
+        let fadeIn = SKAction.fadeAlpha(to: 1, duration: 0.1)
+        let fadeOut = SKAction.fadeAlpha(to: 0, duration: 0.1)
         let numberScaleBackAction = SKAction.scale(to: 1, duration: 0.15)
-        shape.run(numberScaleBackAction)
-        numberLabel.run(fadeOut) {
-            self.shape.run(color, completion: {
-                self.shape.fillColor = .clear
-                self.shape.strokeColor = .clear
-                self.numberLabel.fontColor = self.colorType
-                self.numberLabel.run(fadeIn)
-            })
+        if let shp = childNode(withName: "shape") {
+            shp.run(numberScaleBackAction)
+            numberLabel.run(fadeOut) {
+                shp.run(color, completion: {
+                    self.numberLabel.fontColor = self.colorType
+                    self.numberLabel.run(fadeIn)
+                    shp.removeFromParent()
+                })
+            }
+        } else {
+            self.numberLabel.fontColor = self.colorType
+            self.numberLabel.run(fadeIn)
         }
-        shape.removeAction(forKey: "selected")
     }
-
+    
 }
 
 

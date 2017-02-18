@@ -195,7 +195,7 @@ class GameScene: SKScene {
             try selectElement(element)
         } catch  {
             currentElement = nil
-            let action = SKAction.screenShakeWithNode(element, amount: CGPoint(x:5, y:5), oscillations: 20, duration: 0.50)
+            let action = SKAction.screenShakeWithNode(element, amount: CGPoint(x:30, y:30), oscillations: 20, duration: 0.50)
             element.run(action, completion: {
                 self.endsCombo()
             })
