@@ -160,8 +160,13 @@ struct GridController : GridDispatcher {
                     let object = Joker(gridPosition: position)
                     matrix[position.row][position.column] = object
                     object.position = element.position
-                    element.removeFromParent()
-                    grid.addChild(object)
+                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+                    element.run(fadeOut, completion: {
+                        element.removeFromParent()
+                    })
+                    self.grid.addChild(object)
+                    object.run(fadeIn)
                 } else {
                     element.value = number
                 }
@@ -172,8 +177,13 @@ struct GridController : GridDispatcher {
                     object.position = element.position
                     object.value = number
                     matrix[position.row][position.column] = object
-                    element.removeFromParent()
-                    grid.addChild(object)
+                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+                    element.run(fadeOut, completion: {
+                        element.removeFromParent()
+                    })
+                    self.grid.addChild(object)
+                    object.run(fadeIn)
                 }
             } else {
                 if isJoker {
@@ -181,16 +191,27 @@ struct GridController : GridDispatcher {
                     let object = Joker(gridPosition: position)
                     matrix[position.row][position.column] = object
                     object.position = element.position
-                    element.removeFromParent()
-                    grid.addChild(object)
-                } else {
+                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+                    element.run(fadeOut, completion: {
+                        element.removeFromParent()
+                    })
+                    self.grid.addChild(object)
+                    object.run(fadeIn)
+                }
+                else {
                     let object = NumberSpriteNode(gridPosition: position)
                     let element = matrix[position.row][position.column]
                     object.position = element.position
                     object.value = number
                     matrix[position.row][position.column] = object
-                    element.removeFromParent()
-                    grid.addChild(object)
+                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+                    element.run(fadeOut, completion: {
+                        element.removeFromParent()
+                    })
+                    self.grid.addChild(object)
+                    object.run(fadeIn)
                 }
             }
         }
@@ -229,10 +250,14 @@ struct GridController : GridDispatcher {
         if element is Joker {
             let position:GridPosition = element.gridPosition
             let object = NumberSpriteNode(gridPosition: position)
+            object.alpha = 0
             matrix[position.row][position.column] = object
             object.position = element.position
-            element.removeFromParent()
-            grid.addChild(object)
+            let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+            element.run(fadeOut, completion: {
+                element.removeFromParent()
+            })
+            self.grid.addChild(object)
         }
         element.value = 0
     }

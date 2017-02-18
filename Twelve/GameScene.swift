@@ -303,19 +303,7 @@ class GameScene: SKScene {
         do {
             try gridDispatcher.checkBoard()
         } catch let error as TwelveError where error == .noMorePossibilities {
-            
-            for row in 0..<objectsTileMap.numberOfRows {
-                for column in 0..<objectsTileMap.numberOfColumns {
-                    let gridPosition = GridPosition(row, column)
-                    if let number = try? gridDispatcher.elementAt(position: gridPosition) {
-                        let firstHalfFlip = SKAction.scaleX(to: 0.0, duration: 0.1)
-                        let secondHalfFlip = SKAction.scaleX(to: 1.0, duration: 0.1)
-                        let action = SKAction.sequence([firstHalfFlip, secondHalfFlip])
-                        number?.run(action)
-                    }
-                }
-            }
-            
+                        
             try? self.gridDispatcher.resetNumbers()
             try? self.gridDispatcher.disposeNumbers()
             

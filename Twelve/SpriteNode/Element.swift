@@ -41,6 +41,7 @@ class Element: SKSpriteNode {
         self.gridPosition = gridPosition
         super.init(texture: nil, color: .clear, size: CGSize(width: 80, height: 80))
         zPosition = 2
+        alpha = 0
     }
     
     required init(coder aDecoder: NSCoder) {
