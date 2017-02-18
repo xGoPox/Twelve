@@ -44,13 +44,13 @@ protocol DrawLine {
 
 extension GameScene : DrawLine {
     func drawLine(endingPoint: CGPoint) {
-        if let number = numberTile {
+        if let element = currentElement {
             let path = CGMutablePath()
-            path.move(to: number.position)
+            path.move(to: element.position)
             path.addLine(to: CGPoint(x: endingPoint.x, y:endingPoint.y))
             line.zPosition = 1
             line.path = path
-            line.strokeColor = number.colorType.withAlphaComponent(0.5)
+            line.strokeColor = element.colorType.withAlphaComponent(0.5)
             line.lineWidth = 20
         } else {
             line.path = nil
@@ -66,7 +66,7 @@ extension GameScene : Preparation {
     func fillUpMap()  {
         do {
             let piles = try pilesAvailable()
-            gridDispatcher = GridController(matrix: [[NumberSpriteNode]](), piles: piles, grid: objectsTileMap, currentSolution: nil, frozen: false)
+            gridDispatcher = GridController(matrix: [[NumberSpriteNode]](), piles: piles, grid: objectsTileMap, currentSolution: nil)
             gridDispatcher.fullfillGrid()
             objectsTileMap.addChild(line)
         } catch let error as TwelveError where error == .gridHasNoPile {
@@ -127,7 +127,7 @@ class GameScene: SKScene {
     
     var gridDispatcher : GridController!
     var gameType: GameType = .surviror
-    var numberTile: NumberSpriteNode? {
+    var currentElement: Element? {
         willSet(obj) {
             if let number = obj {
                 gridDispatcher.cancelSolution()
@@ -140,7 +140,7 @@ class GameScene: SKScene {
     
     
     lazy var combo: Combo = {
-        return Combo(lastNumber: nil, numbers: [Int](), currentPile: self.gridDispatcher.pileForNumber(12))
+        return Combo(lastNumber: nil, numbers: [Int](), possiblePiles: self.gridDispatcher.pilesForNumber(1))
     }()
     
     
@@ -189,44 +189,46 @@ class GameScene: SKScene {
     
     
     
-    func analyzeNumber(_ number: NumberSpriteNode) {
+    func analyzeElement(_ element: Element) {
         
         do {
-            try selectNumber(number)
+            try selectElement(element)
         } catch  {
-            numberTile = nil
-            let action = SKAction.screenShakeWithNode(number, amount: CGPoint(x:5, y:5), oscillations: 20, duration: 0.50)
-            number.run(action, completion: {
+            currentElement = nil
+            let action = SKAction.screenShakeWithNode(element, amount: CGPoint(x:5, y:5), oscillations: 20, duration: 0.50)
+            element.run(action, completion: {
                 self.endsCombo()
             })
         }
         
     }
     
-    func selectNumber(_ number : NumberSpriteNode) throws  {
-        numberTile?.unselected()
-        if let prevNumber = numberTile {
-            try gridDispatcher.isTile(prevNumber, adjacentWith: number)
+    func selectElement(_ element : Element) throws  {
+        currentElement?.unselected()
+        if let prevNumber = currentElement {
+            try gridDispatcher.isTile(prevNumber, adjacentWith: element)
         }
-        try addToCombo(number: number)
+        try addToCombo(element: element)
     }
     
     
     
-    private func addToCombo(number: NumberSpriteNode) throws {
+    private func addToCombo(element: Element) throws {
         
-        if let pile = combo.currentPile {
-            try combo.addUpComboWith(number: number.value, on: pile)
-        } else if let pile = gridDispatcher.pileForNumber(number.value) {
-            try combo.addUpComboWith(number: number.value, on: pile)
+        if let piles = combo.possiblePiles {
+            try combo.addUpComboWith(number: element.value, on: piles)
+        } else if let piles = gridDispatcher.pilesForNumber(element.value) {
+            try combo.addUpComboWith(number: element.value, on: piles)
         } else {
             throw TwelveError.numberIsNotFollowingPile
         }
         
-        if combo.numbers.count > 1 && gridDispatcher.frozen == false {
+        if combo.numbers.count > 1  {
             
-            numberTile?.updateNumberValue()
             
+            if let element = currentElement {
+                gridDispatcher.updateElement(element)
+            }
             //  if numbers.count > 2 {
             //      addSecond()
             // }
@@ -236,7 +238,7 @@ class GameScene: SKScene {
             }
         }
         
-        numberTile = number
+        currentElement = element
     }
     
     
@@ -278,20 +280,20 @@ class GameScene: SKScene {
     
     func endsCombo() {
         
-        numberTile?.unselected()
+        currentElement?.unselected()
         do {
-            let comboResult = try combo.doneWithCombo(frozenMode: gridDispatcher.frozen)
-            gridDispatcher.frozen ? addSecond() : addPointsForCombo(comboResult)
-            if gridDispatcher.frozen == false {
-                for _ in 0..<comboResult.numberOfTwelve {
-                    newPileAdded()
-                }
+            let comboResult = try combo.doneWithCombo()
+            addPointsForCombo(comboResult)
+            for _ in 0..<comboResult.numberOfTwelve {
+                newPileAdded()
             }
-            numberTile?.updateNumberValue()
-            numberTile = nil
+            if let element = currentElement {
+                gridDispatcher.updateElement(element)
+            }
+            currentElement = nil
             checkBoard()
         } catch  {
-            numberTile = nil
+            currentElement = nil
             checkBoard()
         }
     }
@@ -305,7 +307,7 @@ class GameScene: SKScene {
             for row in 0..<objectsTileMap.numberOfRows {
                 for column in 0..<objectsTileMap.numberOfColumns {
                     let gridPosition = GridPosition(row, column)
-                    if let number = try? gridDispatcher.numberAt(position: gridPosition) {
+                    if let number = try? gridDispatcher.elementAt(position: gridPosition) {
                         let firstHalfFlip = SKAction.scaleX(to: 0.0, duration: 0.1)
                         let secondHalfFlip = SKAction.scaleX(to: 1.0, duration: 0.1)
                         let action = SKAction.sequence([firstHalfFlip, secondHalfFlip])
@@ -355,11 +357,11 @@ extension GameScene {
         }
         
         let location = touch.location(in: self)
-        if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
-            guard let prevNumber = numberTile , prevNumber.gridPosition != number.gridPosition else {
+        if let element = (nodes(at: location).filter { $0 is Element }).first as? Element {
+            guard let prevElement = currentElement , prevElement.gridPosition != element.gridPosition else {
                 return
             }
-            analyzeNumber(number)
+            analyzeElement(element)
         }
     }
     
@@ -368,19 +370,16 @@ extension GameScene {
         guard let touch = touches.first else {
             return
         }
-        if gridDispatcher.frozen == false {
-            if numberTile != nil {
-                drawLine(endingPoint: touch.location(in: self.objectsTileMap))
+        if currentElement != nil {
+            drawLine(endingPoint: touch.location(in: self.objectsTileMap))
+        }
+        
+        let location = touch.location(in: self)
+        if let element = (nodes(at: location).filter { $0 is Element }).first as? Element {
+            guard let prevElement = currentElement , prevElement.gridPosition != element.gridPosition else {
+                return
             }
-            
-            let location = touch.location(in: self)
-            if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
-                guard let prevNumber = numberTile , prevNumber.gridPosition != number.gridPosition else {
-                    return
-                }
-                analyzeNumber(number)
-            }
-            
+            analyzeElement(element)
         }
     }
     
@@ -394,8 +393,8 @@ extension GameScene {
         }
         else {
             let location = touch.location(in: self)
-            if let number = (nodes(at: location).filter { $0 is NumberSpriteNode }).first as? NumberSpriteNode {
-                analyzeNumber(number)
+            if let element = (nodes(at: location).filter { $0 is Element }).first as? Element {
+                analyzeElement(element)
             }
         }
     }
@@ -430,7 +429,7 @@ extension GameScene {
             for column in 0..<self.objectsTileMap.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
                 do {
-                    if let number = try self.gridDispatcher.numberAt(position: gridPosition) {
+                    if let number = try self.gridDispatcher.elementAt(position: gridPosition) {
                         let scaleDown = SKAction.scale(to: 0, duration: 0)
                         let scaleBack = SKAction.scale(to: 1, duration: 0.5)
                         let fade = SKAction.fadeIn(withDuration: 0.5)
@@ -557,11 +556,11 @@ extension GameScene  {
         for row in 0..<self.objectsTileMap.numberOfRows {
             for column in 0..<self.objectsTileMap.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
-                if let number = try? self.gridDispatcher.numberAt(position: gridPosition) {
+                if let element = try? self.gridDispatcher.elementAt(position: gridPosition) {
                     let scale = SKAction.scale(to: 0.1, duration: 0.5)
                     let fade = SKAction.fadeOut(withDuration: 0.5)
                     let group = SKAction.group([scale, fade])
-                    number?.run(group)
+                    element?.run(group)
                 }
             }
         }

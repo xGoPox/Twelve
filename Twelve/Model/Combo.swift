@@ -15,8 +15,8 @@ typealias ComboResult = (points: Int , comboOf: Int, numberOfTwelve: Int)
 protocol ComboHandler {
     var numbers: [Int] { get set }
     var lastNumber: Int? { get set }
-    mutating func addUpComboWith(number: Int, on pile :  Pile) throws
-    mutating func doneWithCombo(frozenMode: Bool) throws -> ComboResult
+    mutating func addUpComboWith(number: Int, on piles : [Pile]) throws
+    mutating func doneWithCombo() throws -> ComboResult
     func points() -> Int
 }
 
@@ -27,47 +27,66 @@ struct Combo: ComboHandler {
     
     
     var numbers: [Int]
-    var currentPile: Pile?
-    
-   private func isNumberValidForCombo(number: Int, on pile : Pile) -> Bool {
-        return pile.acceptFollowingNumber(number)
+    var possiblePiles: [Pile]?
+
+   private func isNumberValidForCombo(number: Int, on piles : [Pile]) -> Bool {
+    print(piles)
+        return piles.first { $0.acceptFollowingNumber(number) } != nil
     }
     
-    mutating func addUpComboWith(number: Int, on pile : Pile) throws {
-        print("current number of pile : \(pile.currentNumber) - old number \(pile.oldNumber)")
-        guard isNumberValidForCombo(number: number, on: pile) == true else {
+    mutating func addUpComboWith(number: Int, on piles : [Pile]) throws {
+        
+        guard isNumberValidForCombo(number: number, on: piles) == true || number == -1 else {
             throw TwelveError.numberIsNotFollowingPile
         }
-        let finalNumber = number == -1 ? pile.currentNumber.followingNumber() : number
-        currentPile = pile
-        lastNumber = finalNumber
-        currentPile?.currentNumber = finalNumber
-        print("current number of pile : \(pile.currentNumber) - old number \(pile.oldNumber)")
-        numbers.append(finalNumber)
+        
+        if number == -1 && possiblePiles == nil {
+            possiblePiles = piles
+            for pile in possiblePiles! {
+                pile.currentNumber = pile.currentNumber.followingNumber()
+            }
+            numbers.append(number)
+        } else if let finalNumber = (number == -1) ? piles.first?.currentNumber.followingNumber() : number {
+            possiblePiles = piles
+            lastNumber = finalNumber
+            if numbers.count == 1 {
+                if numbers[0] == -1 && finalNumber == 1 {
+                    numbers[0] = 12
+                }
+                while possiblePiles!.count > 1 {
+                    let pile = possiblePiles!.removeLast()
+                    pile.resetForFalseCombo()
+                }
+            }
+            for pile in possiblePiles! {
+                pile.currentNumber = finalNumber
+            }
+            numbers.append(finalNumber)
+        }
     }
     
    private  func isComboValid() -> Bool {
         return numbers.count > 1
     }
     
-    mutating func doneWithCombo(frozenMode: Bool) throws -> ComboResult {
+    mutating func doneWithCombo() throws -> ComboResult {
         guard let number = lastNumber else {
             throw TwelveError.lastNumberIsNill
         }
-        if isComboValid() || frozenMode {
+        if isComboValid() {
             // update the pile
             print("COMBO IS VALID")
-            currentPile?.updateWithLastNumber(number)
+            possiblePiles?.first?.updateWithLastNumber(number)
             let total = points()
-            let comboResult = ComboResult(points: total, comboOf: numbers.count, numberOfTwelve : numbers.filter{$0 == 12}.count)
+            let comboResult = ComboResult(points: total, comboOf: numbers.count, numberOfTwelve : numbers.filter{ $0 == 12}.count)
             numbers.removeAll()
-            currentPile = nil
+            possiblePiles = nil
             return comboResult
         } else {
             print("COMBO IS NOT VALID")
-            currentPile?.resetForFalseCombo()
+           _ = possiblePiles?.map { $0.resetForFalseCombo() }
             numbers.removeAll()
-            currentPile = nil
+            possiblePiles = nil
             throw TwelveError.falseCombo
         }
     }

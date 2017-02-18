@@ -63,6 +63,8 @@
 		3DE8A1801E3CA60900BC150A /* GridController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A17F1E3CA60900BC150A /* GridController.swift */; };
 		3DE8A18D1E3CAC2C00BC150A /* TwelveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A18C1E3CAC2C00BC150A /* TwelveTests.swift */; };
 		3DE8A1951E3CACEA00BC150A /* ComboTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A1941E3CACEA00BC150A /* ComboTest.swift */; };
+		3DFE00101E56F29900C4C13A /* Joker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE000F1E56F29900C4C13A /* Joker.swift */; };
+		3DFE00121E56F2C600C4C13A /* Element.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE00111E56F2C600C4C13A /* Element.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -145,6 +147,8 @@
 		3DE8A18C1E3CAC2C00BC150A /* TwelveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwelveTests.swift; sourceTree = "<group>"; };
 		3DE8A18E1E3CAC2C00BC150A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DE8A1941E3CACEA00BC150A /* ComboTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComboTest.swift; sourceTree = "<group>"; };
+		3DFE000F1E56F29900C4C13A /* Joker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Joker.swift; path = SpriteNode/Joker.swift; sourceTree = "<group>"; };
+		3DFE00111E56F2C600C4C13A /* Element.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Element.swift; path = SpriteNode/Element.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,6 +201,8 @@
 			children = (
 				3D85629B1E40A51A005EFC36 /* RoundedCornerSprite.swift */,
 				3D85629D1E40A52E005EFC36 /* Number.swift */,
+				3DFE00111E56F2C600C4C13A /* Element.swift */,
+				3DFE000F1E56F29900C4C13A /* Joker.swift */,
 				3D85629E1E40A52E005EFC36 /* Pile.swift */,
 				3D8562A11E40AE2D005EFC36 /* EndScoreNode.swift */,
 				3D8562A31E40D9A9005EFC36 /* ScoreNode.swift */,
@@ -479,6 +485,7 @@
 				3D087E981E48D16800EAD2E2 /* SKTEffects.swift in Sources */,
 				3D087E8F1E48D16800EAD2E2 /* CGFloat+Extensions.swift in Sources */,
 				3D8562A21E40AE2D005EFC36 /* EndScoreNode.swift in Sources */,
+				3DFE00101E56F29900C4C13A /* Joker.swift in Sources */,
 				3DAA36C21E4B236A004FE452 /* SpriteKit-Spring.swift in Sources */,
 				3D95CB4D1E35409C008A9A9C /* GameScene.swift in Sources */,
 				3D85629F1E40A52E005EFC36 /* Number.swift in Sources */,
@@ -489,6 +496,7 @@
 				3D95CB471E35409B008A9A9C /* AppDelegate.swift in Sources */,
 				3DE8A17C1E3CA5AC00BC150A /* Combo.swift in Sources */,
 				3D970DD71E4F8BE40058490B /* ProgressBar.swift in Sources */,
+				3DFE00121E56F2C600C4C13A /* Element.swift in Sources */,
 				3D087E961E48D16800EAD2E2 /* SKNode+Extensions.swift in Sources */,
 				3D8562A41E40D9A9005EFC36 /* ScoreNode.swift in Sources */,
 				3D087E901E48D16800EAD2E2 /* CGPoint+Extensions.swift in Sources */,

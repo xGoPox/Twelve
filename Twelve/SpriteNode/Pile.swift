@@ -22,10 +22,11 @@ class Pile : SKSpriteNode, PileHandler {
     let effectNode = SKEffectNode()
     let shape: SKShapeNode!
     let roundShape: SKShapeNode!
-    var possibility: NumberSpriteNode?
+    var possibility: Element?
 
     var oldNumber: Int = 12
     let numberLabel: SKLabelNode!
+    
     var currentNumber: Int = 12 {
         willSet(number) {
             if number != currentNumber {
@@ -40,8 +41,6 @@ class Pile : SKSpriteNode, PileHandler {
         didSet(number) {
             if number != currentNumber {
                 shape?.strokeColor = colorType
-//                let action = SKAction.screenZoomWithNode(shape, amount: CGPoint(x:1.2,y:1.2), oscillations: 3, duration: 0.5)
-//                shape.run(action)
                 shape.removeAction(forKey: "selected")
                 shape.setScale(1)
                 if currentNumber == number.followingNumber() {
@@ -124,7 +123,6 @@ class Pile : SKSpriteNode, PileHandler {
         shape.setScale(1)
         oldNumber = number
         currentNumber = number
-//        removeGlow()
         print("UPDATE pile from old number \(oldNumber) with new number \(number) : currentNumber:  \(currentNumber)")
     }
     
@@ -132,28 +130,11 @@ class Pile : SKSpriteNode, PileHandler {
         shape.removeAction(forKey: "selected")
         shape.setScale(1)
         currentNumber = oldNumber
- //       removeGlow()
         print("RESET pile currentNumber \(oldNumber) with old number \(oldNumber)")
     }
     
 
     
-}
-
-
-extension Pile {
-    
-    func updateGlow(radius: Float = 100) {
-        removeGlow()
-        effectNode.shouldEnableEffects = true
-        effectNode.addChild(self.copy() as! SKSpriteNode)
-        effectNode.filter = CIFilter(name: "CIGaussianBlur", withInputParameters: ["inputRadius":radius])
-    }
-    
-    func removeGlow() {
-        effectNode.shouldEnableEffects = false
-        effectNode.removeAllChildren()
-    }
 }
 
 
@@ -177,9 +158,7 @@ extension Pile : PileValidator {
             return true
         } else if currentNumber + 1 == number {
             return true
-        } else if currentNumber == -1 || number == -1 {
-            return true
-        }
+        } 
         return false
     }
 }
