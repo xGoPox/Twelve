@@ -20,7 +20,6 @@
 		3D087E991E48D16800EAD2E2 /* SKTTimingFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D087E8D1E48D16800EAD2E2 /* SKTTimingFunctions.swift */; };
 		3D087E9A1E48D16800EAD2E2 /* Vector3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D087E8E1E48D16800EAD2E2 /* Vector3.swift */; };
 		3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */; };
-		3D7976AC1E561508005C9520 /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D7976AB1E561508005C9520 /* GameScene_iPad.sks */; };
 		3D85629C1E40A51A005EFC36 /* RoundedCornerSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629B1E40A51A005EFC36 /* RoundedCornerSprite.swift */; };
 		3D85629F1E40A52E005EFC36 /* Number.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629D1E40A52E005EFC36 /* Number.swift */; };
 		3D8562A01E40A52E005EFC36 /* Pile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629E1E40A52E005EFC36 /* Pile.swift */; };
@@ -40,6 +39,8 @@
 		3D970DD71E4F8BE40058490B /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D970DD61E4F8BE40058490B /* ProgressBar.swift */; };
 		3DAA36C21E4B236A004FE452 /* SpriteKit-Spring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */; };
 		3DAA36C41E4B34A1004FE452 /* MyParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DAA36C31E4B34A1004FE452 /* MyParticle.sks */; };
+		3DAFA5221E5A05AB00AB8CD1 /* GameCaracteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAFA5211E5A05AA00AB8CD1 /* GameCaracteristic.swift */; };
+		3DAFA5241E5A05F900AB8CD1 /* SharedGameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAFA5231E5A05F900AB8CD1 /* SharedGameManager.swift */; };
 		3DB187711E53061B009C6BAA /* Exo2-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1875E1E53061B009C6BAA /* Exo2-Black.ttf */; };
 		3DB187721E53061B009C6BAA /* Exo2-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1875F1E53061B009C6BAA /* Exo2-BlackItalic.ttf */; };
 		3DB187731E53061B009C6BAA /* Exo2-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB187601E53061B009C6BAA /* Exo2-Bold.ttf */; };
@@ -65,6 +66,12 @@
 		3DE8A1951E3CACEA00BC150A /* ComboTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DE8A1941E3CACEA00BC150A /* ComboTest.swift */; };
 		3DFE00101E56F29900C4C13A /* Joker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE000F1E56F29900C4C13A /* Joker.swift */; };
 		3DFE00121E56F2C600C4C13A /* Element.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE00111E56F2C600C4C13A /* Element.swift */; };
+		3DFE00151E58AF6300C4C13A /* UIRoundedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE00141E58AF6300C4C13A /* UIRoundedButton.swift */; };
+		3DFE00171E58B29100C4C13A /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE00161E58B29100C4C13A /* MenuViewController.swift */; };
+		3DFE00191E58BE5600C4C13A /* DifficultyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE00181E58BE5600C4C13A /* DifficultyViewController.swift */; };
+		3DFE001B1E58C72C00C4C13A /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DFE001A1E58C72C00C4C13A /* GameScene_iPad.sks */; };
+		3DFE001D1E5903FB00C4C13A /* MyColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE001C1E5903FB00C4C13A /* MyColorExtension.swift */; };
+		3DFE001F1E59F75900C4C13A /* SharedAssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE001E1E59F75900C4C13A /* SharedAssetManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,7 +105,6 @@
 		3D087E8D1E48D16800EAD2E2 /* SKTTimingFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTTimingFunctions.swift; sourceTree = "<group>"; };
 		3D087E8E1E48D16800EAD2E2 /* Vector3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector3.swift; sourceTree = "<group>"; };
 		3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyTileSet.sks; sourceTree = "<group>"; };
-		3D7976AB1E561508005C9520 /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
 		3D85629B1E40A51A005EFC36 /* RoundedCornerSprite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RoundedCornerSprite.swift; path = SpriteNode/RoundedCornerSprite.swift; sourceTree = "<group>"; };
 		3D85629D1E40A52E005EFC36 /* Number.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Number.swift; path = SpriteNode/Number.swift; sourceTree = "<group>"; };
 		3D85629E1E40A52E005EFC36 /* Pile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Pile.swift; path = SpriteNode/Pile.swift; sourceTree = "<group>"; };
@@ -122,6 +128,8 @@
 		3D970DD61E4F8BE40058490B /* ProgressBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProgressBar.swift; path = SpriteNode/ProgressBar.swift; sourceTree = "<group>"; };
 		3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SpriteKit-Spring.swift"; sourceTree = "<group>"; };
 		3DAA36C31E4B34A1004FE452 /* MyParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyParticle.sks; sourceTree = "<group>"; };
+		3DAFA5211E5A05AA00AB8CD1 /* GameCaracteristic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GameCaracteristic.swift; path = Model/GameCaracteristic.swift; sourceTree = "<group>"; };
+		3DAFA5231E5A05F900AB8CD1 /* SharedGameManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedGameManager.swift; sourceTree = "<group>"; };
 		3DB1875E1E53061B009C6BAA /* Exo2-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Black.ttf"; sourceTree = "<group>"; };
 		3DB1875F1E53061B009C6BAA /* Exo2-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-BlackItalic.ttf"; sourceTree = "<group>"; };
 		3DB187601E53061B009C6BAA /* Exo2-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Bold.ttf"; sourceTree = "<group>"; };
@@ -149,6 +157,12 @@
 		3DE8A1941E3CACEA00BC150A /* ComboTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComboTest.swift; sourceTree = "<group>"; };
 		3DFE000F1E56F29900C4C13A /* Joker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Joker.swift; path = SpriteNode/Joker.swift; sourceTree = "<group>"; };
 		3DFE00111E56F2C600C4C13A /* Element.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Element.swift; path = SpriteNode/Element.swift; sourceTree = "<group>"; };
+		3DFE00141E58AF6300C4C13A /* UIRoundedButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIRoundedButton.swift; sourceTree = "<group>"; };
+		3DFE00161E58B29100C4C13A /* MenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
+		3DFE00181E58BE5600C4C13A /* DifficultyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DifficultyViewController.swift; sourceTree = "<group>"; };
+		3DFE001A1E58C72C00C4C13A /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
+		3DFE001C1E5903FB00C4C13A /* MyColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyColorExtension.swift; sourceTree = "<group>"; };
+		3DFE001E1E59F75900C4C13A /* SharedAssetManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedAssetManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -236,17 +250,23 @@
 			children = (
 				3D95CB461E35409B008A9A9C /* AppDelegate.swift */,
 				3D95CB481E35409C008A9A9C /* GameScene.sks */,
-				3D7976AB1E561508005C9520 /* GameScene_iPad.sks */,
+				3DFE001A1E58C72C00C4C13A /* GameScene_iPad.sks */,
 				3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */,
 				3D95CB4A1E35409C008A9A9C /* TestAction.sks */,
 				3D95CB4C1E35409C008A9A9C /* GameScene.swift */,
 				3DAA36C31E4B34A1004FE452 /* MyParticle.sks */,
 				3D8A8CFD1E413A5000C6B148 /* MyHexa.sks */,
+				3DFE001C1E5903FB00C4C13A /* MyColorExtension.swift */,
+				3DFE001E1E59F75900C4C13A /* SharedAssetManager.swift */,
+				3DAFA5231E5A05F900AB8CD1 /* SharedGameManager.swift */,
+				3DFE00131E58AF4E00C4C13A /* UIView */,
 				3D087E821E48D16800EAD2E2 /* SKTUtils */,
 				3D85629A1E40A4D2005EFC36 /* SpriteNode */,
 				3DE8A1811E3CA61300BC150A /* Controller */,
 				3DE8A17A1E3CA58000BC150A /* Model */,
 				3D95CB4E1E35409C008A9A9C /* GameViewController.swift */,
+				3DFE00161E58B29100C4C13A /* MenuViewController.swift */,
+				3DFE00181E58BE5600C4C13A /* DifficultyViewController.swift */,
 				3DB1875D1E53061B009C6BAA /* Exo_2 */,
 				3D95CB501E35409C008A9A9C /* Main.storyboard */,
 				3D95CB531E35409C008A9A9C /* Assets.xcassets */,
@@ -295,6 +315,7 @@
 			isa = PBXGroup;
 			children = (
 				3DE8A17B1E3CA5AC00BC150A /* Combo.swift */,
+				3DAFA5211E5A05AA00AB8CD1 /* GameCaracteristic.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -316,6 +337,14 @@
 				3DE8A18E1E3CAC2C00BC150A /* Info.plist */,
 			);
 			path = TwelveTests;
+			sourceTree = "<group>";
+		};
+		3DFE00131E58AF4E00C4C13A /* UIView */ = {
+			isa = PBXGroup;
+			children = (
+				3DFE00141E58AF6300C4C13A /* UIRoundedButton.swift */,
+			);
+			path = UIView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -446,13 +475,13 @@
 				3D95CB541E35409C008A9A9C /* Assets.xcassets in Resources */,
 				3DB187711E53061B009C6BAA /* Exo2-Black.ttf in Resources */,
 				3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */,
-				3D7976AC1E561508005C9520 /* GameScene_iPad.sks in Resources */,
 				3DB187791E53061B009C6BAA /* Exo2-Italic.ttf in Resources */,
 				3DB187731E53061B009C6BAA /* Exo2-Bold.ttf in Resources */,
 				3D95CB4B1E35409C008A9A9C /* TestAction.sks in Resources */,
 				3DB1877C1E53061B009C6BAA /* Exo2-Medium.ttf in Resources */,
 				3DB187801E53061B009C6BAA /* Exo2-SemiBoldItalic.ttf in Resources */,
 				3DB187821E53061B009C6BAA /* Exo2-ThinItalic.ttf in Resources */,
+				3DFE001B1E58C72C00C4C13A /* GameScene_iPad.sks in Resources */,
 				3D8A8CFE1E413A5000C6B148 /* MyHexa.sks in Resources */,
 				3DB1877D1E53061B009C6BAA /* Exo2-MediumItalic.ttf in Resources */,
 				3DB1877F1E53061B009C6BAA /* Exo2-SemiBold.ttf in Resources */,
@@ -480,15 +509,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3DFE00191E58BE5600C4C13A /* DifficultyViewController.swift in Sources */,
+				3DFE001D1E5903FB00C4C13A /* MyColorExtension.swift in Sources */,
 				3D087E9A1E48D16800EAD2E2 /* Vector3.swift in Sources */,
 				3D087E941E48D16800EAD2E2 /* SKAction+SpecialEffects.swift in Sources */,
 				3D087E981E48D16800EAD2E2 /* SKTEffects.swift in Sources */,
+				3DFE00171E58B29100C4C13A /* MenuViewController.swift in Sources */,
 				3D087E8F1E48D16800EAD2E2 /* CGFloat+Extensions.swift in Sources */,
 				3D8562A21E40AE2D005EFC36 /* EndScoreNode.swift in Sources */,
 				3DFE00101E56F29900C4C13A /* Joker.swift in Sources */,
 				3DAA36C21E4B236A004FE452 /* SpriteKit-Spring.swift in Sources */,
+				3DFE001F1E59F75900C4C13A /* SharedAssetManager.swift in Sources */,
 				3D95CB4D1E35409C008A9A9C /* GameScene.swift in Sources */,
 				3D85629F1E40A52E005EFC36 /* Number.swift in Sources */,
+				3DAFA5221E5A05AB00AB8CD1 /* GameCaracteristic.swift in Sources */,
 				3D95CB4F1E35409C008A9A9C /* GameViewController.swift in Sources */,
 				3DE8A1801E3CA60900BC150A /* GridController.swift in Sources */,
 				3D087E931E48D16800EAD2E2 /* SKAction+Extensions.swift in Sources */,
@@ -498,7 +532,9 @@
 				3D970DD71E4F8BE40058490B /* ProgressBar.swift in Sources */,
 				3DFE00121E56F2C600C4C13A /* Element.swift in Sources */,
 				3D087E961E48D16800EAD2E2 /* SKNode+Extensions.swift in Sources */,
+				3DAFA5241E5A05F900AB8CD1 /* SharedGameManager.swift in Sources */,
 				3D8562A41E40D9A9005EFC36 /* ScoreNode.swift in Sources */,
+				3DFE00151E58AF6300C4C13A /* UIRoundedButton.swift in Sources */,
 				3D087E901E48D16800EAD2E2 /* CGPoint+Extensions.swift in Sources */,
 				3D087E921E48D16800EAD2E2 /* Int+Extensions.swift in Sources */,
 				3D087E991E48D16800EAD2E2 /* SKTTimingFunctions.swift in Sources */,

@@ -36,16 +36,64 @@ struct GridController : GridDispatcher {
     var grid : SKTileMapNode
     var currentSolution: Element?
     
+    var gameMode: GameMode {
+        get {
+            return SharedGameManager.sharedInstance.gameCaracteristic.mode
+        }
+    }
+    
+    var gameDifficulty: GameDifficulty {
+        get {
+            return SharedGameManager.sharedInstance.gameCaracteristic.difficulty
+        }
+    }
+    
     fileprivate var numberOfPossibilities: Int {
         get {
-            return randomInt(min: 1, max: 3)
+            switch gameDifficulty {
+            case .easy:
+                return randomInt(min: 1, max: 2)
+            case .normal:
+                return randomInt(min: 1, max: 3)
+            case .hard:
+                return randomInt(min: 0, max: 3)
+            }
         }
     }
+    
     fileprivate var lengthForCombo: Int {
         get {
-            return randomInt(min: 1, max: 5)
+            switch gameDifficulty {
+            case .easy:
+                return randomInt(min: 3, max: 8)
+            case .normal:
+                return randomInt(min: 2, max: 5)
+            case .hard:
+                return randomInt(min: 1, max: 5)
+            }
         }
     }
+    
+    fileprivate var isJoker: Bool {
+        get {
+            return arc4random_uniform(30) < 2
+        }
+    }
+    
+    fileprivate var updateWithFollowingNumber: Bool {
+        get {
+            switch gameDifficulty {
+            case .easy:
+                return arc4random_uniform(4) < 3
+            case .normal:
+                return arc4random_uniform(3) < 2
+            case .hard:
+                return arc4random_uniform(2) < 1
+            }
+        }
+        
+    }
+    
     
     mutating func fullfillGrid() {
         
@@ -151,17 +199,14 @@ struct GridController : GridDispatcher {
     
     fileprivate mutating func createNumberAt(position : GridPosition, with number: Int) throws {
         if let element = try elementAt(position: position) {
-            var isJoker: Bool {
-                return arc4random_uniform(2) < 1
-            }
             if element is NumberSpriteNode {
                 if isJoker {
                     let position:GridPosition = element.gridPosition
                     let object = Joker(gridPosition: position)
                     matrix[position.row][position.column] = object
                     object.position = element.position
-                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
-                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+                    let fadeOut = SKAction.fadeOut(withDuration: 0.1)
+                    let fadeIn = SKAction.fadeIn(withDuration: 0.1)
                     element.run(fadeOut, completion: {
                         element.removeFromParent()
                     })
@@ -243,6 +288,19 @@ struct GridController : GridDispatcher {
     
     
     
+     func removeNumbers() throws {
+        for row in 0..<grid.numberOfRows {
+            for column in 0..<grid.numberOfColumns {
+                let gridPosition = GridPosition(row, column)
+                guard let element = try elementAt(position: gridPosition) else {
+                    throw TwelveError.noNumberAtPosition
+                }
+                element.removeFromParent()
+            }
+        }
+        
+    }
+
     mutating func resetNumberAt(position: GridPosition) throws {
         guard let element = try elementAt(position: position) else {
             throw TwelveError.noNumberAtPosition
@@ -258,6 +316,8 @@ struct GridController : GridDispatcher {
                 element.removeFromParent()
             })
             self.grid.addChild(object)
+            let fadeIn = SKAction.fadeIn(withDuration: 0)
+            object.run(fadeIn)
         }
         element.value = 0
     }
@@ -302,7 +362,6 @@ struct GridController : GridDispatcher {
         return nil
         
     }
-    
     
     
     func isTile(_ currentTile: Element, adjacentWith tile: Element) throws {
@@ -364,21 +423,15 @@ extension GridController {
         
         if element is NumberSpriteNode {
             
-            var trueFalse: Bool {
-                return arc4random_uniform(3) < 2
-            }
             
-            if element.value > 0 && trueFalse {
-                if trueFalse {
+            if element.value > 0 && updateWithFollowingNumber {
+                if updateWithFollowingNumber {
                     element.value = element.value.followingNumber().followingNumber()
                 } else {
                     element.value = element.value.followingNumber().followingNumber().followingNumber()
                 }
             } else { // becomes a joker or a random number
                 
-                var isJoker: Bool {
-                    return arc4random_uniform(3) < 1
-                }
                 
                 if isJoker {
                     let position:GridPosition = element.gridPosition
@@ -393,7 +446,7 @@ extension GridController {
                     })
                     self.grid.addChild(object)
                     object.run(fadeIn)
-
+                    
                 } else {
                     element.value = randomValue()
                 }
@@ -407,7 +460,7 @@ extension GridController {
             object.position = element.position
             let fadeOut = SKAction.fadeOut(withDuration: 0.10)
             let fadeIn = SKAction.fadeIn(withDuration: 0.10)
-
+            
             element.run(fadeOut, completion: {
                 element.removeFromParent()
             })

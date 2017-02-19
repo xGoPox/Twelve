@@ -13,7 +13,7 @@ class Joker: Element {
     override init(gridPosition: GridPosition) {
         super.init(gridPosition: gridPosition)
         self.value = -1
-        self.texture = SKTexture(imageNamed: "joker")
+        self.texture = SharedAssetsManager.sharedInstance.jokerTexture
     }
     
     required init(coder aDecoder: NSCoder) {

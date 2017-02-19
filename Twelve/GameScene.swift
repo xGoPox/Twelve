@@ -27,12 +27,6 @@ enum TwelveError: Error {
 }
 
 
-enum GameType {
-    case surviror
-    case points
-}
-
-
 
 protocol Preparation {
     func fillUpMap()
@@ -80,6 +74,8 @@ extension GameScene : Preparation {
 
 class GameScene: SKScene {
     
+    var gameVC: GameViewController?
+    
     
     lazy var progressBar: ProgressBar = {
         guard let nodeProgressBar = self.childNode(withName: "progressBar")
@@ -124,9 +120,21 @@ class GameScene: SKScene {
     }()
     
     
-    
     var gridDispatcher : GridController!
-    var gameType: GameType = .surviror
+    
+    var gameMode: GameMode {
+        get {
+            return SharedGameManager.sharedInstance.gameCaracteristic.mode
+        }
+    }
+    
+    var gameDifficulty: GameDifficulty {
+        get {
+            return SharedGameManager.sharedInstance.gameCaracteristic.difficulty
+        }
+    }
+    
+    
     var currentElement: Element? {
         willSet(obj) {
             if let number = obj {
@@ -181,11 +189,15 @@ class GameScene: SKScene {
         }
     }
     
+    
+    
     override func didMove(to view: SKView) {
+        
+        // Do something once texture atlas has loaded
         fillUpMap()
         prepareGame()
+        
     }
-    
     
     
     
@@ -229,9 +241,9 @@ class GameScene: SKScene {
             if let element = currentElement {
                 gridDispatcher.updateElement(element)
             }
-            //  if numbers.count > 2 {
-            //      addSecond()
-            // }
+            
+            addSecond()
+            
             
             if !gameStarted {
                 gameStarted = true
@@ -303,7 +315,7 @@ class GameScene: SKScene {
         do {
             try gridDispatcher.checkBoard()
         } catch let error as TwelveError where error == .noMorePossibilities {
-                        
+            
             try? self.gridDispatcher.resetNumbers()
             try? self.gridDispatcher.disposeNumbers()
             
@@ -316,7 +328,7 @@ class GameScene: SKScene {
     
     func startTimer() {
         
-        timerValue = 60
+        timerValue = gameMode == .survival ? 20 : 60
         
         let wait = SKAction.wait(forDuration: 1)
         let run = SKAction.run {
@@ -378,6 +390,14 @@ extension GameScene {
         
         if atPoint(touch.location(in: self)).name == "Restart" {
             prepareGame()
+        } else   if atPoint(touch.location(in: self)).name == "resumeNode" {
+            isPauseHidden(true)
+        }
+        else if atPoint(touch.location(in: self)).name == "leaveNode" {
+            leaveGame()
+        }
+        else if atPoint(touch.location(in: self)).name == "timerNode" {
+            showPauseMenu()
         }
         else {
             let location = touch.location(in: self)
@@ -396,9 +416,22 @@ extension GameScene {
     }
     
     func addSecond() {
-        timerValue += 1
-        let action = SKAction.screenZoomWithNode(timeLabel, amount: CGPoint(x:2, y:2), oscillations: 2, duration: 1)
-        timeLabel.run(action)
+        if gameMode == .survival {
+            var comboForSeconds = 0
+            switch gameDifficulty {
+            case .easy:
+                comboForSeconds = 3
+            case .normal:
+                comboForSeconds = 4
+            case .hard:
+                comboForSeconds = 5
+            }
+            if combo.numbers.count > comboForSeconds  {
+                timerValue += 1
+                let action = SKAction.screenZoomWithNode(timeLabel, amount: CGPoint(x:2, y:2), oscillations: 2, duration: 1)
+                timeLabel.run(action)
+            }
+        }
     }
 }
 
@@ -410,6 +443,18 @@ extension GameScene {
         try? gridDispatcher.resetNumbers()
         try? gridDispatcher.disposeNumbers()
     }
+    
+    func leaveGame() {
+        gameStarted = false
+        cleanScene()
+        gameVC?.navigationController?.popToRootViewController(animated: true)
+    }
+    
+    func cleanScene() {
+        line.removeFromParent()
+        try? gridDispatcher.removeNumbers()
+    }
+    
     
     func prepareGame() {
         
@@ -427,7 +472,7 @@ extension GameScene {
                 } catch {  }
             }
         }
-        
+        isPauseHidden(true)
         totalPoints = 0
         isEndMenuHidden(true)
         resetPiles()
@@ -450,9 +495,24 @@ extension GameScene  {
         var piles = [Pile]()
         for child in bottomBar.children {
             if child.name == "pile" {
-                let pile = Pile()
-                child.addChild(pile)
-                piles.append(pile)
+                if let spriteNode = child.childNode(withName: "PileSprite") {
+                    spriteNode.isHidden = true
+                } else {
+                    let pile = Pile()
+                    pile.isHidden = true
+                    child.addChild(pile)
+                }
+                
+                if let value = child.userData?.value(forKey: "difficulty") as? Int {
+                    print("gameDifficulty : \(gameDifficulty)")
+                    let difficulty = GameDifficulty(rawValue: value)
+                    if difficulty == .easy && gameDifficulty == .easy || difficulty == .normal && gameDifficulty == .normal || gameDifficulty == .hard {
+                        if let pileSprite = child.childNode(withName: "PileSprite") as? Pile {
+                            pileSprite.isHidden = false
+                            piles.append(pileSprite)
+                        }
+                    }
+                }
             }
         }
         
@@ -503,6 +563,15 @@ extension GameScene  {
         topBar.isHidden = hidden
     }
     
+    func isPauseHidden(_ hidden: Bool) {
+        guard let node = childNode(withName: "pauseMenu")
+            as? SKSpriteNode else {
+                fatalError("pauseMenu node not loaded")
+        }
+        
+        node.isHidden = hidden
+    }
+    
     func isEndMenuHidden(_ hidden: Bool) {
         guard let node = childNode(withName: "menuEndGameSprite")
             as? SKSpriteNode else {
@@ -520,6 +589,17 @@ extension GameScene  {
         node.position = CGPoint(x: 0, y: 0)
         node.isHidden = false
         self.isEndMenuHidden(false)
+    }
+    
+    
+    func showPauseMenu() {
+        guard let node = childNode(withName: "pauseMenu")
+            as? SKSpriteNode else {
+                fatalError("pauseMenu node not loaded")
+        }
+        node.position = CGPoint(x: 0, y: 0)
+        node.isHidden = false
+        self.isPauseHidden(false)
     }
     
     func showGameOver(_ show: Bool) {
@@ -563,50 +643,6 @@ extension GameScene  {
 
 
 
-extension UIColor {
-    
-    static var myGreen: UIColor  { return UIColor(red: 34/255, green: 181/255.0, blue: 115/255.0, alpha: 1) }
-    static var myRed: UIColor { return UIColor(red: 217/255.0, green: 83/255.0, blue: 79/255.0, alpha: 1) }
-    static var myBlue: UIColor { return UIColor(red: 66/255.0, green: 139/255.0, blue: 202/255.0, alpha: 1) }
-    static var myYellow: UIColor { return UIColor(red: 240/255.0, green: 173/255.0, blue: 78/255.0, alpha: 1) }
-    
-    static var myRandomColor: UIColor {
-        let value = 1 + Int(arc4random_uniform(UInt32(4 - 1 + 1)))
-        switch value {
-        case 1:
-            return .myGreen
-        case 2:
-            return .myRed
-        case 3:
-            return .myYellow
-        default:
-            return .myBlue
-        }
-    
-    }
-
-    
-    
-    // Function used to get the red, green, and blue values of a UIColor object.
-    
-    
-    
-    func rgb() -> (red:CGFloat, green:CGFloat, blue:CGFloat, alpha:CGFloat)? {
-        var fRed : CGFloat = 0
-        var fGreen : CGFloat = 0
-        var fBlue : CGFloat = 0
-        var fAlpha: CGFloat = 0
-        if self.getRed(&fRed, green: &fGreen, blue: &fBlue, alpha: &fAlpha) {
-            // Could extract RGBA components
-            return (red:fRed, green:fGreen, blue:fBlue, alpha:fAlpha)
-        } else {
-            // Could not extract RGBA components
-            return nil
-        }
-    }
-    
-    
-}
 
 extension CGFloat {
     // Used to calculate a linear interpolation between two values.

@@ -60,7 +60,7 @@ extension NumberSpriteNode {
         let pulseDown = SKAction.scale(to: 1, duration: 0.20)
         let pulse = SKAction.sequence([pulseUp, pulseDown])
         let color = SKAction.colorize(with: colorType, colorBlendFactor: 1, duration: 0.1)
-        let shape = SKSpriteNode.init(texture: SKTexture.init(imageNamed: "number"), color: colorType, size: self.size)
+        let shape = SKSpriteNode.init(texture: SharedAssetsManager.sharedInstance.numberTexture, color: colorType, size: self.size)
         shape.name = "shape"
         shape.isUserInteractionEnabled = false
         shape.zPosition = 1

@@ -83,6 +83,7 @@ class Pile : SKSpriteNode, PileHandler {
         shape = SKShapeNode()
         roundShape = SKShapeNode()
         super.init(texture: nil, color: .clear, size: CGSize(width: 70, height: 70))
+        name = "PileSprite"
         numberLabel.fontSize = 40
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
