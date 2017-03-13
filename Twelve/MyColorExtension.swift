@@ -15,7 +15,8 @@ extension UIColor {
     static var myRed: UIColor { return UIColor(red: 217/255.0, green: 83/255.0, blue: 79/255.0, alpha: 1) }
     static var myBlue: UIColor { return UIColor(red: 66/255.0, green: 139/255.0, blue: 202/255.0, alpha: 1) }
     static var myYellow: UIColor { return UIColor(red: 240/255.0, green: 173/255.0, blue: 78/255.0, alpha: 1) }
-    
+    static var myTextColor: UIColor { return UIColor(red: 74/255.0, green: 74/255.0, blue: 74/255.0, alpha: 1) }
+
     static var myRandomColor: UIColor {
         let value = 1 + Int(arc4random_uniform(UInt32(4 - 1 + 1)))
         switch value {

@@ -72,6 +72,7 @@
 		3DFE001B1E58C72C00C4C13A /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DFE001A1E58C72C00C4C13A /* GameScene_iPad.sks */; };
 		3DFE001D1E5903FB00C4C13A /* MyColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE001C1E5903FB00C4C13A /* MyColorExtension.swift */; };
 		3DFE001F1E59F75900C4C13A /* SharedAssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE001E1E59F75900C4C13A /* SharedAssetManager.swift */; };
+		E4895E0F1E7717480012C600 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4895E0E1E7717480012C600 /* TutorialViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -163,6 +164,7 @@
 		3DFE001A1E58C72C00C4C13A /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
 		3DFE001C1E5903FB00C4C13A /* MyColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyColorExtension.swift; sourceTree = "<group>"; };
 		3DFE001E1E59F75900C4C13A /* SharedAssetManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedAssetManager.swift; sourceTree = "<group>"; };
+		E4895E0E1E7717480012C600 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -267,6 +269,7 @@
 				3D95CB4E1E35409C008A9A9C /* GameViewController.swift */,
 				3DFE00161E58B29100C4C13A /* MenuViewController.swift */,
 				3DFE00181E58BE5600C4C13A /* DifficultyViewController.swift */,
+				E4895E0E1E7717480012C600 /* TutorialViewController.swift */,
 				3DB1875D1E53061B009C6BAA /* Exo_2 */,
 				3D95CB501E35409C008A9A9C /* Main.storyboard */,
 				3D95CB531E35409C008A9A9C /* Assets.xcassets */,
@@ -532,6 +535,7 @@
 				3D970DD71E4F8BE40058490B /* ProgressBar.swift in Sources */,
 				3DFE00121E56F2C600C4C13A /* Element.swift in Sources */,
 				3D087E961E48D16800EAD2E2 /* SKNode+Extensions.swift in Sources */,
+				E4895E0F1E7717480012C600 /* TutorialViewController.swift in Sources */,
 				3DAFA5241E5A05F900AB8CD1 /* SharedGameManager.swift in Sources */,
 				3D8562A41E40D9A9005EFC36 /* ScoreNode.swift in Sources */,
 				3DFE00151E58AF6300C4C13A /* UIRoundedButton.swift in Sources */,
