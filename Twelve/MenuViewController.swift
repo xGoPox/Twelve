@@ -27,22 +27,12 @@ class MenuViewController: UIViewController {
     
   
     @IBAction func selectClassic(sender : AnyObject?) {
-        UIView.animate(withDuration: 0.25, animations: { 
-            sender?.layer.backgroundColor =  UIColor.myGreen.cgColor
-            sender?.setTitleColor(UIColor.white, for: .normal)
-        }, completion: { done in
-            self.performSegue(withIdentifier: "startClassic", sender: nil)
-        })
+        self.performSegue(withIdentifier: "startClassic", sender: nil)
     }
     
     
     @IBAction func selectSurvival(sender : AnyObject?) {
-        UIView.animate(withDuration: 0.25, animations: {
-            sender?.layer.backgroundColor =  UIColor.myBlue.cgColor
-            sender?.setTitleColor(UIColor.white, for: .normal)
-        }, completion: { done in
-            self.performSegue(withIdentifier: "startSurvival", sender: nil)
-        })
+        self.performSegue(withIdentifier: "startSurvival", sender: nil)
     }
 
     
