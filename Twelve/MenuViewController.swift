@@ -34,6 +34,10 @@ class MenuViewController: UIViewController {
     @IBAction func selectSurvival(sender : AnyObject?) {
         self.performSegue(withIdentifier: "startSurvival", sender: nil)
     }
+    
+    @IBAction func unvindSegueToMainMenu(segue:UIStoryboardSegue) {
+        dismiss(animated: true, completion: nil)
+    }
 
     
     // MARK: - Navigation
