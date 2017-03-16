@@ -27,6 +27,24 @@ enum TwelveError: Error {
 }
 
 
+enum TwelveNode: String {
+    case progressBar = "progressBar"
+    case tileMap = "Tile Map Node"
+    case topBar = "topBar"
+    case scoreNode = "scoreNode"
+    case timerNode = "timerNode"
+    case restartNode = "Restart"
+    case resumeNode = "resumeNode"
+    case leaveNode = "leaveNode"
+    case closeClassicNode = "closeClassicNode"
+    case closeJokerNode = "closeJokerNode"
+    case closeSurvivalNode = "closeSurvivalNode"
+    case confirmQuitNode = "confirmQuitNode"
+    case cancelQuitNode = "cancelQuitNode"
+
+}
+
+
 
 protocol Preparation {
     func fillUpMap()
@@ -78,7 +96,7 @@ class GameScene: SKScene {
     
     
     lazy var progressBar: ProgressBar = {
-        guard let nodeProgressBar = self.childNode(withName: "progressBar")
+        guard let nodeProgressBar = self.childNode(withName: TwelveNode.progressBar.rawValue)
             as? ProgressBar else {
                 fatalError("comboBarTop node not loaded")
         }
@@ -86,7 +104,7 @@ class GameScene: SKScene {
     }()
     
     lazy var objectsTileMap: SKTileMapNode = {
-        guard let map = self.childNode(withName: "Tile Map Node")
+        guard let map = self.childNode(withName: TwelveNode.tileMap.rawValue)
             as? SKTileMapNode else {
                 fatalError("Background node not loaded")
         }
@@ -94,12 +112,12 @@ class GameScene: SKScene {
     }()
     
     lazy var scoreNode: ScoreNode = {
-        guard let topBar = self.childNode(withName: "topBar")
+        guard let topBar = self.childNode(withName: TwelveNode.topBar.rawValue)
             as? SKSpriteNode else {
                 fatalError("topBar node not loaded")
         }
         
-        guard let scoreNode = topBar.childNode(withName: "scoreNode")
+        guard let scoreNode = topBar.childNode(withName: TwelveNode.scoreNode.rawValue)
             as? ScoreNode else {
                 fatalError("scoreNode node not loaded")
         }
@@ -108,11 +126,11 @@ class GameScene: SKScene {
     
     
     lazy var timeLabel: SKLabelNode = {
-        guard let topBar = self.childNode(withName: "topBar")
+        guard let topBar = self.childNode(withName: TwelveNode.topBar.rawValue)
             as? SKSpriteNode else {
                 fatalError("topBarNode node not loaded")
         }
-        guard let label = topBar.childNode(withName: "timerNode")
+        guard let label = topBar.childNode(withName: TwelveNode.timerNode.rawValue)
             as? SKLabelNode else {
                 fatalError("timerNode node not loaded")
         }
@@ -196,7 +214,7 @@ class GameScene: SKScene {
         // Do something once texture atlas has loaded
         fillUpMap()
         prepareGame()
-        
+        shouldShowTutorial()
     }
     
     
@@ -388,23 +406,39 @@ extension GameScene {
             return
         }
         
-        if atPoint(touch.location(in: self)).name == "Restart" {
-            prepareGame()
-        } else   if atPoint(touch.location(in: self)).name == "resumeNode" {
-            isPauseHidden(true)
-        }
-        else if atPoint(touch.location(in: self)).name == "leaveNode" {
-            leaveGame()
-        }
-        else if atPoint(touch.location(in: self)).name == "timerNode" {
-            showPauseMenu()
-        }
-        else {
-            let location = touch.location(in: self)
+        let location = touch.location(in: self)
+        if let name = atPoint(location).name {
+            switch name {
+            case TwelveNode.restartNode.rawValue:
+                prepareGame()
+            case TwelveNode.resumeNode.rawValue:
+                resumeGame()
+            case TwelveNode.leaveNode.rawValue:
+                showConfirmationLeaveGame()
+            case TwelveNode.closeClassicNode.rawValue:
+                removeBackgroundLayer()
+                isClassicTutorialHidden(true)
+            case TwelveNode.closeSurvivalNode.rawValue:
+                removeBackgroundLayer()
+                isSurvivalTutorialHidden(true)
+            case TwelveNode.closeJokerNode.rawValue:
+                removeBackgroundLayer()
+                isJokerTutorialHidden(true)
+            case TwelveNode.timerNode.rawValue:
+                showPauseMenu()
+            case TwelveNode.confirmQuitNode.rawValue:
+                leaveGame()
+            case TwelveNode.cancelQuitNode.rawValue:
+                resumeGame()
+            default:
+                print("nothing to care about")
+            }
+        }  else {
             if let element = (nodes(at: location).filter { $0 is Element }).first as? Element {
                 analyzeElement(element)
             }
         }
+        
     }
 }
 
@@ -445,6 +479,7 @@ extension GameScene {
     }
     
     func leaveGame() {
+        removeBackgroundLayer()
         gameStarted = false
         cleanScene()
         gameVC?.navigationController?.popToRootViewController(animated: true)
@@ -453,6 +488,36 @@ extension GameScene {
     func cleanScene() {
         line.removeFromParent()
         try? gridDispatcher.removeNumbers()
+    }
+    
+    func shouldShowTutorial() {
+        switch gameMode {
+        case .classic:
+            shouldShowClassicTutorial()
+        case .survival:
+            shouldShowSurvivalTutorial()
+        }
+    }
+    
+    func shouldShowClassicTutorial() {
+        if  SharedGameManager.sharedInstance.classicTutorialSeen == false {
+            addBackgroundLayer(belowNode: "tutorialClassicNode")
+            isClassicTutorialHidden(false)
+        }
+    }
+    
+    func shouldShowSurvivalTutorial() {
+        if  SharedGameManager.sharedInstance.survivalTutorialSeen == false {
+            addBackgroundLayer(belowNode: "tutorialSurvivalNode")
+            isSurvivalTutorialHidden(false)
+        }
+    }
+    
+    func shouldShowJokerTutorial() {
+        if  SharedGameManager.sharedInstance.jokerTutorialSeen == false {
+            addBackgroundLayer(belowNode: "tutorialJokerNode")
+            isJokerTutorialHidden(false)
+        }
     }
     
     
@@ -532,6 +597,42 @@ extension GameScene  {
         node.isHidden = hidden
     }
     
+    func isClassicTutorialHidden(_ hidden: Bool) {
+        guard let node = childNode(withName: "tutorialClassicNode")
+            as? SKSpriteNode else {
+                fatalError("tutorialClassicNode node not loaded")
+        }
+        if hidden == false {
+            node.position = CGPoint(x: 0, y: 0)
+        }
+        node.isHidden = hidden
+    }
+    
+    func isSurvivalTutorialHidden(_ hidden: Bool) {
+        guard let node = childNode(withName: "tutorialSurvivalNode")
+            as? SKSpriteNode else {
+                fatalError("tutorialSurvivalNode node not loaded")
+        }
+        if hidden == false {
+            node.position = CGPoint(x: 0, y: 0)
+        }
+        node.isHidden = hidden
+    }
+    
+    func isJokerTutorialHidden(_ hidden: Bool) {
+        guard let node = childNode(withName: "tutorialJokerNode")
+            as? SKSpriteNode else {
+                fatalError("tutorialJokerNode node not loaded")
+        }
+        if hidden == false {
+            node.position = CGPoint(x: 0, y: 0)
+        }
+        node.isHidden = hidden
+    }
+    
+    
+    
+    
     func isMainMenuHidden(_ hidden: Bool) {
         guard let node = childNode(withName: "menu_sprite")
             as? SKSpriteNode else {
@@ -555,7 +656,7 @@ extension GameScene  {
     
     
     func isTopBarHidden(_ hidden: Bool) {
-        guard let topBar = childNode(withName: "topBar")
+        guard let topBar = childNode(withName: TwelveNode.topBar.rawValue)
             as? SKSpriteNode else {
                 fatalError("scoreNode node not loaded")
         }
@@ -591,16 +692,81 @@ extension GameScene  {
         self.isEndMenuHidden(false)
     }
     
+    func resumeGame() {
+        isPauseHidden(true)
+        removeBackgroundLayer()
+    }
+    
+    func showConfirmationLeaveGame(){
+        
+        guard let pauseMenu = childNode(withName: "pauseMenu")
+            as? SKSpriteNode else {
+                fatalError("pauseMenu node not loaded")
+        }
+        
+        guard let confirmationLeaveMenu = pauseMenu.childNode(withName: "pauseConfirmationMenu")
+            as? SKSpriteNode else {
+                fatalError("confirmationLeaveMenu node not loaded")
+        }
+        
+        let currentScaleX = pauseMenu.xScale
+        
+        let flip = SKAction.scaleX(to: 0, duration: 0.1)
+        
+        let flipBack = SKAction.scaleX(to: currentScaleX, duration: 0.1)
+        
+        let changeView = SKAction.run( {
+            confirmationLeaveMenu.isHidden = false
+        })
+        
+        let action = SKAction.sequence([flip, changeView, flipBack] )
+        
+        pauseMenu.run(action)
+        
+    }
+    
     
     func showPauseMenu() {
         guard let node = childNode(withName: "pauseMenu")
             as? SKSpriteNode else {
                 fatalError("pauseMenu node not loaded")
         }
+        guard let confirmationLeaveMenu = node.childNode(withName: "pauseConfirmationMenu")
+            as? SKSpriteNode else {
+                fatalError("confirmationLeaveMenu node not loaded")
+        }
+        confirmationLeaveMenu.isHidden = true
         node.position = CGPoint(x: 0, y: 0)
         node.isHidden = false
-        self.isPauseHidden(false)
+        addBackgroundLayer(belowNode: "pauseMenu")
+        isPauseHidden(false)
+        
     }
+    
+    func addBackgroundLayer(belowNode: String) {
+        hideNumbers(hide: true)
+        guard let node = childNode(withName: "pauseMenu")
+            as? SKSpriteNode else {
+                fatalError("pauseMenu node not loaded")
+        }
+        let sizeScreen = UIScreen.main.nativeBounds.size
+        let size = CGSize(width: sizeScreen.width, height: sizeScreen.height)
+        let backgroundNode = SKSpriteNode.init(color: UIColor.myTextColor.withAlphaComponent(0.30), size: size)
+        backgroundNode.name = "backgroundNode"
+        backgroundNode.position = CGPoint(x: 0, y: 0)
+        backgroundNode.zPosition = node.zPosition - 1
+        addChild(backgroundNode)
+    }
+    
+    func removeBackgroundLayer() {
+        hideNumbers(hide: false)
+        guard let node = childNode(withName: "backgroundNode")
+            as? SKSpriteNode else {
+                fatalError("backgroundNode node not loaded")
+        }
+        node.removeFromParent()
+    }
+    
     
     func showGameOver(_ show: Bool) {
         
@@ -636,6 +802,29 @@ extension GameScene  {
         node.run(move, completion: {
             self.showEndMenu()
         })
+    }
+    
+    func hideNumbers(hide: Bool) {
+        
+        for row in 0..<self.objectsTileMap.numberOfRows {
+            for column in 0..<self.objectsTileMap.numberOfColumns {
+                let gridPosition = GridPosition(row, column)
+                if let element = try? self.gridDispatcher.elementAt(position: gridPosition) {
+                    if hide {
+                        let scale = SKAction.scale(to: 0.1, duration: 0.25)
+                        let fade = SKAction.fadeOut(withDuration: 0.25)
+                        let group = SKAction.group([scale, fade])
+                        element?.run(group)
+                    } else {
+                        let scale = SKAction.scale(to: 1, duration: 0.25)
+                        let fade = SKAction.fadeIn(withDuration: 0.25)
+                        let group = SKAction.group([scale, fade])
+                        element?.run(group)
+                    }
+                }
+            }
+        }
+        
     }
     
     

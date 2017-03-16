@@ -29,7 +29,7 @@ class GameViewController: UIViewController {
             // Get the SKScene from the loaded GKScene
             if let sceneNode = scene.rootNode as! GameScene? {
                 
-                sceneNode.scaleMode = .aspectFit
+                sceneNode.scaleMode = .fill
                 sceneNode.gameVC = self
                                // Present the scene
                 if let view = self.view as! SKView? {

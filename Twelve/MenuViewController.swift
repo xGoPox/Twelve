@@ -12,11 +12,16 @@ import UIKit
 
 class MenuViewController: UIViewController {
 
+    @IBOutlet var collectionOfButtons: Array<UIButton>!
+    let font = UIFont(name: "Exo2-Medium", size: UIDevice.current.userInterfaceIdiom == .pad ? 32 : 16)!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         SharedAssetsManager.sharedInstance.loadTextures()
         SharedAssetsManager.sharedInstance.loadScene()
+        for button in collectionOfButtons {
+            button.titleLabel?.font = font
+        }
         // Do any additional setup after loading the view.
     }
 

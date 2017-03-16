@@ -13,12 +13,15 @@ class TutorialContainerViewController: UIViewController, TutorialPageViewControl
 
     @IBOutlet weak var leftArrow: UIImageView!
     @IBOutlet weak var rigthArrow: UIImageView!
+    @IBOutlet weak var closeButton: UIButton!
+
 
     let indexMax = 3
     
     override func viewDidLoad() {
         super.viewDidLoad()
         leftArrow.isHidden = true
+        closeButton.isHidden = true
     }
     
     func tutorialPageViewController(tutorialPageViewController: TutorialPageViewController,
@@ -31,9 +34,15 @@ class TutorialContainerViewController: UIViewController, TutorialPageViewControl
                                     didUpdatePageIndex index: Int) {
         leftArrow.isHidden = index == 0
         rigthArrow.isHidden = index == indexMax
+        closeButton.isHidden = index != indexMax
     }
 
 
+    @IBAction func dismissViewAction(sender: UIButton) {
+        dismiss(animated: true, completion: nil)
+    }
+
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let tutorialPageViewController = segue.destination as? TutorialPageViewController {
             tutorialPageViewController.tutorialDelegate = self as TutorialPageViewControllerDelegate

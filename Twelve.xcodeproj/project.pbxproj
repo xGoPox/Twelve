@@ -19,17 +19,14 @@
 		3D087E981E48D16800EAD2E2 /* SKTEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D087E8C1E48D16800EAD2E2 /* SKTEffects.swift */; };
 		3D087E991E48D16800EAD2E2 /* SKTTimingFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D087E8D1E48D16800EAD2E2 /* SKTTimingFunctions.swift */; };
 		3D087E9A1E48D16800EAD2E2 /* Vector3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D087E8E1E48D16800EAD2E2 /* Vector3.swift */; };
-		3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */; };
 		3D85629C1E40A51A005EFC36 /* RoundedCornerSprite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629B1E40A51A005EFC36 /* RoundedCornerSprite.swift */; };
 		3D85629F1E40A52E005EFC36 /* Number.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629D1E40A52E005EFC36 /* Number.swift */; };
 		3D8562A01E40A52E005EFC36 /* Pile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D85629E1E40A52E005EFC36 /* Pile.swift */; };
 		3D8562A21E40AE2D005EFC36 /* EndScoreNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8562A11E40AE2D005EFC36 /* EndScoreNode.swift */; };
 		3D8562A41E40D9A9005EFC36 /* ScoreNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8562A31E40D9A9005EFC36 /* ScoreNode.swift */; };
 		3D8A11B51E3D1937009302D3 /* BoardTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8A11B41E3D1937009302D3 /* BoardTest.swift */; };
-		3D8A8CFE1E413A5000C6B148 /* MyHexa.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D8A8CFD1E413A5000C6B148 /* MyHexa.sks */; };
 		3D95CB471E35409B008A9A9C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB461E35409B008A9A9C /* AppDelegate.swift */; };
 		3D95CB491E35409C008A9A9C /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB481E35409C008A9A9C /* GameScene.sks */; };
-		3D95CB4B1E35409C008A9A9C /* TestAction.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB4A1E35409C008A9A9C /* TestAction.sks */; };
 		3D95CB4D1E35409C008A9A9C /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB4C1E35409C008A9A9C /* GameScene.swift */; };
 		3D95CB4F1E35409C008A9A9C /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB4E1E35409C008A9A9C /* GameViewController.swift */; };
 		3D95CB521E35409C008A9A9C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D95CB501E35409C008A9A9C /* Main.storyboard */; };
@@ -38,7 +35,6 @@
 		3D95CB621E35409C008A9A9C /* TwelveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D95CB611E35409C008A9A9C /* TwelveUITests.swift */; };
 		3D970DD71E4F8BE40058490B /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D970DD61E4F8BE40058490B /* ProgressBar.swift */; };
 		3DAA36C21E4B236A004FE452 /* SpriteKit-Spring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */; };
-		3DAA36C41E4B34A1004FE452 /* MyParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DAA36C31E4B34A1004FE452 /* MyParticle.sks */; };
 		3DAFA5221E5A05AB00AB8CD1 /* GameCaracteristic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAFA5211E5A05AA00AB8CD1 /* GameCaracteristic.swift */; };
 		3DAFA5241E5A05F900AB8CD1 /* SharedGameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAFA5231E5A05F900AB8CD1 /* SharedGameManager.swift */; };
 		3DB187711E53061B009C6BAA /* Exo2-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3DB1875E1E53061B009C6BAA /* Exo2-Black.ttf */; };
@@ -69,7 +65,6 @@
 		3DFE00151E58AF6300C4C13A /* UIRoundedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE00141E58AF6300C4C13A /* UIRoundedButton.swift */; };
 		3DFE00171E58B29100C4C13A /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE00161E58B29100C4C13A /* MenuViewController.swift */; };
 		3DFE00191E58BE5600C4C13A /* DifficultyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE00181E58BE5600C4C13A /* DifficultyViewController.swift */; };
-		3DFE001B1E58C72C00C4C13A /* GameScene_iPad.sks in Resources */ = {isa = PBXBuildFile; fileRef = 3DFE001A1E58C72C00C4C13A /* GameScene_iPad.sks */; };
 		3DFE001D1E5903FB00C4C13A /* MyColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE001C1E5903FB00C4C13A /* MyColorExtension.swift */; };
 		3DFE001F1E59F75900C4C13A /* SharedAssetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFE001E1E59F75900C4C13A /* SharedAssetManager.swift */; };
 		E4895E0F1E7717480012C600 /* TutorialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4895E0E1E7717480012C600 /* TutorialViewController.swift */; };
@@ -105,18 +100,15 @@
 		3D087E8C1E48D16800EAD2E2 /* SKTEffects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTEffects.swift; sourceTree = "<group>"; };
 		3D087E8D1E48D16800EAD2E2 /* SKTTimingFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTTimingFunctions.swift; sourceTree = "<group>"; };
 		3D087E8E1E48D16800EAD2E2 /* Vector3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector3.swift; sourceTree = "<group>"; };
-		3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyTileSet.sks; sourceTree = "<group>"; };
 		3D85629B1E40A51A005EFC36 /* RoundedCornerSprite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RoundedCornerSprite.swift; path = SpriteNode/RoundedCornerSprite.swift; sourceTree = "<group>"; };
 		3D85629D1E40A52E005EFC36 /* Number.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Number.swift; path = SpriteNode/Number.swift; sourceTree = "<group>"; };
 		3D85629E1E40A52E005EFC36 /* Pile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Pile.swift; path = SpriteNode/Pile.swift; sourceTree = "<group>"; };
 		3D8562A11E40AE2D005EFC36 /* EndScoreNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EndScoreNode.swift; path = SpriteNode/EndScoreNode.swift; sourceTree = "<group>"; };
 		3D8562A31E40D9A9005EFC36 /* ScoreNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ScoreNode.swift; path = SpriteNode/ScoreNode.swift; sourceTree = "<group>"; };
 		3D8A11B41E3D1937009302D3 /* BoardTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoardTest.swift; sourceTree = "<group>"; };
-		3D8A8CFD1E413A5000C6B148 /* MyHexa.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyHexa.sks; sourceTree = "<group>"; };
 		3D95CB431E35409B008A9A9C /* Twelve.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Twelve.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D95CB461E35409B008A9A9C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3D95CB481E35409C008A9A9C /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
-		3D95CB4A1E35409C008A9A9C /* TestAction.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = TestAction.sks; sourceTree = "<group>"; };
 		3D95CB4C1E35409C008A9A9C /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		3D95CB4E1E35409C008A9A9C /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		3D95CB511E35409C008A9A9C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -128,7 +120,6 @@
 		3D95CB631E35409C008A9A9C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3D970DD61E4F8BE40058490B /* ProgressBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProgressBar.swift; path = SpriteNode/ProgressBar.swift; sourceTree = "<group>"; };
 		3DAA36C11E4B236A004FE452 /* SpriteKit-Spring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SpriteKit-Spring.swift"; sourceTree = "<group>"; };
-		3DAA36C31E4B34A1004FE452 /* MyParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyParticle.sks; sourceTree = "<group>"; };
 		3DAFA5211E5A05AA00AB8CD1 /* GameCaracteristic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GameCaracteristic.swift; path = Model/GameCaracteristic.swift; sourceTree = "<group>"; };
 		3DAFA5231E5A05F900AB8CD1 /* SharedGameManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedGameManager.swift; sourceTree = "<group>"; };
 		3DB1875E1E53061B009C6BAA /* Exo2-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Exo2-Black.ttf"; sourceTree = "<group>"; };
@@ -161,7 +152,6 @@
 		3DFE00141E58AF6300C4C13A /* UIRoundedButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIRoundedButton.swift; sourceTree = "<group>"; };
 		3DFE00161E58B29100C4C13A /* MenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		3DFE00181E58BE5600C4C13A /* DifficultyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DifficultyViewController.swift; sourceTree = "<group>"; };
-		3DFE001A1E58C72C00C4C13A /* GameScene_iPad.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene_iPad.sks; sourceTree = "<group>"; };
 		3DFE001C1E5903FB00C4C13A /* MyColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyColorExtension.swift; sourceTree = "<group>"; };
 		3DFE001E1E59F75900C4C13A /* SharedAssetManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedAssetManager.swift; sourceTree = "<group>"; };
 		E4895E0E1E7717480012C600 /* TutorialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialViewController.swift; sourceTree = "<group>"; };
@@ -252,12 +242,7 @@
 			children = (
 				3D95CB461E35409B008A9A9C /* AppDelegate.swift */,
 				3D95CB481E35409C008A9A9C /* GameScene.sks */,
-				3DFE001A1E58C72C00C4C13A /* GameScene_iPad.sks */,
-				3D48EB9B1E3E5C1C00F80BB7 /* MyTileSet.sks */,
-				3D95CB4A1E35409C008A9A9C /* TestAction.sks */,
 				3D95CB4C1E35409C008A9A9C /* GameScene.swift */,
-				3DAA36C31E4B34A1004FE452 /* MyParticle.sks */,
-				3D8A8CFD1E413A5000C6B148 /* MyHexa.sks */,
 				3DFE001C1E5903FB00C4C13A /* MyColorExtension.swift */,
 				3DFE001E1E59F75900C4C13A /* SharedAssetManager.swift */,
 				3DAFA5231E5A05F900AB8CD1 /* SharedGameManager.swift */,
@@ -463,7 +448,6 @@
 				3DB187751E53061B009C6BAA /* Exo2-ExtraBold.ttf in Resources */,
 				3DB1877B1E53061B009C6BAA /* Exo2-LightItalic.ttf in Resources */,
 				3DB187811E53061B009C6BAA /* Exo2-Thin.ttf in Resources */,
-				3D48EB9C1E3E5C1C00F80BB7 /* MyTileSet.sks in Resources */,
 				3D95CB521E35409C008A9A9C /* Main.storyboard in Resources */,
 				3DB187721E53061B009C6BAA /* Exo2-BlackItalic.ttf in Resources */,
 				3DB187761E53061B009C6BAA /* Exo2-ExtraBoldItalic.ttf in Resources */,
@@ -472,7 +456,6 @@
 				3DB1877E1E53061B009C6BAA /* Exo2-Regular.ttf in Resources */,
 				3DB187741E53061B009C6BAA /* Exo2-BoldItalic.ttf in Resources */,
 				3D95CB491E35409C008A9A9C /* GameScene.sks in Resources */,
-				3DAA36C41E4B34A1004FE452 /* MyParticle.sks in Resources */,
 				3DB187831E53061B009C6BAA /* OFL.txt in Resources */,
 				3DB187781E53061B009C6BAA /* Exo2-ExtraLightItalic.ttf in Resources */,
 				3D95CB541E35409C008A9A9C /* Assets.xcassets in Resources */,
@@ -480,12 +463,9 @@
 				3D95CB571E35409C008A9A9C /* LaunchScreen.storyboard in Resources */,
 				3DB187791E53061B009C6BAA /* Exo2-Italic.ttf in Resources */,
 				3DB187731E53061B009C6BAA /* Exo2-Bold.ttf in Resources */,
-				3D95CB4B1E35409C008A9A9C /* TestAction.sks in Resources */,
 				3DB1877C1E53061B009C6BAA /* Exo2-Medium.ttf in Resources */,
 				3DB187801E53061B009C6BAA /* Exo2-SemiBoldItalic.ttf in Resources */,
 				3DB187821E53061B009C6BAA /* Exo2-ThinItalic.ttf in Resources */,
-				3DFE001B1E58C72C00C4C13A /* GameScene_iPad.sks in Resources */,
-				3D8A8CFE1E413A5000C6B148 /* MyHexa.sks in Resources */,
 				3DB1877D1E53061B009C6BAA /* Exo2-MediumItalic.ttf in Resources */,
 				3DB1877F1E53061B009C6BAA /* Exo2-SemiBold.ttf in Resources */,
 			);
