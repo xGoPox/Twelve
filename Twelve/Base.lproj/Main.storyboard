@@ -212,7 +212,6 @@
                     <navigationItem key="navigationItem" id="fGi-KA-E2B"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
-                <exit id="I4e-c0-WZb" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="12" y="35.532233883058474"/>
         </scene>
@@ -267,17 +266,6 @@
                             <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" image="&lt;" translatesAutoresizingMaskIntoConstraints="NO" id="lJA-fi-jJ9">
                                 <rect key="frame" x="16" y="326" width="10" height="15"/>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q4U-3R-CDs">
-                                <rect key="frame" x="315" y="28" width="46" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="46" id="o2N-Xf-h3e"/>
-                                    <constraint firstAttribute="height" constant="30" id="otD-aw-igU"/>
-                                </constraints>
-                                <state key="normal" title="DONE"/>
-                                <connections>
-                                    <segue destination="I4e-c0-WZb" kind="unwind" unwindAction="unvindSegueToMainMenuWithSegue:" id="vjh-Hw-uuS"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -290,10 +278,8 @@
                             <constraint firstItem="MC2-MA-bzh" firstAttribute="trailing" secondItem="mjT-0X-YfD" secondAttribute="trailingMargin" constant="2" id="dRR-nq-aq1"/>
                             <constraint firstItem="dAd-YO-OfV" firstAttribute="top" secondItem="CYg-1Q-iLY" secondAttribute="bottom" id="foy-dv-LNT"/>
                             <constraint firstItem="lJA-fi-jJ9" firstAttribute="centerY" secondItem="mjT-0X-YfD" secondAttribute="centerY" id="hTq-Tr-w1d"/>
-                            <constraint firstAttribute="trailing" secondItem="q4U-3R-CDs" secondAttribute="trailing" constant="14" id="jJC-RP-l0D"/>
                             <constraint firstItem="CYg-1Q-iLY" firstAttribute="leading" secondItem="mjT-0X-YfD" secondAttribute="leading" id="lrE-Fo-jIq"/>
                             <constraint firstItem="lJA-fi-jJ9" firstAttribute="height" secondItem="MC2-MA-bzh" secondAttribute="height" id="mvZ-OX-Wc3"/>
-                            <constraint firstItem="q4U-3R-CDs" firstAttribute="top" secondItem="YoE-0C-CJD" secondAttribute="bottom" constant="8" id="x3h-mG-NpV"/>
                             <constraint firstItem="lJA-fi-jJ9" firstAttribute="leading" secondItem="mjT-0X-YfD" secondAttribute="leadingMargin" id="xcb-3C-kRd"/>
                         </constraints>
                     </view>
@@ -627,15 +613,19 @@
                                     <constraint firstAttribute="width" secondItem="B3P-Sq-CHk" secondAttribute="height" multiplier="1:1" id="ROy-23-BtZ"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TEXT FOR TUTORIAL TEXT FOR TUTORIAL TEXT FOR TUTORIAL" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LHl-mw-R9W">
+                            <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TEXT FOR TUTORIAL TEXT FOR TUTORIAL TEXT FOR TUTORIAL" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LHl-mw-R9W">
                                 <rect key="frame" x="37" y="462" width="300" height="97"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="97" id="2Cf-sT-fx4"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="Exo2-Medium" family="Exo 2" pointSize="16"/>
                                 <color key="textColor" red="0.2901960784" green="0.2901960784" blue="0.2901960784" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="KfJ-cU-ONN" appends="YES" id="MN7-VJ-x10"/>
+                                </connections>
                             </label>
                             <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="Pile Blue Tutorial" translatesAutoresizingMaskIntoConstraints="NO" id="ukW-Hx-8vh">
                                 <rect key="frame" x="100" y="567" width="175" height="80"/>
@@ -672,6 +662,11 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xEM-hs-iCc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="KfJ-cU-ONN">
+                    <connections>
+                        <action selector="dismissViewActionWithSender:" destination="AOE-ga-qFf" id="F9v-LC-6Zy"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="2628" y="1579"/>
         </scene>

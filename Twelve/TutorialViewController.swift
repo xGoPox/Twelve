@@ -36,7 +36,7 @@ class TutorialContainerViewController: UIViewController, TutorialPageViewControl
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let tutorialPageViewController = segue.destination as? TutorialPageViewController {
-            tutorialPageViewController.tutorialDelegate = self as! TutorialPageViewControllerDelegate
+            tutorialPageViewController.tutorialDelegate = self as TutorialPageViewControllerDelegate
         }
     }
     
@@ -345,6 +345,11 @@ class FourthTutorialViewController: TutorialViewController {
         bottomText.attributedText = bottomAttributedString
         
     }
+    
+    @IBAction func dismissViewAction(sender: UIButton) {
+        dismiss(animated: true, completion: nil)
+    }
+
     
     
 }
