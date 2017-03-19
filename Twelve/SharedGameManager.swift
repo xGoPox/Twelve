@@ -19,10 +19,12 @@ class SharedGameManager {
     private let jokerTutorialSeenKey = "jokerTutorialSeenKey"
     private let classicTutorialSeenKey = "classicTutorialSeenKey"
     private let survivalTutorialSeenKey = "survivalTutorialSeenKey"
+    private let hasAchievedAGameKey = "hasAchievedAGameKey"
+
 
     var jokerTutorialSeen : Bool {
         get {
-            if preferences.object(forKey: jokerTutorialSeenKey) == nil {
+            if preferences.bool(forKey: jokerTutorialSeenKey) == false {
                 preferences.set(true, forKey: jokerTutorialSeenKey)
                 preferences.synchronize()
                 return false
@@ -32,9 +34,10 @@ class SharedGameManager {
         }
     }
     
+    
     var classicTutorialSeen : Bool {
         get {
-            if preferences.object(forKey: classicTutorialSeenKey) == nil {
+            if preferences.bool(forKey: classicTutorialSeenKey) == false {
                 preferences.set(true, forKey: classicTutorialSeenKey)
                 preferences.synchronize()
                 return false
@@ -46,7 +49,7 @@ class SharedGameManager {
 
     var survivalTutorialSeen : Bool {
         get {
-            if preferences.object(forKey: survivalTutorialSeenKey) == nil {
+            if preferences.bool(forKey: survivalTutorialSeenKey) == false {
                 preferences.set(true, forKey: survivalTutorialSeenKey)
                 preferences.synchronize()
                 return false
@@ -56,4 +59,15 @@ class SharedGameManager {
         }
     }
 
+    var hasAchievedAGame : Bool {
+        get {
+            return preferences.bool(forKey: hasAchievedAGameKey)
+        }
+        set(achieved) {
+            preferences.set(true, forKey: hasAchievedAGameKey)
+            preferences.synchronize()
+        }
+    }
+
+    
 }

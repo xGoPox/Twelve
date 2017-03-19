@@ -41,7 +41,7 @@ enum TwelveNode: String {
     case closeSurvivalNode = "closeSurvivalNode"
     case confirmQuitNode = "confirmQuitNode"
     case cancelQuitNode = "cancelQuitNode"
-
+    
 }
 
 
@@ -78,7 +78,7 @@ extension GameScene : Preparation {
     func fillUpMap()  {
         do {
             let piles = try pilesAvailable()
-            gridDispatcher = GridController(matrix: [[NumberSpriteNode]](), piles: piles, grid: objectsTileMap, currentSolution: nil)
+            gridDispatcher = GridController(matrix: [[NumberSpriteNode]](), piles: piles, grid: objectsTileMap, currentSolution: nil, frozen: false)
             gridDispatcher.fullfillGrid()
             objectsTileMap.addChild(line)
         } catch let error as TwelveError where error == .gridHasNoPile {
@@ -152,7 +152,6 @@ class GameScene: SKScene {
         }
     }
     
-    
     var currentElement: Element? {
         willSet(obj) {
             if let number = obj {
@@ -182,6 +181,7 @@ class GameScene: SKScene {
     }
     
     
+    
     var gameStarted = false {
         willSet(started) {
             if started {
@@ -192,11 +192,6 @@ class GameScene: SKScene {
                 startTimer()
             } else {
                 timeLabel.removeAction(forKey: "countdown")
-                updateTotal(score: totalPoints)
-                isTopBarHidden(true)
-                showGameOver(true)
-                isDeckMenuHidden(true)
-                endsCombo()
             }
         }
     }
@@ -215,6 +210,13 @@ class GameScene: SKScene {
         fillUpMap()
         prepareGame()
         shouldShowTutorial()
+    }
+    
+    
+    func setPaused() {
+        if timeLabel.isPaused == false  {
+            showPauseMenu()
+        }
     }
     
     
@@ -273,49 +275,74 @@ class GameScene: SKScene {
     
     
     func newPileAdded() {
-        /*        if progressBar.increaseAndHasGivenBonus() == true {
-         
-         if let action = timeLabel.action(forKey: "countdown") {
-         action.speed = 0
-         }
-         
-         progressBar.value = 0
-         
-         let colorizeUp = SKAction.colorize(with: .black, colorBlendFactor: 1, duration: 0.25)
-         //            let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
-         //            let sequences = SKAction.sequence([colorizeUp])
-         
-         
-         run(colorizeUp, completion: {
-         
-         self.gridDispatcher.frozen = true
-         
-         self.afterDelay(10, runBlock: {
-         let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
-         self.gridDispatcher.frozen = false
-         self.run(colorizeDown, completion: {
-         if let action = self.timeLabel.action(forKey: "countdown") {
-         action.speed = 1
-         }
-         })
-         })
-         
-         })
-         
-         }*/
+        
+        //        twelve_reached_view
+        
+        
+/*        let reachedMax = progressBar.increaseAndHasGivenBonus()
+        
+        let size = (scene?.view?.frame.size)!
+        
+        let flashView = SKSpriteNode(texture: SKTexture(image: UIImage(named: "twelve_reached_view")!), size: size)
+        flashView.colorBlendFactor = 1
+        flashView.color = progressBar.colorType
+        flashView.alpha = 0
+        flashView.position = CGPoint(x: 0, y: 0)
+        flashView.zPosition = 10
+        addChild(flashView)
+        let fadeIn = SKAction.fadeIn(withDuration: 0.3)
+        let wait = SKAction.wait(forDuration: 0.4)
+        let fadeOut = SKAction.fadeOut(withDuration: 0.3)
+        let sequence = SKAction.sequence([fadeIn, wait, fadeOut])
+        flashView.run(sequence) {
+            flashView.removeFromParent()
+        }
+        
+        if reachedMax {
+            
+            timeLabel.action(forKey: "countdown")?.speed = 0
+            
+            //progressBar.value = 0
+            progressBar.isPaused = true
+            
+            
+            self.gridDispatcher.frozen = true
+            try? self.gridDispatcher.freezeNumbers()
+
+            self.afterDelay(10, runBlock: {
+            self.gridDispatcher.frozen = false
+                try? self.gridDispatcher.unFreezeNumbers()
+
+//                let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
+//                self.gridDispatcher.frozen = false
+//                self.run(colorizeDown, completion: {
+//                    if let action = self.timeLabel.action(forKey: "countdown") {
+//                        action.speed = 1
+//                    }
+//                })
+            })
+            
+            
+        }
+        */
+        
     }
-    
     
     
     
     func endsCombo() {
         
         currentElement?.unselected()
+        
         do {
-            let comboResult = try combo.doneWithCombo()
-            addPointsForCombo(comboResult)
-            for _ in 0..<comboResult.numberOfTwelve {
-                newPileAdded()
+            if gridDispatcher.frozen {
+                try combo.doneWithFrozenNumber()
+            } else {
+                let comboResult = try combo.doneWithCombo()
+                addPointsForCombo(comboResult)
+                for _ in 0..<comboResult.numberOfTwelve {
+                    newPileAdded()
+                }
             }
             if let element = currentElement {
                 gridDispatcher.updateElement(element)
@@ -353,7 +380,7 @@ class GameScene: SKScene {
             if self.timerValue > 0 {
                 self.timerValue -= 1
             } else {
-                self.gameStarted = false
+                self.endGame()
             }
         }
         
@@ -361,16 +388,29 @@ class GameScene: SKScene {
         
     }
     
+    func endGame() {
+        SharedGameManager.sharedInstance.hasAchievedAGame = true
+        gameStarted = false
+        updateTotal(score: totalPoints)
+        isTopBarHidden(true)
+        showGameOver(true)
+        isDeckMenuHidden(true)
+        endsCombo()
+    }
+    
 }
 
 extension GameScene {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard gridDispatcher.frozen == false else {
+            return
+        }
         endsCombo()
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else {
+        guard let touch = touches.first , gridDispatcher.frozen == false else {
             return
         }
         
@@ -385,7 +425,7 @@ extension GameScene {
     
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else {
+        guard let touch = touches.first , gridDispatcher.frozen == false else {
             return
         }
         if currentElement != nil {
@@ -436,6 +476,9 @@ extension GameScene {
         }  else {
             if let element = (nodes(at: location).filter { $0 is Element }).first as? Element {
                 analyzeElement(element)
+                if currentElement != nil , gridDispatcher.frozen {
+                    endsCombo()
+                }
             }
         }
         
@@ -451,22 +494,30 @@ extension GameScene {
     
     func addSecond() {
         if gameMode == .survival {
-            var comboForSeconds = 0
-            switch gameDifficulty {
-            case .easy:
-                comboForSeconds = 3
-            case .normal:
-                comboForSeconds = 4
-            case .hard:
-                comboForSeconds = 5
-            }
-            if combo.numbers.count > comboForSeconds  {
+            if gridDispatcher.frozen {
                 timerValue += 1
                 let action = SKAction.screenZoomWithNode(timeLabel, amount: CGPoint(x:2, y:2), oscillations: 2, duration: 1)
                 timeLabel.run(action)
+            } else {
+                var comboForSeconds = 0
+                switch gameDifficulty {
+                case .easy:
+                    comboForSeconds = 3
+                case .normal:
+                    comboForSeconds = 4
+                case .hard:
+                    comboForSeconds = 5
+                }
+                if combo.numbers.count > comboForSeconds  {
+                    timerValue += 1
+                    let action = SKAction.screenZoomWithNode(timeLabel, amount: CGPoint(x:2, y:2), oscillations: 2, duration: 1)
+                    timeLabel.run(action)
+                }
             }
         }
     }
+    
+
 }
 
 extension GameScene {
@@ -503,6 +554,8 @@ extension GameScene {
         if  SharedGameManager.sharedInstance.classicTutorialSeen == false {
             addBackgroundLayer(belowNode: "tutorialClassicNode")
             isClassicTutorialHidden(false)
+        } else {
+            shouldShowJokerTutorial()
         }
     }
     
@@ -510,13 +563,17 @@ extension GameScene {
         if  SharedGameManager.sharedInstance.survivalTutorialSeen == false {
             addBackgroundLayer(belowNode: "tutorialSurvivalNode")
             isSurvivalTutorialHidden(false)
+        } else  {
+            shouldShowJokerTutorial()
         }
     }
     
     func shouldShowJokerTutorial() {
-        if  SharedGameManager.sharedInstance.jokerTutorialSeen == false {
-            addBackgroundLayer(belowNode: "tutorialJokerNode")
-            isJokerTutorialHidden(false)
+        if SharedGameManager.sharedInstance.hasAchievedAGame == true {
+            if  SharedGameManager.sharedInstance.jokerTutorialSeen == false {
+                addBackgroundLayer(belowNode: "tutorialJokerNode")
+                isJokerTutorialHidden(false)
+            }
         }
     }
     
@@ -544,6 +601,7 @@ extension GameScene {
         isMainMenuHidden(false)
         isTopBarHidden(true)
     }
+    
     
 }
 
@@ -693,6 +751,8 @@ extension GameScene  {
     }
     
     func resumeGame() {
+        timeLabel.action(forKey: "countdown")?.speed = 1
+        timeLabel.isPaused = false
         isPauseHidden(true)
         removeBackgroundLayer()
     }
@@ -740,7 +800,8 @@ extension GameScene  {
         node.isHidden = false
         addBackgroundLayer(belowNode: "pauseMenu")
         isPauseHidden(false)
-        
+        timeLabel.action(forKey: "countdown")?.speed = 0
+        timeLabel.isPaused = true
     }
     
     func addBackgroundLayer(belowNode: String) {
@@ -827,9 +888,7 @@ extension GameScene  {
         
     }
     
-    
 }
-
 
 
 

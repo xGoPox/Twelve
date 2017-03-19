@@ -17,6 +17,7 @@ protocol ComboHandler {
     var lastNumber: Int? { get set }
     mutating func addUpComboWith(number: Int, on piles : [Pile]) throws
     mutating func doneWithCombo() throws -> ComboResult
+    mutating func doneWithFrozenNumber() throws
     func points() -> Int
 }
 
@@ -89,6 +90,17 @@ struct Combo: ComboHandler {
             possiblePiles = nil
             throw TwelveError.falseCombo
         }
+    }
+    
+    mutating func doneWithFrozenNumber() throws {
+        guard let number = lastNumber else {
+            throw TwelveError.lastNumberIsNill
+        }
+        // update the pile
+        print("COMBO IS VALID")
+        possiblePiles?.first?.updateWithLastNumber(number)
+        numbers.removeAll()
+        possiblePiles = nil
     }
     
     func points() -> Int {

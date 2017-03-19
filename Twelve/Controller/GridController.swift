@@ -18,6 +18,13 @@ protocol Helper {
     func randomInt(min: Int, max:Int) -> Int
 }
 
+protocol Freeze {
+    mutating func freezeNumbers() throws
+    mutating func unFreezeNumbers() throws
+    mutating func updateElementWithFrozenNumber(_ element: Element)
+}
+
+
 
 protocol GridValidator {
     func possibility() throws -> Element
@@ -35,6 +42,13 @@ struct GridController : GridDispatcher {
     var piles: [Pile]
     var grid : SKTileMapNode
     var currentSolution: Element?
+    var frozen: Bool = false {
+        willSet(freeze) {
+            if freeze {
+            }
+        }
+        
+    }
     
     var gameMode: GameMode {
         get {
@@ -94,6 +108,10 @@ struct GridController : GridDispatcher {
         
     }
     
+}
+
+
+extension GridController {
     
     mutating func fullfillGrid() {
         
@@ -122,9 +140,14 @@ struct GridController : GridDispatcher {
     }
     
     mutating func disposeNumbers() throws {
-        try disposePossibilities()
-        try disposeFuturesCombos()
-        try disposeRandomNumbers()
+        if frozen {
+            try disposeFrozenPossibilities()
+            try disposeRandomNumbers()
+        } else {
+            try disposePossibilities()
+            try disposeFuturesCombos()
+            try disposeRandomNumbers()
+        }
     }
     
     
@@ -166,6 +189,37 @@ struct GridController : GridDispatcher {
         }
     }
     
+    fileprivate mutating func disposeFrozenPossibilities() throws {
+        
+        for pile in piles {
+            
+            for _ in 0..<numberOfPossibilities {
+                
+                let followingNumber = pile.followingNumber()
+                
+                var gridPosition: GridPosition
+                
+                if let possibility = pile.possibility , try (isNumberAt(position: possibility.gridPosition, equalWith: followingNumber) || isJokerAt(position: possibility.gridPosition)) {
+                    gridPosition = possibility.gridPosition
+                } else {
+                    guard let position = randomEmptyPosition() else {
+                        break
+                    }
+                    gridPosition = position
+                    if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: followingNumber) || isJokerAt(position: gridPosition)) {
+                        try createNumberAt(position: gridPosition, with: followingNumber)
+                    }
+                    
+                }
+                
+                pile.possibility = try elementAt(position: gridPosition)
+                
+            }
+            
+        }
+    }
+
+    
     fileprivate mutating func disposeFuturesCombos() throws {
         
         for pile in piles {
@@ -201,65 +255,41 @@ struct GridController : GridDispatcher {
         if let element = try elementAt(position: position) {
             if element is NumberSpriteNode {
                 if isJoker {
-                    let position:GridPosition = element.gridPosition
                     let object = Joker(gridPosition: position)
-                    matrix[position.row][position.column] = object
-                    object.position = element.position
-                    let fadeOut = SKAction.fadeOut(withDuration: 0.1)
-                    let fadeIn = SKAction.fadeIn(withDuration: 0.1)
-                    element.run(fadeOut, completion: {
-                        element.removeFromParent()
-                    })
-                    self.grid.addChild(object)
-                    object.run(fadeIn)
+                    updateElement(element, with: object, at: position)
                 } else {
                     element.value = number
                 }
             } else if element is Joker {
                 if !isJoker {
                     let object = NumberSpriteNode(gridPosition: position)
-                    let element = matrix[position.row][position.column]
-                    object.position = element.position
                     object.value = number
-                    matrix[position.row][position.column] = object
-                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
-                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
-                    element.run(fadeOut, completion: {
-                        element.removeFromParent()
-                    })
-                    self.grid.addChild(object)
-                    object.run(fadeIn)
+                    updateElement(element, with: object, at: position)
                 }
             } else {
                 if isJoker {
-                    let position:GridPosition = element.gridPosition
                     let object = Joker(gridPosition: position)
-                    matrix[position.row][position.column] = object
-                    object.position = element.position
-                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
-                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
-                    element.run(fadeOut, completion: {
-                        element.removeFromParent()
-                    })
-                    self.grid.addChild(object)
-                    object.run(fadeIn)
+                    updateElement(element, with: object, at: position)
                 }
                 else {
                     let object = NumberSpriteNode(gridPosition: position)
-                    let element = matrix[position.row][position.column]
-                    object.position = element.position
                     object.value = number
-                    matrix[position.row][position.column] = object
-                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
-                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
-                    element.run(fadeOut, completion: {
-                        element.removeFromParent()
-                    })
-                    self.grid.addChild(object)
-                    object.run(fadeIn)
+                    updateElement(element, with: object, at: position)
                 }
             }
         }
+    }
+    
+    private mutating func updateElement(_ element : Element, with object : Element, at position: GridPosition) {
+        object.position = element.position
+        matrix[position.row][position.column] = object
+        let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+        let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+        element.run(fadeOut, completion: {
+            element.removeFromParent()
+        })
+        grid.addChild(object)
+        object.run(fadeIn)
     }
     
     fileprivate func isNumberAt(position: GridPosition, equalWith number: Int) throws -> Bool {
@@ -288,7 +318,7 @@ struct GridController : GridDispatcher {
     
     
     
-     func removeNumbers() throws {
+    func removeNumbers() throws {
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
@@ -300,12 +330,12 @@ struct GridController : GridDispatcher {
         }
         
     }
-
+    
     mutating func resetNumberAt(position: GridPosition) throws {
         guard let element = try elementAt(position: position) else {
             throw TwelveError.noNumberAtPosition
         }
-        if element is Joker {
+        if element is Joker , element is FrozenNumber {
             let position:GridPosition = element.gridPosition
             let object = NumberSpriteNode(gridPosition: position)
             object.alpha = 0
@@ -405,7 +435,49 @@ struct GridController : GridDispatcher {
         return nil
     }
     
+    
 }
+
+extension GridController : Freeze {
+    mutating func freezeNumbers() throws {
+        for row in 0..<grid.numberOfRows {
+            for column in 0..<grid.numberOfColumns {
+                let gridPosition = GridPosition(row, column)
+                guard let element = try elementAt(position: gridPosition) else {
+                    fatalError("there should be an element at this position")
+                }
+                updateElementWithFrozenNumber(element)
+                
+            }
+        }
+    }
+    
+    
+    mutating func unFreezeNumbers() throws {
+        try resetNumbers()
+        try disposeNumbers()
+    }
+
+    
+    mutating func updateElementWithFrozenNumber(_ element: Element) {
+        
+        let position:GridPosition = element.gridPosition
+        let object = FrozenNumber(gridPosition: position, value : randomValue())
+        object.position = element.position
+        object.alpha = 0
+        let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+        let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+        element.run(fadeOut, completion: {
+            element.removeFromParent()
+        })
+        matrix[position.row][position.column] = object
+        object.addShape()
+        self.grid.addChild(object)
+        object.run(fadeIn)
+    }
+    
+}
+
 
 extension GridController {
     
@@ -421,38 +493,13 @@ extension GridController {
     
     mutating func updateElement(_ element: Element) {
         
-        if element is NumberSpriteNode {
-            
-            
-            if element.value > 0 && updateWithFollowingNumber {
-                if updateWithFollowingNumber {
-                    element.value = element.value.followingNumber().followingNumber()
-                } else {
-                    element.value = element.value.followingNumber().followingNumber().followingNumber()
-                }
-            } else { // becomes a joker or a random number
-                
-                
-                if isJoker {
-                    let position:GridPosition = element.gridPosition
-                    let object = Joker(gridPosition: position)
-                    object.alpha = 0
-                    object.position = element.position
-                    let fadeOut = SKAction.fadeOut(withDuration: 0.10)
-                    let fadeIn = SKAction.fadeIn(withDuration: 0.10)
-                    matrix[position.row][position.column] = object
-                    element.run(fadeOut, completion: {
-                        element.removeFromParent()
-                    })
-                    self.grid.addChild(object)
-                    object.run(fadeIn)
-                    
-                } else {
-                    element.value = randomValue()
-                }
-            }
-            
-        } else {
+        switch element {
+        case is FrozenNumber:
+            updateFrozenNumber(element as! FrozenNumber)
+            break
+        case is NumberSpriteNode:
+            updateNumber(element as! NumberSpriteNode)
+        default:
             let position:GridPosition = element.gridPosition
             let object = NumberSpriteNode(gridPosition: position)
             object.alpha = 0
@@ -467,9 +514,45 @@ extension GridController {
             matrix[position.row][position.column] = object
             self.grid.addChild(object)
             object.run(fadeIn)
+            
         }
         
+        
     }
+    
+    mutating func updateNumber(_ element: NumberSpriteNode) {
+        if element.value > 0 && updateWithFollowingNumber {
+            if updateWithFollowingNumber {
+                element.value = element.value.followingNumber().followingNumber()
+            } else {
+                element.value = element.value.followingNumber().followingNumber().followingNumber()
+            }
+        } else { // becomes a joker or a random number
+            if isJoker {
+                let position:GridPosition = element.gridPosition
+                let object = Joker(gridPosition: position)
+                object.alpha = 0
+                object.position = element.position
+                let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+                let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+                matrix[position.row][position.column] = object
+                element.run(fadeOut, completion: {
+                    element.removeFromParent()
+                })
+                self.grid.addChild(object)
+                object.run(fadeIn)
+                
+            } else {
+                element.value = randomValue()
+            }
+        }
+
+    }
+    
+    mutating func updateFrozenNumber(_ element: FrozenNumber) {
+        element.value = randomValue()
+    }
+
     
     func randomValue() -> Int {
         return randomInt(min: 1, max: 12)
@@ -482,7 +565,6 @@ extension GridController : Helper {
     func randomInt(min: Int, max:Int) -> Int {
         return min + Int(arc4random_uniform(UInt32(max - min + 1)))
     }
-    
     
 }
 
@@ -508,7 +590,9 @@ extension GridController : GridValidator {
     mutating func checkBoard() throws {
         currentSolution = try possibility()
         currentSolution?.removeSolution()
-        currentSolution?.showSolution()
+        if !frozen {
+            currentSolution?.showSolution()
+        }
     }
     
     
@@ -535,10 +619,14 @@ extension GridController : GridValidator {
             }
         }
         
-        guard let possibleNumber = array.possibility(on: matrix) else {
-            throw TwelveError.noMorePossibilities
+        if frozen && array.isEmpty == false {
+            return array.first!
+        } else {
+            guard let possibleNumber = array.possibility(on: matrix) else {
+                throw TwelveError.noMorePossibilities
+            }
+            return possibleNumber
         }
-        return possibleNumber
     }
     
     

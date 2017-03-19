@@ -29,6 +29,8 @@ class GameViewController: UIViewController {
             // Get the SKScene from the loaded GKScene
             if let sceneNode = scene.rootNode as! GameScene? {
                 
+                NotificationCenter.default.addObserver(sceneNode, selector:#selector(GameScene.setPaused), name: NSNotification.Name(rawValue: "stayPausedNotification"), object: nil)
+
                 sceneNode.scaleMode = .fill
                 sceneNode.gameVC = self
                                // Present the scene

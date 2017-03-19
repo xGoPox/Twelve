@@ -17,12 +17,15 @@ class SharedAssetsManager {
     //Keep these private for safety.
     var numberTexture: SKTexture?
     var jokerTexture: SKTexture?
+    var numberFrozenTexture: SKTexture?
+
     var scene: GKScene?
 
     func loadTextures() {
         let atlas = SKTextureAtlas(named: "Sprites")
         atlas.preload {
-            self.numberTexture = atlas.textureNamed("number")
+            self.numberFrozenTexture = atlas.textureNamed("NumberSelectedFrozen")
+            self.numberTexture = atlas.textureNamed("NumberSelected")
             self.jokerTexture = atlas.textureNamed("Joker")
         }
     }
