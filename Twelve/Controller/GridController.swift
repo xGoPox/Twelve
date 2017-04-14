@@ -27,21 +27,28 @@ protocol Freeze {
 
 
 protocol GridValidator {
-    func possibility() throws -> Element
-    func possibilityForPile(_ pile: Pile) throws -> Element
-    mutating func checkBoard() throws
+    func possibility() throws -> Solution
+    func possibilityForPile(_ pile: Pile) throws -> Solution
+    mutating func checkBoard() throws -> Solution?
     func cancelSolution()
 }
 
 
 typealias GridPosition = (row: Int, column: Int)
+typealias Solution = (fromElement: Element, toElement: Element?)
+
+
+protocol GridChecker {
+    func isTile(_ currentTile: Element, adjacentWith tile: Element) throws
+}
+
 
 struct GridController : GridDispatcher {
     
-    var matrix: [[Element]]
+    var matrix: [[Element?]]
     var piles: [Pile]
     var grid : SKTileMapNode
-    var currentSolution: Element?
+    var currentSolution: Solution?
     var frozen: Bool = false {
         willSet(freeze) {
             if freeze {
@@ -68,7 +75,7 @@ struct GridController : GridDispatcher {
             case .easy:
                 return randomInt(min: 1, max: 2)
             case .normal:
-                return randomInt(min: 1, max: 3)
+                return randomInt(min: 1, max: 2)
             case .hard:
                 return randomInt(min: 0, max: 3)
             }
@@ -81,7 +88,7 @@ struct GridController : GridDispatcher {
             case .easy:
                 return randomInt(min: 3, max: 8)
             case .normal:
-                return randomInt(min: 2, max: 5)
+                return randomInt(min: 1, max: 4)
             case .hard:
                 return randomInt(min: 1, max: 5)
             }
@@ -90,7 +97,11 @@ struct GridController : GridDispatcher {
     
     fileprivate var isJoker: Bool {
         get {
-            return arc4random_uniform(30) < 2
+            if SharedGameManager.sharedInstance.hasAchievedAGame {
+                return arc4random_uniform(50) < 2
+            } else {
+                return false
+            }
         }
     }
     
@@ -120,12 +131,10 @@ extension GridController {
         var row = 0
         
         for _ in 0..<self.grid.numberOfRows {
-            matrix.append([Element]())
+            matrix.append([Element?](repeating: nil, count: 5))
             var column = 0
             for _ in 0..<self.grid.numberOfColumns {
-                let sprite = Element(gridPosition: GridPosition(row, column))
-                sprite.position = grid.centerOfTile(atColumn: sprite.gridPosition.column, row: sprite.gridPosition.row)
-                matrix[row].append(sprite)
+                matrix[row].append(nil)
                 column += 1
             }
             row += 1
@@ -135,7 +144,7 @@ extension GridController {
     
     func resetPiles() {
         for pile in piles {
-            pile.reset()
+            pile.reset(lastNumber : 12)
         }
     }
     
@@ -168,7 +177,7 @@ extension GridController {
                         break
                     }
                     gridPosition = position
-                    if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: followingNumber) || isJokerAt(position: gridPosition)) {
+                    if try (isEmtpyAtPosition(gridPosition) || isNumberAt(position: gridPosition, equalWith: followingNumber) || isJokerAt(position: gridPosition)) {
                         try createNumberAt(position: gridPosition, with: followingNumber)
                     }
                     
@@ -206,7 +215,7 @@ extension GridController {
                         break
                     }
                     gridPosition = position
-                    if try (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: followingNumber) || isJokerAt(position: gridPosition)) {
+                    if try (isEmtpyAtPosition(gridPosition) || isNumberAt(position: gridPosition, equalWith: followingNumber) || isJokerAt(position: gridPosition)) {
                         try createNumberAt(position: gridPosition, with: followingNumber)
                     }
                     
@@ -277,6 +286,19 @@ extension GridController {
                     updateElement(element, with: object, at: position)
                 }
             }
+        } else {
+            if frozen {
+                let object = FrozenNumber(gridPosition: position, value : number)
+                addElement(object)
+            }
+            else if isJoker {
+                let object = Joker(gridPosition: position)
+                addElement(object)
+            } else {
+                let object = NumberSpriteNode(gridPosition: position)
+                object.value = number
+                addElement(object)
+            }
         }
     }
     
@@ -292,12 +314,29 @@ extension GridController {
         object.run(fadeIn)
     }
     
+    private mutating func addElement(_ element : Element) {
+        element.position = grid.centerOfTile(atColumn: element.gridPosition.column, row: element.gridPosition.row)
+        matrix[element.gridPosition.row][element.gridPosition.column] = element
+        let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+        grid.addChild(element)
+        element.run(fadeIn)
+    }
+
+    
     fileprivate func isNumberAt(position: GridPosition, equalWith number: Int) throws -> Bool {
         if let sprite = try elementAt(position: position) , sprite.value == number {
             return true
         }
         return false
     }
+    
+    fileprivate func isEmtpyAtPosition(_ position: GridPosition) throws -> Bool {
+        if try elementAt(position: position) == nil {
+            return true
+        }
+        return false
+    }
+
     
     fileprivate func isJokerAt(position: GridPosition) throws -> Bool {
         if let sprite = try elementAt(position: position) , sprite is Joker {
@@ -335,21 +374,21 @@ extension GridController {
         guard let element = try elementAt(position: position) else {
             throw TwelveError.noNumberAtPosition
         }
-        if element is Joker , element is FrozenNumber {
+//        if element is Joker , element is FrozenNumber {
             let position:GridPosition = element.gridPosition
-            let object = NumberSpriteNode(gridPosition: position)
-            object.alpha = 0
-            matrix[position.row][position.column] = object
-            object.position = element.position
+//            let object = NumberSpriteNode(gridPosition: position)
+//            object.alpha = 0
+            matrix[position.row][position.column] = nil
+//            object.position = element.position
             let fadeOut = SKAction.fadeOut(withDuration: 0.10)
             element.run(fadeOut, completion: {
                 element.removeFromParent()
             })
-            self.grid.addChild(object)
-            let fadeIn = SKAction.fadeIn(withDuration: 0)
-            object.run(fadeIn)
-        }
-        element.value = 0
+//            self.grid.addChild(object)
+//            let fadeIn = SKAction.fadeIn(withDuration: 0)
+//            object.run(fadeIn)
+ //       }
+        //element.value = 0
     }
     
     
@@ -360,10 +399,13 @@ extension GridController {
             for column in 0..<grid.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
                 do {
-                    if try isNumberAt(position: gridPosition, equalWith: 0) {
-                        if let element = try elementAt(position: gridPosition) {
-                            updateElement(element)
-                        }
+                    
+                    if try isEmtpyAtPosition(gridPosition) {
+                        
+                        try createNumberAt(position: gridPosition, with: randomValue())
+//                        if let element = try elementAt(position: gridPosition) {
+//                            updateElement(element)
+//                        }
                     }
                 } catch let error as TwelveError {
                     fatalError("there should be no error here : \(error)")
@@ -374,7 +416,7 @@ extension GridController {
     
     private mutating func createFollowingNumber(_ number: Int, position : GridPosition) -> GridPosition? {
         
-        for _ in 0..<100 {
+        for _ in 0..<1000 {
             
             let newRow = randomInt(min: -1, max: 1)
             
@@ -383,7 +425,7 @@ extension GridController {
             let gridPosition = GridPosition(row: position.row + newRow, column: position.column + newColumn)
             
             if gridPosition != position {
-                if let result = try? (isNumberAt(position: gridPosition, equalWith: 0) || isNumberAt(position: gridPosition, equalWith: number) || isJokerAt(position: gridPosition)) , result == true {
+                if let result = try? (isEmtpyAtPosition(gridPosition) || isNumberAt(position: gridPosition, equalWith: number) || isJokerAt(position: gridPosition)) , result == true {
                     try? createNumberAt(position: gridPosition, with:number)
                     return gridPosition
                 }
@@ -394,6 +436,29 @@ extension GridController {
     }
     
     
+    
+    
+    
+    
+    private func randomEmptyPosition() -> GridPosition? {
+        for _ in 0..<1000 {
+            var gridPosition: GridPosition
+            gridPosition.row = randomInt(min: 0, max: grid.numberOfRows - 1)
+            gridPosition.column = randomInt(min: 0, max: grid.numberOfColumns - 1)
+            do {
+                if try isEmtpyAtPosition(gridPosition) {
+                    return gridPosition
+                }
+            } catch { }
+        }
+        return nil
+    }
+    
+    
+}
+
+
+extension GridController : GridChecker {
     func isTile(_ currentTile: Element, adjacentWith tile: Element) throws {
         
         var newRow = -1
@@ -417,26 +482,8 @@ extension GridController {
         }
         throw TwelveError.notAdjacent
     }
-    
-    
-    
-    
-    private func randomEmptyPosition() -> GridPosition? {
-        for _ in 0..<100 {
-            var gridPosition: GridPosition
-            gridPosition.row = randomInt(min: 0, max: grid.numberOfRows - 1)
-            gridPosition.column = randomInt(min: 0, max: grid.numberOfColumns - 1)
-            do {
-                if try isNumberAt(position: gridPosition, equalWith: 0) {
-                    return gridPosition
-                }
-            } catch { }
-        }
-        return nil
-    }
-    
-    
 }
+
 
 extension GridController : Freeze {
     mutating func freezeNumbers() throws {
@@ -482,6 +529,7 @@ extension GridController : Freeze {
 extension GridController {
     
     mutating func resetNumbers() throws {
+        cancelSolution()
         for row in 0..<grid.numberOfRows {
             for column in 0..<grid.numberOfColumns {
                 let gridPosition = GridPosition(row, column)
@@ -492,7 +540,7 @@ extension GridController {
     
     
     mutating func updateElement(_ element: Element) {
-        
+        cancelSolution()
         switch element {
         case is FrozenNumber:
             updateFrozenNumber(element as! FrozenNumber)
@@ -584,19 +632,24 @@ extension GridController {
 extension GridController : GridValidator {
     
     func cancelSolution() {
-        currentSolution?.removeSolution()
+         let solutionNode = grid.childNode(withName: "showSolution")
+            as? SKSpriteNode
+        solutionNode?.removeAction(forKey: "showSolution")
+        solutionNode?.alpha = 0
+        currentSolution?.fromElement.removeSolution()
     }
     
-    mutating func checkBoard() throws {
+    mutating func checkBoard() throws -> Solution? {
         currentSolution = try possibility()
-        currentSolution?.removeSolution()
+        cancelSolution()
         if !frozen {
-            currentSolution?.showSolution()
+            return currentSolution
         }
+        return nil
     }
     
     
-    func possibility() throws -> Element {
+    func possibility() throws -> Solution {
         for pile in piles {
             do {
                 return try possibilityForPile(pile)
@@ -605,7 +658,7 @@ extension GridController : GridValidator {
         throw TwelveError.noMorePossibilities
     }
     
-    func possibilityForPile(_ pile: Pile) throws -> Element {
+    func possibilityForPile(_ pile: Pile) throws -> Solution {
         
         var array = [Element]()
         
@@ -620,7 +673,7 @@ extension GridController : GridValidator {
         }
         
         if frozen && array.isEmpty == false {
-            return array.first!
+            return Solution(array.first!, nil)
         } else {
             guard let possibleNumber = array.possibility(on: matrix) else {
                 throw TwelveError.noMorePossibilities

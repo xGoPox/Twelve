@@ -9,7 +9,7 @@
 import Foundation
 
 
-typealias ComboResult = (points: Int , comboOf: Int, numberOfTwelve: Int)
+typealias ComboResult = (points: Int , comboOf: Int, numberOfTwelve: Int, lastNumber: Int)
 
 
 protocol ComboHandler {
@@ -17,12 +17,12 @@ protocol ComboHandler {
     var lastNumber: Int? { get set }
     mutating func addUpComboWith(number: Int, on piles : [Pile]) throws
     mutating func doneWithCombo() throws -> ComboResult
-    mutating func doneWithFrozenNumber() throws
     func points() -> Int
 }
 
 
 struct Combo: ComboHandler {
+
     
     var lastNumber: Int?
     
@@ -66,6 +66,21 @@ struct Combo: ComboHandler {
         }
     }
     
+    
+    mutating func addUpFrozenNumber(number: Int, on piles : [Pile]) throws {
+        
+        guard isNumberValidForCombo(number: number, on: piles) == true else {
+            throw TwelveError.numberIsNotFollowingPile
+        }
+        
+        if possiblePiles == nil {
+            possiblePiles = piles
+            possiblePiles?.first?.updateWithLastNumber(number)
+            possiblePiles = nil
+        }
+    }
+
+    
    private  func isComboValid() -> Bool {
         return numbers.count > 1
     }
@@ -79,7 +94,7 @@ struct Combo: ComboHandler {
             print("COMBO IS VALID")
             possiblePiles?.first?.updateWithLastNumber(number)
             let total = points()
-            let comboResult = ComboResult(points: total, comboOf: numbers.count, numberOfTwelve : numbers.filter{ $0 == 12}.count)
+            let comboResult = ComboResult(points: total, comboOf: numbers.count, numberOfTwelve : numbers.filter{ $0 == 12 }.count, lastNumber: number)
             numbers.removeAll()
             possiblePiles = nil
             return comboResult
@@ -92,16 +107,16 @@ struct Combo: ComboHandler {
         }
     }
     
-    mutating func doneWithFrozenNumber() throws {
-        guard let number = lastNumber else {
-            throw TwelveError.lastNumberIsNill
-        }
-        // update the pile
-        print("COMBO IS VALID")
-        possiblePiles?.first?.updateWithLastNumber(number)
-        numbers.removeAll()
-        possiblePiles = nil
-    }
+//    mutating func doneWithFrozenNumber() throws {
+//        guard let number = lastNumber else {
+//            throw TwelveError.lastNumberIsNill
+//        }
+//        // update the pile
+////        print("COMBO IS VALID for pile \(possiblePiles?.first?)")
+//        possiblePiles?.first?.updateWithLastNumber(number)
+//        numbers.removeAll()
+//        possiblePiles = nil
+//    }
     
     func points() -> Int {
         let pts = numbers.count * numbers.count

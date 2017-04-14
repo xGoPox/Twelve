@@ -19,9 +19,27 @@ enum GameDifficulty : Int {
     case hard = 2
 }
 
+enum TutorialStep {
+    case firstStep
+    case secondStep
+    case thirdStep
+}
+
+
+
 struct GameCaracteristic {
     
     var mode: GameMode = .classic
-    var difficulty: GameDifficulty = .easy
+    var difficulty: GameDifficulty = .normal
     
-}
+    var seconds: Int = 0 {
+        willSet(newTime) {
+            SharedGameManager.sharedInstance.bestTime = newTime
+        }
+    }
+    
+    var points: Int = 0 {
+        willSet(newPoints) {
+            SharedGameManager.sharedInstance.bestPoints = newPoints
+        }
+    }}

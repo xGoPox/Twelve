@@ -14,7 +14,6 @@ import GameplayKit
 
 class GameViewController: UIViewController {
 
-    var myScene: GKScene?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,15 +23,14 @@ class GameViewController: UIViewController {
     
     func loadScene() {
         
-        if let scene = SharedAssetsManager.sharedInstance.scene {
-                        
+        if let scene = SharedAssetsManager.sharedInstance.gameScene {
+            
             // Get the SKScene from the loaded GKScene
             if let sceneNode = scene.rootNode as! GameScene? {
                 
                 NotificationCenter.default.addObserver(sceneNode, selector:#selector(GameScene.setPaused), name: NSNotification.Name(rawValue: "stayPausedNotification"), object: nil)
 
                 sceneNode.scaleMode = .fill
-                sceneNode.gameVC = self
                                // Present the scene
                 if let view = self.view as! SKView? {
                     view.presentScene(sceneNode)
@@ -56,6 +54,9 @@ class GameViewController: UIViewController {
             return .all
         }
     }
+    
+
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

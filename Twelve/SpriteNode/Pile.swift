@@ -19,6 +19,12 @@ protocol PileHandler {
 
 class Pile : SKSpriteNode, PileHandler {
 
+    var modeColor: SKColor {
+        get {
+            return  SharedGameManager.sharedInstance.settings.darkMode ? .black : .white
+        }
+    }
+
     let effectNode = SKEffectNode()
     let shape: SKShapeNode!
     let roundShape: SKShapeNode!
@@ -26,6 +32,8 @@ class Pile : SKSpriteNode, PileHandler {
 
     var oldNumber: Int = 12
     let numberLabel: SKLabelNode!
+    
+    var frozen = false
     
     var currentNumber: Int = 12 {
         willSet(number) {
@@ -49,7 +57,9 @@ class Pile : SKSpriteNode, PileHandler {
                     let pulseDown = SKAction.scale(to: 1, duration: 0.20)
                     let pulse = SKAction.sequence([pulseUp, pulseDown])
                     let repeatAction = SKAction.repeatForever(pulse)
-                    shape.run(repeatAction , withKey: "selected")
+                    if !frozen {
+                        shape.run(repeatAction , withKey: "selected")
+                    }
                 }
 
 
@@ -88,14 +98,15 @@ class Pile : SKSpriteNode, PileHandler {
         numberLabel.horizontalAlignmentMode = .center
         numberLabel.verticalAlignmentMode = .center
         numberLabel.isUserInteractionEnabled = false
-        numberLabel.fontColor = .white
+        numberLabel.fontColor = modeColor
+        numberLabel.colorBlendFactor = 1
         numberLabel.text = String(currentNumber)
         shape.isUserInteractionEnabled = false
         let corners : UIRectCorner = [UIRectCorner.allCorners]
         shape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
         shape.position = CGPoint(x: frame.midX, y:    frame.midY)
         shape.lineWidth = 2
-        shape.fillColor = .white
+        shape.fillColor = modeColor
         shape.setScale(1.05)
         roundShape.isUserInteractionEnabled = false
         roundShape.path = UIBezierPath(roundedRect: frame, byRoundingCorners: corners, cornerRadii: size).cgPath
@@ -110,13 +121,18 @@ class Pile : SKSpriteNode, PileHandler {
         addChild(numberLabel)
     }
     
+    func updatePileView() {
+        shape.fillColor = modeColor
+        numberLabel.fontColor = modeColor
+    }
+    
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func reset() {
+    func reset(lastNumber: Int) {
         possibility = nil
-        updateWithLastNumber(12)
+        updateWithLastNumber(lastNumber)
     }
     
     func updateWithLastNumber(_ number: Int) {

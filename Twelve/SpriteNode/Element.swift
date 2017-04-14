@@ -10,6 +10,8 @@ import SpriteKit
 
 class Element: SKSpriteNode {
     
+    let modeColor: SKColor = SharedGameManager.sharedInstance.settings.darkMode ? .black : .white
+
     typealias GridPosition = (row: Int , column: Int )
     
     final var gridPosition: GridPosition
@@ -35,6 +37,25 @@ class Element: SKSpriteNode {
             }
         }
     }
+    
+    
+    var handTexture: SKTexture? {
+        get {
+            switch value {
+            case 1...3:
+                return SharedAssetsManager.sharedInstance.greenHand
+            case 4...6:
+                return SharedAssetsManager.sharedInstance.redHand
+            case 7...9:
+                return SharedAssetsManager.sharedInstance.yellowHand
+            case 10...12:
+                return SharedAssetsManager.sharedInstance.blueHand
+            default:
+                return SharedAssetsManager.sharedInstance.greenHand
+            }
+        }
+    }
+
     
     
     init(gridPosition: GridPosition) {
@@ -81,6 +102,7 @@ extension Element : Animation {
     }
     
     func removeSolution() {
+        removeAction(forKey: "showSolution")
         if (action(forKey: "solution") != nil) {
             let pulseUp = SKAction.scale(to: 1, duration: 0.1)
             run(pulseUp)
@@ -91,8 +113,20 @@ extension Element : Animation {
 }
 
 extension Sequence where Iterator.Element == Element {
-    func possibility(on matrix:[[Element]]) -> Element? {
-        return self.first { $0.adjacentNumber(on: matrix) != nil }
+    func possibility(on matrix:[[Element?]]) -> Solution? {
+        var toElement: Element?
+        
+        if let fromElement = self.first(where: { (element) -> Bool in
+            toElement = element.adjacentNumber(on: matrix)
+            if toElement != nil {
+                return true
+            } else {
+                return false
+            }
+        }) {
+            return Solution(fromElement, toElement)
+        }
+        return nil
     }
 }
 
@@ -104,12 +138,12 @@ func ==(lhs: Element, rhs: Element) -> Bool {
 
 
 protocol Adjacent {
-    func adjacentNumber(on matrix:[[Element]]) -> Element?
+    func adjacentNumber(on matrix:[[Element?]]) -> Element?
 }
 
 extension Element : Adjacent {
     
-    func adjacentNumber(on matrix:[[Element]]) -> Element? {
+    func adjacentNumber(on matrix:[[Element?]]) -> Element? {
         var row = -1
         var column = -1
         while row < 2 {
@@ -117,10 +151,11 @@ extension Element : Adjacent {
             while column < 2 {
                 let rowTmp = self.gridPosition.row + row
                 let columnTmp = self.gridPosition.column + column
-                if rowTmp >= 0 && rowTmp < matrix[0].count && columnTmp >= 0 && columnTmp < matrix[0].count {
-                    let value = matrix[rowTmp][columnTmp].value
-                    if value == followingNumber {
-                        return matrix[rowTmp][columnTmp]
+                if rowTmp >= 0 && rowTmp < matrix[0].count && columnTmp >= 0 && columnTmp < matrix[0].count && rowTmp < matrix.count {
+                    if let element = matrix[rowTmp][columnTmp] {
+                        if element.value == followingNumber {
+                            return element
+                        }
                     }
                 }
                 column += 1

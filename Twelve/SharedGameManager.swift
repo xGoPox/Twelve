@@ -8,11 +8,30 @@
 
 import Foundation
 
+class Settings : NSObject {
+    
+    private let preferences = UserDefaults.standard
+    private let darkModeKey = "darkModeKey"
+    
+   dynamic var darkMode : Bool {
+        get {
+            return preferences.bool(forKey: darkModeKey)
+        }
+        set(enable) {
+            preferences.set(enable, forKey: darkModeKey)
+            preferences.synchronize()
+        }
+    }
+}
+
 class SharedGameManager {
     
     static let sharedInstance = SharedGameManager()
     
     var gameCaracteristic = GameCaracteristic()
+    
+    var settings = Settings()
+
     
     private let preferences = UserDefaults.standard
     
@@ -20,6 +39,9 @@ class SharedGameManager {
     private let classicTutorialSeenKey = "classicTutorialSeenKey"
     private let survivalTutorialSeenKey = "survivalTutorialSeenKey"
     private let hasAchievedAGameKey = "hasAchievedAGameKey"
+    private let bestPointsKey = "bestPointsKey"
+    private let bestTimeKey = "bestTimeKey"
+
 
 
     var jokerTutorialSeen : Bool {
@@ -34,6 +56,34 @@ class SharedGameManager {
         }
     }
     
+    
+    var bestPoints : Int {
+        set(newPoints) {
+            if newPoints > preferences.integer(forKey: bestPointsKey) {
+                preferences.set(newPoints, forKey: bestPointsKey)
+                preferences.synchronize()
+            }
+        }
+        get {
+            return preferences.integer(forKey: bestPointsKey)
+        }
+    }
+    
+    
+    var bestTime : Int {
+        set(newTime) {
+            if newTime > preferences.integer(forKey: bestTimeKey) {
+                preferences.set(newTime, forKey: bestTimeKey)
+                preferences.synchronize()
+            }
+        }
+        get {
+            return preferences.integer(forKey: bestTimeKey)
+        }
+    }
+
+    
+  
     
     var classicTutorialSeen : Bool {
         get {

@@ -2,18 +2,7 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "Rectangle 3.pdf",
-      "resizing" : {
-        "mode" : "3-part-vertical",
-        "center" : {
-          "mode" : "tile",
-          "height" : 17
-        },
-        "cap-insets" : {
-          "top" : 39,
-          "bottom" : 67
-        }
-      }
+      "filename" : "pause.pdf"
     }
   ],
   "info" : {

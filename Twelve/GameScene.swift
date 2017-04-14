@@ -8,6 +8,7 @@
 
 import SpriteKit
 import GameplayKit
+import AudioToolbox
 
 enum TwelveError: Error {
     case numberIsNotFollowingPile
@@ -41,6 +42,11 @@ enum TwelveNode: String {
     case closeSurvivalNode = "closeSurvivalNode"
     case confirmQuitNode = "confirmQuitNode"
     case cancelQuitNode = "cancelQuitNode"
+    case tutorialNode = "tutorialNode"
+    case survivalNode = "survivalNode"
+    case classicNode = "classicNode"
+    case settingsNode = "settingsNode"
+    //    TutorialContainerViewController
     
 }
 
@@ -79,7 +85,7 @@ extension GameScene : Preparation {
         do {
             let piles = try pilesAvailable()
             gridDispatcher = GridController(matrix: [[NumberSpriteNode]](), piles: piles, grid: objectsTileMap, currentSolution: nil, frozen: false)
-            gridDispatcher.fullfillGrid()
+            gridDispatcher?.fullfillGrid()
             objectsTileMap.addChild(line)
         } catch let error as TwelveError where error == .gridHasNoPile {
             fatalError("no piles available on grid")
@@ -88,11 +94,17 @@ extension GameScene : Preparation {
         }
     }
     
+    
+    
+    
 }
 
-class GameScene: SKScene {
+
+
+
+class GameScene: KVOScene {
     
-    var gameVC: GameViewController?
+    var menuVC: MenuViewController?
     
     
     lazy var progressBar: ProgressBar = {
@@ -121,6 +133,16 @@ class GameScene: SKScene {
             as? ScoreNode else {
                 fatalError("scoreNode node not loaded")
         }
+        
+        guard let scoreTitle = scoreNode.childNode(withName: "points")
+            as? SKLabelNode else {
+                fatalError("white node not loaded")
+        }
+        
+        let color: SKColor = SharedGameManager.sharedInstance.settings.darkMode ? .white : .black
+        scoreTitle.colorBlendFactor = 1
+        scoreTitle.fontColor = color
+        
         return scoreNode
     }()
     
@@ -134,11 +156,21 @@ class GameScene: SKScene {
             as? SKLabelNode else {
                 fatalError("timerNode node not loaded")
         }
+        
+        guard let timeLabel = topBar.childNode(withName: "time")
+            as? SKLabelNode else {
+                fatalError("timerNode node not loaded")
+        }
+        
+        let color: SKColor = SharedGameManager.sharedInstance.settings.darkMode ? .white : .black
+        timeLabel.colorBlendFactor = 1
+        timeLabel.fontColor = color
+        
         return label
     }()
     
     
-    var gridDispatcher : GridController!
+    var gridDispatcher : GridController?
     
     var gameMode: GameMode {
         get {
@@ -155,7 +187,7 @@ class GameScene: SKScene {
     var currentElement: Element? {
         willSet(obj) {
             if let number = obj {
-                gridDispatcher.cancelSolution()
+                gridDispatcher?.cancelSolution()
                 number.selected()
             } else {
                 line.path = nil
@@ -165,7 +197,7 @@ class GameScene: SKScene {
     
     
     lazy var combo: Combo = {
-        return Combo(lastNumber: nil, numbers: [Int](), possiblePiles: self.gridDispatcher.pilesForNumber(1))
+        return Combo(lastNumber: nil, numbers: [Int](), possiblePiles: self.gridDispatcher?.pilesForNumber(1))
     }()
     
     
@@ -175,8 +207,13 @@ class GameScene: SKScene {
     
     var timerValue = 60 {
         willSet(newValue) {
+            let secondsMade = (newValue - totalSeconds) > 0 ? (newValue - totalSeconds) : 0
+            totalSeconds = totalSeconds + secondsMade
+            print("totalSeconds : \(totalSeconds)")
             timeLabel.text = String(newValue)
-            self.progressBar.decrease()
+            if gameMode == .classic {
+                self.progressBar.decrease()
+            }
         }
     }
     
@@ -202,19 +239,54 @@ class GameScene: SKScene {
         }
     }
     
+    var totalSeconds = 0
+    
+    
+    override func updateForMode() {
+        super.updateForMode()
+        guard let classicButton = childNode(withName: TwelveNode.classicNode.rawValue)
+            as? SKSpriteNode else {
+                fatalError("testButton node not loaded")
+        }
+        guard let classicLabelNode = classicButton.childNode(withName: TwelveNode.classicNode.rawValue)
+            as? SKLabelNode else {
+                fatalError("labelNode node not loaded")
+        }
+        
+        guard let survivalButton = childNode(withName: TwelveNode.survivalNode.rawValue)
+            as? SKSpriteNode else {
+                fatalError("testButton node not loaded")
+        }
+        guard let survivalLabelNode = survivalButton.childNode(withName: TwelveNode.survivalNode.rawValue)
+            as? SKLabelNode else {
+                fatalError("labelNode node not loaded")
+        }
+        
+        
+        let color: SKColor = SharedGameManager.sharedInstance.settings.darkMode ? .black : .white
+        survivalLabelNode.colorBlendFactor = 1
+        classicLabelNode.colorBlendFactor = 1
+        classicLabelNode.fontColor = color
+        survivalLabelNode.fontColor = color
+        
+    }
+    
     
     
     override func didMove(to view: SKView) {
-        
         // Do something once texture atlas has loaded
+        let color: UIColor = SharedGameManager.sharedInstance.settings.darkMode ? .black : .white
+        backgroundColor = color
+        isTopBarHidden(true)
         fillUpMap()
         prepareGame()
         shouldShowTutorial()
+        updateTopBarForDarkMode()
     }
     
     
     func setPaused() {
-        if timeLabel.isPaused == false  {
+        if timeLabel.isPaused == false && gameStarted {
             showPauseMenu()
         }
     }
@@ -228,6 +300,7 @@ class GameScene: SKScene {
         } catch  {
             currentElement = nil
             let action = SKAction.screenShakeWithNode(element, amount: CGPoint(x:30, y:30), oscillations: 20, duration: 0.50)
+            AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
             element.run(action, completion: {
                 self.endsCombo()
             })
@@ -238,7 +311,7 @@ class GameScene: SKScene {
     func selectElement(_ element : Element) throws  {
         currentElement?.unselected()
         if let prevNumber = currentElement {
-            try gridDispatcher.isTile(prevNumber, adjacentWith: element)
+            try gridDispatcher?.isTile(prevNumber, adjacentWith: element)
         }
         try addToCombo(element: element)
     }
@@ -248,18 +321,25 @@ class GameScene: SKScene {
     private func addToCombo(element: Element) throws {
         
         if let piles = combo.possiblePiles {
-            try combo.addUpComboWith(number: element.value, on: piles)
-        } else if let piles = gridDispatcher.pilesForNumber(element.value) {
-            try combo.addUpComboWith(number: element.value, on: piles)
+            if gridDispatcher!.frozen {
+                try combo.addUpFrozenNumber(number: element.value, on: piles)
+            } else {
+                try combo.addUpComboWith(number: element.value, on: piles)
+            }
+        } else if let piles = gridDispatcher?.pilesForNumber(element.value) {
+            if gridDispatcher!.frozen {
+                try combo.addUpFrozenNumber(number: element.value, on: piles)
+            } else {
+                try combo.addUpComboWith(number: element.value, on: piles)
+            }
         } else {
             throw TwelveError.numberIsNotFollowingPile
         }
         
         if combo.numbers.count > 1  {
             
-            
             if let element = currentElement {
-                gridDispatcher.updateElement(element)
+                gridDispatcher?.updateElement(element)
             }
             
             addSecond()
@@ -279,7 +359,7 @@ class GameScene: SKScene {
         //        twelve_reached_view
         
         
-/*        let reachedMax = progressBar.increaseAndHasGivenBonus()
+        let reachedMax = progressBar.increaseAndHasGivenBonus()
         
         let size = (scene?.view?.frame.size)!
         
@@ -306,13 +386,21 @@ class GameScene: SKScene {
             progressBar.isPaused = true
             
             
-            self.gridDispatcher.frozen = true
-            try? self.gridDispatcher.freezeNumbers()
-
+            self.gridDispatcher?.frozen = true
+            
+            for pile in try! pilesAvailable() {
+                pile.frozen = true
+            }
+            try? self.gridDispatcher?.freezeNumbers()
+            
             self.afterDelay(10, runBlock: {
-            self.gridDispatcher.frozen = false
-                try? self.gridDispatcher.unFreezeNumbers()
-
+                self.gridDispatcher?.frozen = false
+                for pile in try! self.pilesAvailable() {
+                    pile.frozen = false
+                }
+                try? self.gridDispatcher?.unFreezeNumbers()
+                self.progressBar.isPaused = false
+                self.timeLabel.action(forKey: "countdown")?.speed = 1
 //                let colorizeDown = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.25)
 //                self.gridDispatcher.frozen = false
 //                self.run(colorizeDown, completion: {
@@ -324,7 +412,7 @@ class GameScene: SKScene {
             
             
         }
-        */
+        
         
     }
     
@@ -335,17 +423,17 @@ class GameScene: SKScene {
         currentElement?.unselected()
         
         do {
-            if gridDispatcher.frozen {
-                try combo.doneWithFrozenNumber()
-            } else {
+            if !gridDispatcher!.frozen {
                 let comboResult = try combo.doneWithCombo()
                 addPointsForCombo(comboResult)
-                for _ in 0..<comboResult.numberOfTwelve {
-                    newPileAdded()
+                if gameMode == .classic {
+                    for _ in 0..<comboResult.numberOfTwelve {
+                        newPileAdded()
+                    }
                 }
             }
             if let element = currentElement {
-                gridDispatcher.updateElement(element)
+                gridDispatcher?.updateElement(element)
             }
             currentElement = nil
             checkBoard()
@@ -357,19 +445,106 @@ class GameScene: SKScene {
     
     func checkBoard() {
         
+        gridDispatcher?.cancelSolution()
+        
         do {
-            try gridDispatcher.checkBoard()
+            if let solution = try gridDispatcher?.checkBoard() , gridDispatcher?.frozen == false {
+                showSolution(solution)
+            }
+            
         } catch let error as TwelveError where error == .noMorePossibilities {
             
-            try? self.gridDispatcher.resetNumbers()
-            try? self.gridDispatcher.disposeNumbers()
+            scaleElements(to: 0, duration: gridDispatcher!.frozen ? 0.05 : 0.25)
+            
+            afterDelay(gridDispatcher!.frozen ? 0.05 : 0.10, runBlock: {
+                
+                self.showShuffle()
+                
+                self.afterDelay( self.gridDispatcher!.frozen ? 0.25 : 0.75, runBlock: {
+                    
+                    try? self.gridDispatcher?.resetNumbers()
+                    
+                    self.gridDispatcher!.grid.isHidden = true
+                    
+                    try? self.gridDispatcher?.disposeNumbers()
+                    
+                    self.scaleElements(to: 0, duration: 0)
+                    
+                    self.afterDelay(self.gridDispatcher!.frozen ? 0.05 : 0.25, runBlock: {
+                        self.removeShuffle()
+                        self.gridDispatcher!.grid.isHidden = false
+                        self.scaleElements(to: 1, duration: self.gridDispatcher!.frozen ? 0.5 : 0.25)
+                    })
+                })
+            })
             
         } catch {
             fatalError("checkBoard exception should have been caught error : \(error)")
         }
-        
     }
     
+    func showSolution(_ solution : Solution) {
+        
+        
+        solution.fromElement.showSolution()
+        
+        guard let toElement = solution.toElement else {
+            return
+        }
+        
+        var positionFromElement = solution.fromElement.position
+        var positionToElement = toElement.position
+        
+        guard let solutionNode = self.objectsTileMap.childNode(withName: "showSolution")
+            as? SKSpriteNode else {
+                fatalError("showSolution node not loaded")
+        }
+        solutionNode.isUserInteractionEnabled = false
+        solutionNode.alpha = 0
+        if let texture = solution.fromElement.handTexture {
+            solutionNode.texture = texture
+        }
+        
+        let fromGridPosition = solution.fromElement.gridPosition
+        let toGridPosition = toElement.gridPosition
+        
+        print("from : \(fromGridPosition) to : \(toGridPosition)")
+        if fromGridPosition.row > toGridPosition.row && fromGridPosition.column > toGridPosition.column {
+            positionFromElement = positionFromElement.offset(dx: -30, dy: -30)
+            positionToElement = positionToElement.offset(dx: 30, dy: 30)
+        } else if fromGridPosition.row == toGridPosition.row && fromGridPosition.column > toGridPosition.column {
+            positionFromElement = positionFromElement.offset(dx: -30, dy: 0)
+            positionToElement = positionToElement.offset(dx: 30, dy: 0)
+        } else if fromGridPosition.row < toGridPosition.row && fromGridPosition.column > toGridPosition.column {
+            positionFromElement =  positionFromElement.offset(dx: -30, dy: 30)
+            positionToElement = positionToElement.offset(dx: 30, dy: -30)
+        } else if fromGridPosition.row < toGridPosition.row && fromGridPosition.column == toGridPosition.column {
+            positionFromElement =  positionFromElement.offset(dx: 0, dy: 30)
+            positionToElement = positionToElement.offset(dx: 0, dy: -30)
+        } else if fromGridPosition.row > toGridPosition.row && fromGridPosition.column == toGridPosition.column {
+            positionFromElement =  positionFromElement.offset(dx: 0, dy: -30)
+            positionToElement = positionToElement.offset(dx: 0, dy: 30)
+        } else if fromGridPosition.row < toGridPosition.row && fromGridPosition.column < toGridPosition.column {
+            positionFromElement =  positionFromElement.offset(dx: 30, dy: 30)
+            positionToElement = positionToElement.offset(dx: -30, dy: -30)
+        } else if fromGridPosition.row == toGridPosition.row && fromGridPosition.column < toGridPosition.column {
+            positionFromElement =  positionFromElement.offset(dx: 30, dy: 0)
+            positionToElement = positionToElement.offset(dx: -30, dy: 0)
+        } else if fromGridPosition.row > toGridPosition.row && fromGridPosition.column < toGridPosition.column {
+            positionFromElement = positionFromElement.offset(dx: 30, dy: -30)
+            positionToElement = positionToElement.offset(dx: -30, dy: 40)
+        }
+        solutionNode.position = positionFromElement
+        let move = SKAction.move(to: positionToElement, duration: 1)
+        let moveBack = SKAction.move(to: positionFromElement, duration: 0)
+        let sequence = SKAction.sequence([move, moveBack])
+        let repeatAction = SKAction.repeatForever(sequence)
+        let showNode = SKAction.fadeAlpha(to: 0.75, duration: 0.10)
+        let group = SKAction.sequence([showNode, repeatAction])
+        let delay = (gameStarted == true) ? 5 : 0
+        let finalAction = SKAction.afterDelay(TimeInterval(delay), performAction: group)
+        solutionNode.run(finalAction, withKey: "showSolution")
+    }
     
     func startTimer() {
         
@@ -389,28 +564,49 @@ class GameScene: SKScene {
     }
     
     func endGame() {
+        gridDispatcher?.cancelSolution()
         SharedGameManager.sharedInstance.hasAchievedAGame = true
+        SharedGameManager.sharedInstance.gameCaracteristic.points = totalPoints
+        SharedGameManager.sharedInstance.gameCaracteristic.seconds = totalSeconds
+        endsCombo()
         gameStarted = false
         updateTotal(score: totalPoints)
-        isTopBarHidden(true)
-        showGameOver(true)
-        isDeckMenuHidden(true)
-        endsCombo()
+        isPauseHidden(true)
+        cleanScene()
+        menuVC?.transitionResultGame()
     }
+    
+    func scaleElements(to scaleValue: CGFloat, duration : TimeInterval) {
+        for row in 0..<self.objectsTileMap.numberOfRows {
+            for column in 0..<self.objectsTileMap.numberOfColumns {
+                let gridPosition = GridPosition(row, column)
+                let element = try! self.gridDispatcher?.elementAt(position: gridPosition)
+                let scale = SKAction.scale(to: scaleValue, duration: duration)
+                element?.run(scale)
+            }
+        }
+    }
+    
     
 }
 
 extension GameScene {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard gridDispatcher.frozen == false else {
+        guard gridDispatcher != nil else {
+            return
+        }
+        guard gridDispatcher?.frozen == false else {
             return
         }
         endsCombo()
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first , gridDispatcher.frozen == false else {
+        guard gridDispatcher != nil else {
+            return
+        }
+        guard let touch = touches.first , gridDispatcher?.frozen == false else {
             return
         }
         
@@ -425,9 +621,13 @@ extension GameScene {
     
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first , gridDispatcher.frozen == false else {
+        guard gridDispatcher != nil else {
             return
         }
+        guard let touch = touches.first , gridDispatcher?.frozen == false else {
+            return
+        }
+        
         if currentElement != nil {
             drawLine(endingPoint: touch.location(in: self.objectsTileMap))
         }
@@ -442,9 +642,16 @@ extension GameScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
         guard let touch = touches.first else {
             return
         }
+        
+        if gridDispatcher?.frozen == false {
+            currentElement?.unselected()
+        }
+        
+        gridDispatcher?.cancelSolution()
         
         let location = touch.location(in: self)
         if let name = atPoint(location).name {
@@ -464,26 +671,46 @@ extension GameScene {
             case TwelveNode.closeJokerNode.rawValue:
                 removeBackgroundLayer()
                 isJokerTutorialHidden(true)
-            case TwelveNode.timerNode.rawValue:
+            case TwelveNode.timerNode.rawValue, TwelveNode.topBar.rawValue:
                 showPauseMenu()
             case TwelveNode.confirmQuitNode.rawValue:
                 leaveGame()
             case TwelveNode.cancelQuitNode.rawValue:
                 resumeGame()
             default:
-                print("nothing to care about")
-            }
-        }  else {
-            if let element = (nodes(at: location).filter { $0 is Element }).first as? Element {
-                analyzeElement(element)
-                if currentElement != nil , gridDispatcher.frozen {
-                    endsCombo()
+                if gridDispatcher!.frozen {
+                    touchElement(at: location)
                 }
+                
+                /*
+                 if let node = atPoint(location) as? SKSpriteNode , node.name == "shapeSelected" {
+                 if node.parent is Element {
+                 analyzeElement(node.parent as! Element)
+                 if currentElement != nil , gridDispatcher!.frozen {
+                 endsCombo()
+                 }
+                 }
+                 }*/
+            }
+        }
+        else {
+            touchElement(at: location)
+        }
+        
+    }
+    
+    func touchElement(at location : CGPoint) {
+        if let element = (nodes(at: location).filter { $0 is Element }).first as? Element {
+            analyzeElement(element)
+            if currentElement != nil , gridDispatcher!.frozen {
+                endsCombo()
             }
         }
         
     }
 }
+
+
 
 
 extension GameScene {
@@ -494,52 +721,48 @@ extension GameScene {
     
     func addSecond() {
         if gameMode == .survival {
-            if gridDispatcher.frozen {
+            let comboForSeconds = 3
+            if combo.numbers.count > comboForSeconds  {
                 timerValue += 1
-                let action = SKAction.screenZoomWithNode(timeLabel, amount: CGPoint(x:2, y:2), oscillations: 2, duration: 1)
+                let action = SKAction.screenZoomWithNode(timeLabel, amount: CGPoint(x:2.5, y:2.5), oscillations: 2, duration: 1)
                 timeLabel.run(action)
-            } else {
-                var comboForSeconds = 0
-                switch gameDifficulty {
-                case .easy:
-                    comboForSeconds = 3
-                case .normal:
-                    comboForSeconds = 4
-                case .hard:
-                    comboForSeconds = 5
-                }
-                if combo.numbers.count > comboForSeconds  {
-                    timerValue += 1
-                    let action = SKAction.screenZoomWithNode(timeLabel, amount: CGPoint(x:2, y:2), oscillations: 2, duration: 1)
-                    timeLabel.run(action)
-                }
+            }
+   
+        } else if gridDispatcher!.frozen {
+                timerValue += 1
+                let action = SKAction.screenZoomWithNode(timeLabel, amount: CGPoint(x:2.5, y:2.5), oscillations: 2, duration: 1)
+                timeLabel.run(action)
             }
         }
-    }
     
-
 }
 
 extension GameScene {
     
     
     func resetPiles() {
-        gridDispatcher.resetPiles()
-        try? gridDispatcher.resetNumbers()
-        try? gridDispatcher.disposeNumbers()
+        gridDispatcher?.resetPiles()
+        try? gridDispatcher?.resetNumbers()
+        try? gridDispatcher?.disposeNumbers()
     }
     
     func leaveGame() {
+        isPauseHidden(true)
         removeBackgroundLayer()
         gameStarted = false
         cleanScene()
-        gameVC?.navigationController?.popToRootViewController(animated: true)
+        objectsTileMap.isHidden = true
+        afterDelay(0.3) {
+            self.menuVC?.transitionBack(from: self.scene)
+        }
     }
     
     func cleanScene() {
+        removeAllActions()
         line.removeFromParent()
-        try? gridDispatcher.removeNumbers()
+        try? gridDispatcher?.removeNumbers()
     }
+    
     
     func shouldShowTutorial() {
         switch gameMode {
@@ -580,26 +803,31 @@ extension GameScene {
     
     func prepareGame() {
         
-        for row in 0..<self.objectsTileMap.numberOfRows {
-            for column in 0..<self.objectsTileMap.numberOfColumns {
-                let gridPosition = GridPosition(row, column)
-                do {
-                    if let number = try self.gridDispatcher.elementAt(position: gridPosition) {
-                        let scaleDown = SKAction.scale(to: 0, duration: 0)
-                        let scaleBack = SKAction.scale(to: 1, duration: 0.5)
-                        let fade = SKAction.fadeIn(withDuration: 0.5)
-                        let group = SKAction.group([scaleDown, scaleBack, fade])
-                        number.run(group)
-                    }
-                } catch {  }
-            }
+        guard let solutionNode = self.objectsTileMap.childNode(withName: "showSolution")
+            as? SKSpriteNode else {
+                fatalError("showSolution node not loaded")
         }
+        
+        solutionNode.alpha = 0
+        
+        objectsTileMap.isHidden = true
+        
+        
+        isDeckMenuHidden(true)
         isPauseHidden(true)
         totalPoints = 0
         isEndMenuHidden(true)
         resetPiles()
         isMainMenuHidden(false)
         isTopBarHidden(true)
+        checkBoard()
+        
+        afterDelay(0.5) {
+            self.scaleElements(to: 0, duration: 0)
+            self.objectsTileMap.isHidden = false
+            self.scaleElements(to: 1, duration: 0.25)
+        }
+        
     }
     
     
@@ -633,6 +861,7 @@ extension GameScene  {
                         if let pileSprite = child.childNode(withName: "PileSprite") as? Pile {
                             pileSprite.isHidden = false
                             piles.append(pileSprite)
+                            pileSprite.updatePileView()
                         }
                     }
                 }
@@ -723,13 +952,23 @@ extension GameScene  {
     }
     
     func isPauseHidden(_ hidden: Bool) {
-        guard let node = childNode(withName: "pauseMenu")
+        guard let node = childNode(withName: "pauseMenuContainer")
             as? SKSpriteNode else {
                 fatalError("pauseMenu node not loaded")
         }
         
         node.isHidden = hidden
     }
+    
+    func isShuffleHidden(_ hidden: Bool) {
+        guard let node = childNode(withName: "shuffleNode")
+            as? SKSpriteNode else {
+                fatalError("shuffleNode node not loaded")
+        }
+        
+        node.isHidden = hidden
+    }
+    
     
     func isEndMenuHidden(_ hidden: Bool) {
         guard let node = childNode(withName: "menuEndGameSprite")
@@ -750,16 +989,45 @@ extension GameScene  {
         self.isEndMenuHidden(false)
     }
     
+    
     func resumeGame() {
-        timeLabel.action(forKey: "countdown")?.speed = 1
-        timeLabel.isPaused = false
-        isPauseHidden(true)
+        
+        guard let node = childNode(withName: "pauseMenuContainer")
+            as? SKSpriteNode else {
+                fatalError("pauseMenu node not loaded")
+        }
+        
+        guard let pauseMenu = node.childNode(withName: "pauseMenu")
+            as? SKSpriteNode else {
+                fatalError("pauseMenu node not loaded")
+        }
+        
+        
+        
+        let hidePauseAction = SKAction.fadeOut(withDuration: 0.15)
+        pauseMenu.run(hidePauseAction)
+        self.isPauseHidden(true)
+        
+        
+        //        self.timeLabel.action(forKey: "countdown")?.speed = 1
+        self.timeLabel.isPaused = false
+        
+        
+        
         removeBackgroundLayer()
     }
     
+    
+    
+    
+    
     func showConfirmationLeaveGame(){
         
-        guard let pauseMenu = childNode(withName: "pauseMenu")
+        guard let node = childNode(withName: "pauseMenuContainer")
+            as? SKSpriteNode else {
+                fatalError("pauseMenuContainer node not loaded")
+        }
+        guard let pauseMenu = node.childNode(withName: "pauseMenu")
             as? SKSpriteNode else {
                 fatalError("pauseMenu node not loaded")
         }
@@ -787,109 +1055,181 @@ extension GameScene  {
     
     
     func showPauseMenu() {
-        guard let node = childNode(withName: "pauseMenu")
+        guard let node = childNode(withName: "pauseMenuContainer")
+            as? SKSpriteNode else {
+                fatalError("pauseMenuContainer node not loaded")
+        }
+        
+        guard let pauseMenu = node.childNode(withName: "pauseMenu")
             as? SKSpriteNode else {
                 fatalError("pauseMenu node not loaded")
         }
-        guard let confirmationLeaveMenu = node.childNode(withName: "pauseConfirmationMenu")
+        
+        guard let confirmationLeaveMenu = pauseMenu.childNode(withName: "pauseConfirmationMenu")
             as? SKSpriteNode else {
                 fatalError("confirmationLeaveMenu node not loaded")
         }
+        pauseMenu.alpha = 0
         confirmationLeaveMenu.isHidden = true
+        node.size = size
+        
         node.position = CGPoint(x: 0, y: 0)
-        node.isHidden = false
-        addBackgroundLayer(belowNode: "pauseMenu")
+        
+        addBackgroundLayer(belowNode: "pauseMenuContainer")
         isPauseHidden(false)
-        timeLabel.action(forKey: "countdown")?.speed = 0
+        //        timeLabel.action(forKey: "countdown")?.speed = 0
         timeLabel.isPaused = true
+        
+        let showPauseAction = SKAction.fadeIn(withDuration: 0.15)
+        pauseMenu.run(showPauseAction)
     }
     
-    func addBackgroundLayer(belowNode: String) {
-        hideNumbers(hide: true)
-        guard let node = childNode(withName: "pauseMenu")
+    
+    func showShuffle() {
+        guard let node = childNode(withName: "shuffleNode")
             as? SKSpriteNode else {
-                fatalError("pauseMenu node not loaded")
+                fatalError("shuffleNode node not loaded")
         }
-        let sizeScreen = UIScreen.main.nativeBounds.size
+        
+        node.alpha = 0
+        node.position = CGPoint(x: 0, y: 0)
+        isShuffleHidden(false)
+        timeLabel.isPaused = true
+        let showPauseAction = SKAction.fadeIn(withDuration: 0.25)
+        node.run(showPauseAction)
+    }
+    
+    func removeShuffle() {
+        guard let node = childNode(withName: "shuffleNode")
+            as? SKSpriteNode else {
+                fatalError("shuffleNode node not loaded")
+        }
+        let hideShuffle = SKAction.fadeOut(withDuration: 0.15)
+        node.run(hideShuffle)
+        isShuffleHidden(true)
+        self.timeLabel.isPaused = false
+        
+    }
+    
+    
+    func addBackgroundLayer(belowNode: String) {
+        scaleElements(to: 0, duration: 0.25)
+        guard let node = childNode(withName: belowNode)
+            as? SKSpriteNode else {
+                fatalError("\(belowNode) node not loaded")
+        }
+        
+        guard let leftPause = childNode(withName: "leftPause")
+            as? SKSpriteNode else {
+                fatalError("leftPause node not loaded")
+        }
+        guard let rightPause = childNode(withName: "rightPause")
+            as? SKSpriteNode else {
+                fatalError("rightPause node not loaded")
+        }
+        
+        leftPause.zPosition = node.zPosition - 1
+        rightPause.zPosition = node.zPosition - 1
+        rightPause.alpha = 0
+        leftPause.alpha = 0
+        let sizeScreen = UIScreen.main.bounds.size
         let size = CGSize(width: sizeScreen.width, height: sizeScreen.height)
-        let backgroundNode = SKSpriteNode.init(color: UIColor.myTextColor.withAlphaComponent(0.30), size: size)
-        backgroundNode.name = "backgroundNode"
-        backgroundNode.position = CGPoint(x: 0, y: 0)
-        backgroundNode.zPosition = node.zPosition - 1
-        addChild(backgroundNode)
+        
+        leftPause.size = size
+        leftPause.position = CGPoint(x : -size.width, y: -sizeScreen.height / 3)
+        rightPause.size = size
+        rightPause.position = CGPoint(x : +size.width, y: sizeScreen.height / 3)
+        let actionMoveCenter = SKAction.move(to: CGPoint(x : 0, y : 0), duration: 0.25)
+        let fadeIn = SKAction.fadeIn(withDuration: 0.10)
+        let groupAction = SKAction.group([actionMoveCenter, fadeIn])
+        leftPause.run(groupAction)
+        rightPause.run(groupAction)
+        
+        /*
+         let sizeScreen = UIScreen.main.bounds.size
+         let size = CGSize(width: sizeScreen.width, height: sizeScreen.height)
+         let backgroundNode = SKSpriteNode.init(color: UIColor.myTextColor.withAlphaComponent(0.30), size: size)
+         backgroundNode.name = "backgroundNode"
+         */
+        
     }
     
     func removeBackgroundLayer() {
-        hideNumbers(hide: false)
-        guard let node = childNode(withName: "backgroundNode")
+        scaleElements(to: 1, duration: 0.25)
+        guard let leftPause = childNode(withName: "leftPause")
             as? SKSpriteNode else {
-                fatalError("backgroundNode node not loaded")
+                fatalError("leftPause node not loaded")
         }
-        node.removeFromParent()
-    }
-    
-    
-    func showGameOver(_ show: Bool) {
-        
-        guard let node = childNode(withName: "gameOverSprite")
+        guard let rightPause = childNode(withName: "rightPause")
             as? SKSpriteNode else {
-                fatalError("gameOverSprite node not loaded")
-        }
-        node.position = CGPoint(x: frame.minX, y: 0)
-        node.isHidden = !show
-        let moveShow = SKAction.moveTo(x: 0, duration: 0.15)
-        let rotR = SKAction.rotate(byAngle: 0.15, duration: 0.1)
-        let rotL = SKAction.rotate(byAngle: -0.15, duration: 0.1)
-        let rotates = SKAction.sequence([rotR, rotL])
-        let repeatAction = SKAction.repeat(rotates, count: 2)
-        let rotateBack = SKAction.rotate(toAngle: 0, duration: 0.15)
-        let cycle = SKAction.sequence([repeatAction, rotateBack])
-        let wait = SKAction.wait(forDuration: 0.25)
-        let moveHide = SKAction.moveTo(x: frame.maxX + node.size.width, duration: 0.15)
-        let move = SKAction.sequence([moveShow, cycle, wait, moveHide])
-        
-        for row in 0..<self.objectsTileMap.numberOfRows {
-            for column in 0..<self.objectsTileMap.numberOfColumns {
-                let gridPosition = GridPosition(row, column)
-                if let element = try? self.gridDispatcher.elementAt(position: gridPosition) {
-                    let scale = SKAction.scale(to: 0.1, duration: 0.5)
-                    let fade = SKAction.fadeOut(withDuration: 0.5)
-                    let group = SKAction.group([scale, fade])
-                    element?.run(group)
-                }
-            }
+                fatalError("rightPause node not loaded")
         }
         
-        node.run(move, completion: {
-            self.showEndMenu()
-        })
+        let sizeScreen = UIScreen.main.bounds.size
+        let size = CGSize(width: sizeScreen.width, height: sizeScreen.height)
+        let leftPausePosition = CGPoint(x : -size.width, y: -sizeScreen.height / 3)
+        let rightPausePosition = CGPoint(x : +size.width, y: sizeScreen.height / 3)
+        let leftActionMoveOutOfBounds = SKAction.move(to: leftPausePosition, duration: 0.25)
+        let rightActionMoveOutOfBounds = SKAction.move(to: rightPausePosition, duration: 0.25)
+        leftPause.run(leftActionMoveOutOfBounds)
+        
+        let fadeOut = SKAction.fadeOut(withDuration: 0.10)
+        let groupActionLeft = SKAction.group([leftActionMoveOutOfBounds, fadeOut])
+        let groupActionRight = SKAction.group([rightActionMoveOutOfBounds, fadeOut])
+        
+        
+        leftPause.run(groupActionLeft)
+        rightPause.run(groupActionRight)
+        /*        guard let node = childNode(withName: "backgroundNode")
+         as? SKSpriteNode else {
+         fatalError("backgroundNode node not loaded")
+         }
+         node.removeFromParent()
+         */
     }
     
-    func hideNumbers(hide: Bool) {
-        
-        for row in 0..<self.objectsTileMap.numberOfRows {
-            for column in 0..<self.objectsTileMap.numberOfColumns {
-                let gridPosition = GridPosition(row, column)
-                if let element = try? self.gridDispatcher.elementAt(position: gridPosition) {
-                    if hide {
-                        let scale = SKAction.scale(to: 0.1, duration: 0.25)
-                        let fade = SKAction.fadeOut(withDuration: 0.25)
-                        let group = SKAction.group([scale, fade])
-                        element?.run(group)
-                    } else {
-                        let scale = SKAction.scale(to: 1, duration: 0.25)
-                        let fade = SKAction.fadeIn(withDuration: 0.25)
-                        let group = SKAction.group([scale, fade])
-                        element?.run(group)
-                    }
-                }
-            }
-        }
-        
-    }
+    
     
 }
 
+
+extension GameScene {
+    
+    
+    func updateTopBarForDarkMode() {
+        
+        guard let topBar = self.childNode(withName: TwelveNode.topBar.rawValue)
+            as? SKSpriteNode else {
+                fatalError("topBarNode node not loaded")
+        }
+        
+        
+        guard let timeLabel = topBar.childNode(withName: "time")
+            as? SKLabelNode else {
+                fatalError("timerNode node not loaded")
+        }
+        
+        let color: SKColor = SharedGameManager.sharedInstance.settings.darkMode ? .white : .black
+        timeLabel.colorBlendFactor = 1
+        timeLabel.fontColor = color
+        
+        
+        guard let scoreNode = topBar.childNode(withName: TwelveNode.scoreNode.rawValue)
+            as? ScoreNode else {
+                fatalError("scoreNode node not loaded")
+        }
+        
+        guard let scoreTitle = scoreNode.childNode(withName: "points")
+            as? SKLabelNode else {
+                fatalError("white node not loaded")
+        }
+        
+        scoreTitle.colorBlendFactor = 1
+        scoreTitle.fontColor = color
+        
+        
+    }
+}
 
 
 extension CGFloat {

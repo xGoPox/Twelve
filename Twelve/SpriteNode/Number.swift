@@ -30,10 +30,10 @@ class FrozenNumber : NumberSpriteNode {
 */
             numberLabel.text = String(number)
             numberLabel.alpha = 1
-            numberLabel.fontColor = colorType
-            if let shapeUnselected = childNode(withName: "shapeUnselected") as? SKSpriteNode {
-                shapeUnselected.color = colorType
-            }
+            numberLabel.fontColor = .white
+//            if let shapeUnselected = childNode(withName: "shapeUnselected") as? SKSpriteNode {
+//                shapeUnselected.color = colorType
+//            }
         }
     }
     
@@ -59,43 +59,37 @@ class FrozenNumber : NumberSpriteNode {
 
 extension FrozenNumber {
     
-    override func selected() {
-        /*
-        if let shapeUnselected = childNode(withName: "shapeUnselected") {
-            shapeUnselected.removeFromParent()
+    
+    override func unselected() {
+        if let shp = childNode(withName: "shapeSelected") {
+            shp.removeFromParent()
         }
-
-        let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
-        let pulseDown = SKAction.scale(to: 1, duration: 0.20)
-        
-        let pulse = SKAction.sequence([pulseUp, pulseDown])
         
         let color = SKAction.colorize(with: colorType, colorBlendFactor: 1, duration: 0.1)
-        
-        let shape = SKSpriteNode.init(texture: SharedAssetsManager.sharedInstance.numberTexture, color: colorType, size: self.size)
-        
+        let shape = SKSpriteNode.init(texture: SharedAssetsManager.sharedInstance.numberTexture, color: colorType, size: CGSize(width: size.width + 20, height: size.height + 20))
         shape.name = "shapeSelected"
         shape.isUserInteractionEnabled = false
         shape.zPosition = 1
         addChild(shape)
-        shape.run(SKAction.sequence([color, SKAction.repeatForever(pulse)]))
+        let actionOne = SKAction.moveBy(x: -1, y: 1, duration: 0.03)
+        let actionThree = SKAction.moveBy(x: 1, y: -1, duration: 0.03)
+        let actionTwo = SKAction.moveBy(x: 1, y: 1, duration: 0.03)
+        let actionFour = SKAction.moveBy(x: -1, y: -1, duration: 0.03)
+
+//        let actionOne = SKAction.screenShakeWithNode(shape, amount: CGPoint(x: 10, y: 10), oscillations: 2, duration: 0.25)
+//        let actionTwo = SKAction.screenShakeWithNode(shape, amount: CGPoint(x: -10, y: -10), oscillations: 2, duration: 0.25)
+        let group = SKAction.sequence([actionOne, actionTwo, actionThree, actionFour])
+        shape.run(SKAction.group([color, SKAction.repeatForever(group)]))
         let fadeIn = SKAction.fadeAlpha(to: 1, duration: 0.1)
         let fadeOut = SKAction.fadeAlpha(to: 0, duration: 0.1)
         numberLabel.run(fadeOut) {
-            self.numberLabel.fontColor = .white
+            self.numberLabel.fontColor = self.modeColor
             self.numberLabel.run(fadeIn)
         }
- */
     }
     
-    override func unselected() {
-        
-/*        let shapeUnselected = SKSpriteNode.init(texture: SharedAssetsManager.sharedInstance.numberFrozenTexture, color: colorType, size: self.size)
-        shapeUnselected.name = "shapeUnselected"
-        shapeUnselected.isUserInteractionEnabled = false
-        shapeUnselected.zPosition = 1
-
-        let color = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.1)
+    override func selected() {
+        let color = SKAction.colorize(with: modeColor, colorBlendFactor: 1, duration: 0.1)
         let fadeIn = SKAction.fadeAlpha(to: 1, duration: 0.1)
         let fadeOut = SKAction.fadeAlpha(to: 0, duration: 0.1)
         let numberScaleBackAction = SKAction.scale(to: 1, duration: 0.15)
@@ -106,16 +100,71 @@ extension FrozenNumber {
                     self.numberLabel.fontColor = self.colorType
                     self.numberLabel.run(fadeIn)
                     shp.removeFromParent()
-                    self.addChild(shapeUnselected)
                 })
             }
         } else {
             self.numberLabel.fontColor = self.colorType
             self.numberLabel.run(fadeIn)
         }
- */
     }
- 
+    
+//    override func selected() {
+//        /*
+//        if let shapeUnselected = childNode(withName: "shapeUnselected") {
+//            shapeUnselected.removeFromParent()
+//        }
+//
+//        let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
+//        let pulseDown = SKAction.scale(to: 1, duration: 0.20)
+//        
+//        let pulse = SKAction.sequence([pulseUp, pulseDown])
+//        
+//        let color = SKAction.colorize(with: colorType, colorBlendFactor: 1, duration: 0.1)
+//        
+//        let shape = SKSpriteNode.init(texture: SharedAssetsManager.sharedInstance.numberTexture, color: colorType, size: self.size)
+//        
+//        shape.name = "shapeSelected"
+//        shape.isUserInteractionEnabled = false
+//        shape.zPosition = 1
+//        addChild(shape)
+//        shape.run(SKAction.sequence([color, SKAction.repeatForever(pulse)]))
+//        let fadeIn = SKAction.fadeAlpha(to: 1, duration: 0.1)
+//        let fadeOut = SKAction.fadeAlpha(to: 0, duration: 0.1)
+//        numberLabel.run(fadeOut) {
+//            self.numberLabel.fontColor = .white
+//            self.numberLabel.run(fadeIn)
+//        }
+// */
+//    }
+//    
+//    override func unselected() {
+//        
+///*        let shapeUnselected = SKSpriteNode.init(texture: SharedAssetsManager.sharedInstance.numberFrozenTexture, color: colorType, size: self.size)
+//        shapeUnselected.name = "shapeUnselected"
+//        shapeUnselected.isUserInteractionEnabled = false
+//        shapeUnselected.zPosition = 1
+//
+//        let color = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.1)
+//        let fadeIn = SKAction.fadeAlpha(to: 1, duration: 0.1)
+//        let fadeOut = SKAction.fadeAlpha(to: 0, duration: 0.1)
+//        let numberScaleBackAction = SKAction.scale(to: 1, duration: 0.15)
+//        if let shp = childNode(withName: "shapeSelected") {
+//            shp.run(numberScaleBackAction)
+//            numberLabel.run(fadeOut) {
+//                shp.run(color, completion: {
+//                    self.numberLabel.fontColor = self.colorType
+//                    self.numberLabel.run(fadeIn)
+//                    shp.removeFromParent()
+//                    self.addChild(shapeUnselected)
+//                })
+//            }
+//        } else {
+//            self.numberLabel.fontColor = self.colorType
+//            self.numberLabel.run(fadeIn)
+//        }
+// */
+//    }
+// 
     
 }
 
@@ -155,7 +204,7 @@ class NumberSpriteNode : Element {
         numberLabel.verticalAlignmentMode = .center
         numberLabel.color = .clear
         numberLabel.isUserInteractionEnabled = false
-        numberLabel.fontColor = .white
+        numberLabel.fontColor = modeColor
         numberLabel.zPosition = 2
         addChild(numberLabel)
     }
@@ -169,6 +218,9 @@ class NumberSpriteNode : Element {
 extension NumberSpriteNode {
     
     override func selected() {
+        if let shp = childNode(withName: "shapeSelected") {
+            shp.removeFromParent()
+        }
         let pulseUp = SKAction.scale(to: 1.3, duration: 0.20)
         let pulseDown = SKAction.scale(to: 1, duration: 0.20)
         let pulse = SKAction.sequence([pulseUp, pulseDown])
@@ -182,13 +234,13 @@ extension NumberSpriteNode {
         let fadeIn = SKAction.fadeAlpha(to: 1, duration: 0.1)
         let fadeOut = SKAction.fadeAlpha(to: 0, duration: 0.1)
         numberLabel.run(fadeOut) {
-            self.numberLabel.fontColor = .white
+            self.numberLabel.fontColor = self.modeColor
             self.numberLabel.run(fadeIn)
         }
     }
     
     override func unselected() {
-        let color = SKAction.colorize(with: .white, colorBlendFactor: 1, duration: 0.1)
+        let color = SKAction.colorize(with: modeColor, colorBlendFactor: 1, duration: 0.1)
         let fadeIn = SKAction.fadeAlpha(to: 1, duration: 0.1)
         let fadeOut = SKAction.fadeAlpha(to: 0, duration: 0.1)
         let numberScaleBackAction = SKAction.scale(to: 1, duration: 0.15)
